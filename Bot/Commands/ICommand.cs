@@ -5,9 +5,9 @@ namespace FinancialAdvisorTelegramBot.Bot.Commands
 {
     public interface ICommand
     {
-        string Name { get; }
-
         virtual bool IsFinished => true;
+
+        bool CanExecute(Update update, TelegramUser user);
 
         Task Execute(Update update, TelegramUser user);
     }

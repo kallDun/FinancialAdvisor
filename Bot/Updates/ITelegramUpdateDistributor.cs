@@ -4,7 +4,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Updates
 {
     public interface ITelegramUpdateDistributor
     {
-        Task TryToSignIn(Update update);
+        Task SignIn(Update update);
 
         Task GetUpdate(Update update);
     }

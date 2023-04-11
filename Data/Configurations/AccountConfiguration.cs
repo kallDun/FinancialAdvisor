@@ -14,7 +14,8 @@ namespace FinancialAdvisorTelegramBot.Data.Configurations
             builder.HasOne(x => x.User)
                 .WithMany(x => x.Accounts)
                 .HasForeignKey(x => x.UserId)
-                .IsRequired();
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.Property(x => x.Id)
                 .HasColumnName("id")
@@ -26,7 +27,7 @@ namespace FinancialAdvisorTelegramBot.Data.Configurations
 
             builder.Property(x => x.Name)
                 .HasColumnName("name")
-                .HasMaxLength(20)
+                .HasMaxLength(100)
                 .IsRequired();
 
             builder.Property(x => x.Description)
@@ -40,12 +41,12 @@ namespace FinancialAdvisorTelegramBot.Data.Configurations
 
             builder.Property(x => x.CreatedAt)
                 .HasColumnName("created_at")
-                .ValueGeneratedOnAdd()
+                .HasColumnType("timestamp with time zone")
                 .IsRequired();
 
             builder.Property(x => x.UpdatedAt)
                 .HasColumnName("updated_at")
-                .ValueGeneratedOnAddOrUpdate();
+                .HasColumnType("timestamp with time zone");
         }
     }
 }

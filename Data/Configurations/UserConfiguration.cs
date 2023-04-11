@@ -11,6 +11,10 @@ namespace FinancialAdvisorTelegramBot.Data.Configurations
             builder.ToTable("users");
             builder.HasKey(x => x.Id);
 
+            builder.HasOne(x => x.TelegramUser)
+                .WithOne(x => x.User)
+                .OnDelete(DeleteBehavior.Cascade);
+
             builder.Property(x => x.Id)
                 .HasColumnName("id")
                 .ValueGeneratedOnAdd();
@@ -30,12 +34,12 @@ namespace FinancialAdvisorTelegramBot.Data.Configurations
 
             builder.Property(x => x.CreatedAt)
                 .HasColumnName("created_at")
-                .ValueGeneratedOnAdd()
+                .HasColumnType("timestamp with time zone")
                 .IsRequired();
 
             builder.Property(x => x.UpdatedAt)
                 .HasColumnName("updated_at")
-                .ValueGeneratedOnAddOrUpdate();
+                .HasColumnType("timestamp with time zone");
         }
     }
 }

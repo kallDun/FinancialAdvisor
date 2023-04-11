@@ -1,44 +1,33 @@
 ﻿using FinancialAdvisorTelegramBot.Models.Telegram;
+using FinancialAdvisorTelegramBot.Services.Telegram;
 using Telegram.Bot.Types;
 
 namespace FinancialAdvisorTelegramBot.Bot.Updates
 {
     public class TelegramUpdateDistributor : ITelegramUpdateDistributor
     {
-        private readonly ITelegramUpdateListenerContainer _listenerContainer;
         private readonly ITelegramAvailableListeners _availableListeners;
+        private readonly ITelegramUserService _telegramUserService;
         private TelegramUser? _user;
 
-        public TelegramUpdateDistributor(ITelegramUpdateListenerContainer listenerContainer, ITelegramAvailableListeners availableListeners)
+        public TelegramUpdateDistributor(ITelegramAvailableListeners availableListeners, ITelegramUserService telegramUserService)
         {
-            _listenerContainer = listenerContainer;
             _availableListeners = availableListeners;
+            _telegramUserService = telegramUserService;
         }
 
-        public async Task TryToSignIn(Update update)
+        public async Task SignIn(Update update)
         {
             if (update.Message is null) return;
-
-            long chatId = update.Message.Chat.Id;
-
-            List<ITelegramUpdateListener>? listeners = _listenerContainer.Listeners.GetValueOrDefault(chatId);
-            if (listeners is null)
-            {
-                _listenerContainer.Listeners.Add(chatId, _availableListeners.Listeners);
-            }
-
-            // TODO: find or create telegram user
-            _user = new();
+            var chat = update.Message.Chat;
+            _user = await _telegramUserService.GetExistingOrCreateNewTelegramUser(chat.Id, chat.Username, chat.FirstName, chat.LastName);
         }
 
         public async Task GetUpdate(Update update)
         {
             if (update.Message is null || _user is null) return;
 
-            long chatId = update.Message.Chat.Id;
-            List<ITelegramUpdateListener>? listeners = _listenerContainer.Listeners.GetValueOrDefault(chatId);
-            if (listeners is null) return;
-            foreach (var listener in listeners)
+            foreach (var listener in _availableListeners.Listeners)
             {
                 await listener.GetUpdate(update, _user);
             }

@@ -3,7 +3,7 @@ using FinancialAdvisorTelegramBot.Bot.Updates;
 
 namespace FinancialAdvisorTelegramBot.Utils
 {
-    public static class ServiceCollectionExtension
+    public static class ServiceCollectionExtensions
     {
         public static IServiceCollection AutomaticAddCommandsFromAssembly(this IServiceCollection services)
         {
@@ -16,10 +16,10 @@ namespace FinancialAdvisorTelegramBot.Utils
 
             foreach (var command in commands)
             {
-                services.AddSingleton(command);
+                services.AddScoped(command);
             }
 
-            services.AddSingleton<ICommandContainer>(
+            services.AddScoped<ICommandContainer>(
                 provider => new CommandContainer(
                     commands.Select(x => (ICommand)provider.GetRequiredService(x))
                     .ToArray()));

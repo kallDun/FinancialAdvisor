@@ -18,9 +18,9 @@ namespace FinancialAdvisorTelegramBot.Bot.Controllers
         }
 
         [HttpPost]
-        public async void Post(Update update)
+        public async Task Post(Update update)
         {
-            await _updateDistributor.TryToSignIn(update);
+            await _updateDistributor.SignIn(update);
             await _updateDistributor.GetUpdate(update);
         }
 

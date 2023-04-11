@@ -1,7 +1,8 @@
 using FinancialAdvisorTelegramBot.Bot;
 using FinancialAdvisorTelegramBot.Bot.Updates;
 using FinancialAdvisorTelegramBot.Data;
-using FinancialAdvisorTelegramBot.Services;
+using FinancialAdvisorTelegramBot.Repositories.Telegram;
+using FinancialAdvisorTelegramBot.Services.Telegram;
 using FinancialAdvisorTelegramBot.Utils;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,23 +17,23 @@ builder.Services.AddScoped<DbContext>(provider => provider.GetRequiredService<Ap
 // telegram
 builder.Services.AddSingleton<IBot, Bot>();
 builder.Services.Configure<BotSettings>(builder.Configuration.GetSection("BotSettings"));
-builder.Services.AddSingleton<ITelegramUpdateListenerContainer, TelegramUpdateListenerContainer>();
 builder.Services.AddScoped<ITelegramUpdateDistributor, TelegramUpdateDistributor>();
 builder.Services.AutomaticAddUpdateListenersFromAssembly();
 builder.Services.AutomaticAddCommandsFromAssembly();
 
 
 // custom
-builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ITelegramUserRepository, TelegramUserRepository>();
+builder.Services.AddScoped<ITelegramUserService, TelegramUserService>();
 
 
 // main services
 builder.Services.AddControllers().AddNewtonsoftJson();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 var app = builder.Build();
-
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

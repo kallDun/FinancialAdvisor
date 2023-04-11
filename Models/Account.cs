@@ -1,4 +1,6 @@
-﻿namespace FinancialAdvisorTelegramBot.Models
+﻿using FinancialAdvisorTelegramBot.Models.Operations;
+
+namespace FinancialAdvisorTelegramBot.Models
 {
     public class Account
     {
@@ -19,5 +21,7 @@
         public DateTime? UpdatedAt { get; set; }
 
         public virtual IList<Transaction>? Transactions { get; set; }
+
+        public virtual IList<Subscription>? Subscriptions { get; set; }
     }
 }
