@@ -12,5 +12,10 @@ namespace FinancialAdvisorTelegramBot.Bot
             BotClient = new TelegramBotClient(options.Value.Token 
                 ?? throw new ArgumentNullException(nameof(options.Value.Token)));
         }
+
+        public async Task Write(string message, long chatId)
+        {
+            await BotClient.SendTextMessageAsync(chatId, message);
+        }
     }
 }

@@ -21,7 +21,6 @@
 
   <ItemGroup>
     <Folder Include="Models\Operations\" />
-    <Folder Include="Models\Telegram\" />
   </ItemGroup>
 
 </Project>

@@ -4,6 +4,8 @@ namespace FinancialAdvisorTelegramBot.Bot
 {
     public interface IBot
     {
-        public TelegramBotClient BotClient { get; }
+        TelegramBotClient BotClient { get; }
+
+        Task Write(string message, long chatId);
     }
 }
