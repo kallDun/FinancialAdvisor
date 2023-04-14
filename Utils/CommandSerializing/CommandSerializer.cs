@@ -22,16 +22,16 @@ namespace FinancialAdvisorTelegramBot.Utils.CommandSerializing
             return serialized.ToString();
         }
 
-        public static void DeserializeInto<T>(string serialized, T command) where T : ICommand
+        public static void Deserialize<T>(string data, T command) where T : ICommand
         {
             Type type = command.GetType();
             var properties = type.GetProperties();
-            string[] serializedProperties = serialized.Split(';');
+            string[] serializedProperties = data.Split(';');
             foreach (var serializedProperty in serializedProperties)
             {
                 string[] serializedPropertyData = serializedProperty.Split('=');
                 string propertyName = serializedPropertyData[0];
-                string propertyValue = serializedPropertyData[1];
+                string? propertyValue = serializedPropertyData.Length > 1 ? serializedPropertyData[1] : null;
                 PropertyInfo? property = properties.FirstOrDefault(p => p.Name == propertyName);
                 if (property is null) continue;
                 object? value = Convert.ChangeType(propertyValue, property.PropertyType);

@@ -13,7 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 // database init
 builder.Services.AddDbContext<AppDbContext>(
     options => options.UseNpgsql(builder.Configuration.GetConnectionString("AppDatabaseConnection")));
-builder.Services.AddSingleton<DbContext>(provider => provider.GetRequiredService<AppDbContext>());
+builder.Services.AddScoped<DbContext>(provider => provider.GetRequiredService<AppDbContext>());
 
 
 // telegram

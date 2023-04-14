@@ -23,10 +23,11 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Profile
         private readonly IBot _bot;
         private readonly IUserService _userService;
 
-        [CommandSerializeData] private CreatingProfileStatus Status;
-        [CommandSerializeData] private string Name = "";
-        [CommandSerializeData] private string? Surname = null;
-        [CommandSerializeData] private string? Email = null;
+        private CreatingProfileStatus _status => (CreatingProfileStatus)Status;
+        [CommandSerializeData] public int Status { get; set; }
+        [CommandSerializeData] public string? Name { get; set; }
+        [CommandSerializeData] public string? Surname { get; set; }
+        [CommandSerializeData] public string? Email { get; set; }
 
         public CreateProfileCommand(IBot bot, IUserService userService)
         {
@@ -41,76 +42,65 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Profile
 
         public async Task Execute(UpdateArgs update, TelegramUser user)
         {
-            try
+            switch (_status)
             {
-                switch (Status)
-                {
-                    case CreatingProfileStatus.AskName:
-                        await _bot.Write(user, new TextMessageArgs
-                        {
-                            Text = $"Write your name:",
-                            HideKeyboard = true
-                        });
-                        break;
+                case CreatingProfileStatus.AskName:
+                    await _bot.Write(user, new TextMessageArgs
+                    {
+                        Text = $"Write your name:",
+                        HideKeyboard = true
+                    });
+                    break;
 
-                    case CreatingProfileStatus.AskLastname:
-                        string name = update.GetTextData().Trim();
-                        if (name.Length > 20) throw new ArgumentOutOfRangeException("Name is too long!");
-                        Name = name;
-                        await _bot.Write(user, new TextMessageArgs 
-                        { 
-                            Text = $"Write your surname:" +
-                            $"\n(you can {GeneralCommands.Skip} this field)" 
-                        });
-                        break;
+                case CreatingProfileStatus.AskLastname:
+                    string name = update.GetTextData().Trim();
+                    if (name.Length > 20) throw new ArgumentOutOfRangeException("Name is too long!");
+                    Name = name;
+                    await _bot.Write(user, new TextMessageArgs
+                    {
+                        Text = $"Write your surname:" +
+                        $"\n(you can {GeneralCommands.Skip} this field)"
+                    });
+                    break;
 
-                    case CreatingProfileStatus.AskEmail:
-                        if (update.GetTextData() != GeneralCommands.Skip)
-                        {
-                            string surname = update.GetTextData().Trim();
-                            if (surname.Length > 20) throw new ArgumentOutOfRangeException("Surname is too long!");
-                            Surname = surname;
-                        }
-                        await _bot.Write(user, new TextMessageArgs
-                        {
-                            Text = $"Write your email:" +
-                            $"\n(you can {GeneralCommands.Skip} this field)"
-                        });
-                        break;
+                case CreatingProfileStatus.AskEmail:
+                    if (update.GetTextData() != GeneralCommands.Skip)
+                    {
+                        string surname = update.GetTextData().Trim();
+                        if (surname.Length > 20) throw new ArgumentOutOfRangeException("Surname is too long!");
+                        Surname = surname;
+                    }
+                    await _bot.Write(user, new TextMessageArgs
+                    {
+                        Text = $"Write your email:" +
+                        $"\n(you can {GeneralCommands.Skip} this field)"
+                    });
+                    break;
 
-                    case CreatingProfileStatus.Finished:
-                        if (update.GetTextData() != GeneralCommands.Skip)
-                        {
-                            string email = update.GetTextData().Trim();
-                            if (email.Length > 50) throw new ArgumentOutOfRangeException("Email is too long!");
-                            if (!Validators.ValidateEmail(email)) throw new ArgumentException("Email is not correct!");
-                            Email = email;
-                        }
+                case CreatingProfileStatus.Finished:
+                    if (update.GetTextData() != GeneralCommands.Skip)
+                    {
+                        string email = update.GetTextData().Trim();
+                        if (email.Length > 50) throw new ArgumentOutOfRangeException("Email is too long!");
+                        if (!Validators.ValidateEmail(email)) throw new ArgumentException("Email is not correct!");
+                        Email = email;
+                    }
 
-                        User profile = await _userService.Create(user, Name, Surname, Email);
-                        await _bot.Write(user, new TextMessageArgs
-                        {
-                            Text = $"Profile for {profile.FirstName}" + 
-                            $"{(profile.LastName is null ? "" : " ")}{profile.LastName} was created!"
-                        });
-                        break;
-                }
-                if (Status is CreatingProfileStatus.Finished)
-                {
-                    IsFinished = true;
-                }
-                else
-                {
-                    Status += 1;
-                }
+                    User profile = await _userService.Create(user, Name, Surname, Email);
+                    await _bot.Write(user, new TextMessageArgs
+                    {
+                        Text = $"Profile for {profile.FirstName}" +
+                        $"{(profile.LastName is null ? "" : " ")}{profile.LastName} was created!"
+                    });
+                    break;
             }
-            catch (Exception e)
+            if (_status is CreatingProfileStatus.Finished)
             {
-                await _bot.Write(user, new TextMessageArgs
-                {
-                    Text = $"Could not create profile. {e.Message}"
-                });
                 IsFinished = true;
+            }
+            else
+            {
+                Status += 1;
             }
         }
     }

@@ -1,4 +1,5 @@
 ﻿using FinancialAdvisorTelegramBot.Bot.Args;
+using FinancialAdvisorTelegramBot.Bot.ReplyArgs;
 using FinancialAdvisorTelegramBot.Bot.Updates;
 using Microsoft.AspNetCore.Mvc;
 using Telegram.Bot.Types;
@@ -22,8 +23,19 @@ namespace FinancialAdvisorTelegramBot.Bot.Controllers
         public async Task Post(Update update)
         {
             UpdateArgs updateArgs = new(update);
-            await _updateDistributor.SignIn(updateArgs);
-            await _updateDistributor.GetUpdate(updateArgs);
+            try
+            {
+                await _updateDistributor.SignIn(updateArgs);
+                await _updateDistributor.GetUpdate(updateArgs);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Something went wrong in user {updateArgs.From.Username}: " + e);
+                await _bot.WriteByChatId(updateArgs.ChatId, new TextMessageArgs
+                {
+                    Text = $"Something went wrong: {e.Message}"
+                });
+            }
         }
 
         [HttpGet]

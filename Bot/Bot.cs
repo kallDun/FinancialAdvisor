@@ -18,7 +18,7 @@ namespace FinancialAdvisorTelegramBot.Bot
                 ?? throw new ArgumentNullException(nameof(options.Value.Token)));
         }
 
-        public async Task Write(TelegramUser user, TextMessageArgs messageArgs)
+        public async Task WriteByChatId(long chatId, TextMessageArgs messageArgs)
         {
             try
             {
@@ -27,7 +27,7 @@ namespace FinancialAdvisorTelegramBot.Bot
 
                 foreach (string message in messages)
                 {
-                    await BotClient.SendTextMessageAsync(user.ChatId, message,
+                    await BotClient.SendTextMessageAsync(chatId, message,
                         parseMode: messageArgs.ParseMode,
                         replyMarkup: messageArgs.HideKeyboard ? new ReplyKeyboardRemove() : null,
                         disableWebPagePreview: messageArgs.DisableWebPagePreview);
@@ -39,6 +39,11 @@ namespace FinancialAdvisorTelegramBot.Bot
                 Console.WriteLine("Exception occured in 'Write' botMessage method: " + e.Message);
                 //Logger.Log($"Exception occured in 'Write' bot method in user '{user?.Username}': " + e.Message);
             }
+        }
+
+        public async Task Write(TelegramUser user, TextMessageArgs messageArgs)
+        {
+            await WriteByChatId(user.ChatId, messageArgs);
         }
 
         public async Task SendInlineKeyboard(TelegramUser user, InlineKeyboardArgs keyboardArgs)

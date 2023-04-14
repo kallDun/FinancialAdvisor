@@ -23,5 +23,7 @@ namespace FinancialAdvisorTelegramBot.Models.Telegram
         public DateTime? CreatedAt { get; set; }
 
         public DateTime? UpdatedAt { get; set; }
+
+        public virtual TelegramUserView? CurrentView { get; set; }
     }
 }

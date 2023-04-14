@@ -8,6 +8,8 @@ namespace FinancialAdvisorTelegramBot.Bot
     {
         TelegramBotClient BotClient { get; }
 
+        Task WriteByChatId(long chatId, TextMessageArgs messageArgs);
+
         Task Write(TelegramUser user, TextMessageArgs messageArgs);
 
         Task SendInlineKeyboard(TelegramUser user, InlineKeyboardArgs keyboardArgs);

@@ -19,7 +19,7 @@ namespace FinancialAdvisorTelegramBot.Data
             //Database.EnsureDeleted();
             Database.EnsureCreated();
         }
-
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

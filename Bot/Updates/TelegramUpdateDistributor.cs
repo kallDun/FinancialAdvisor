@@ -26,7 +26,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Updates
 
         public async Task GetUpdate(UpdateArgs update)
         {
-            if (update.Message is null || _user is null) return;
+            if (_user is null) return;
 
             foreach (var listener in _availableListeners.Listeners)
             {
