@@ -2,9 +2,9 @@
 {
     public interface IReadonlyRepository<T>
     {
-        Task<IList<T>> GetAll();   
+        Task<IList<T>> GetAll(); 
         
-        Task<T?> Get(int id);
+        Task<T?> GetById(int id);
 
         Task<int> Add(T entity);
     }

@@ -4,6 +4,7 @@ namespace FinancialAdvisorTelegramBot.Services.Telegram
 {
     public interface ITelegramUserService
     {
-        Task<TelegramUser> GetExistingOrCreateNewTelegramUser(long chatId, string? username, string? firstName, string? lastName);
+        Task<TelegramUser> GetExistingOrCreateNewTelegramUser(long chatId, long telegramId,
+            string? username, string? firstName, string? lastName);
     }
 }

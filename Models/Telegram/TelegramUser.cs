@@ -1,10 +1,14 @@
-﻿namespace FinancialAdvisorTelegramBot.Models.Telegram
+﻿using FinancialAdvisorTelegramBot.Models.Core;
+
+namespace FinancialAdvisorTelegramBot.Models.Telegram
 {
     public class TelegramUser
     {
         public int Id { get; set; }
         
         public long ChatId { get; set; }
+
+        public long TelegramId { get; set; }
 
         public int? UserId { get; set; }
 

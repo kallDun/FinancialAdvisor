@@ -12,20 +12,22 @@ namespace FinancialAdvisorTelegramBot.Services.Telegram
             _telegramUserRepository = telegramUserRepository;
         }
 
-        public async Task<TelegramUser> GetExistingOrCreateNewTelegramUser(long chatId, string? username, string? firstName, string? lastName)
+        public async Task<TelegramUser> GetExistingOrCreateNewTelegramUser(long chatId, long telegramId,
+            string? username, string? firstName, string? lastName)
         {
-            TelegramUser? telegramUser = await _telegramUserRepository.GetByChatId(chatId);
+            TelegramUser? telegramUser = await _telegramUserRepository.GetByTelegramId(telegramId);
             if (telegramUser == null)
             {
                 telegramUser = new TelegramUser
                 {
                     ChatId = chatId,
+                    TelegramId = telegramId,
                     Username = username,
                     FirstName = firstName,
                     LastName = lastName
                 };
                 int id = await _telegramUserRepository.Add(telegramUser);
-                telegramUser = await _telegramUserRepository.Get(id);
+                telegramUser = await _telegramUserRepository.GetById(id);
                 if (telegramUser == null)
                 {
                     throw new Exception("Telegram user was not created");

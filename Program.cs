@@ -1,7 +1,9 @@
 using FinancialAdvisorTelegramBot.Bot;
 using FinancialAdvisorTelegramBot.Bot.Updates;
 using FinancialAdvisorTelegramBot.Data;
+using FinancialAdvisorTelegramBot.Repositories.Core;
 using FinancialAdvisorTelegramBot.Repositories.Telegram;
+using FinancialAdvisorTelegramBot.Services.Core;
 using FinancialAdvisorTelegramBot.Services.Telegram;
 using FinancialAdvisorTelegramBot.Utils;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 // database init
 builder.Services.AddDbContext<AppDbContext>(
     options => options.UseNpgsql(builder.Configuration.GetConnectionString("AppDatabaseConnection")));
-builder.Services.AddScoped<DbContext>(provider => provider.GetRequiredService<AppDbContext>());
+builder.Services.AddSingleton<DbContext>(provider => provider.GetRequiredService<AppDbContext>());
 
 
 // telegram
@@ -25,6 +27,8 @@ builder.Services.AutomaticAddCommandsFromAssembly();
 // custom
 builder.Services.AddScoped<ITelegramUserRepository, TelegramUserRepository>();
 builder.Services.AddScoped<ITelegramUserService, TelegramUserService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 
 // main services

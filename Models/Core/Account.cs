@@ -1,6 +1,8 @@
-﻿namespace FinancialAdvisorTelegramBot.Models
+﻿using FinancialAdvisorTelegramBot.Models.Operations;
+
+namespace FinancialAdvisorTelegramBot.Models.Core
 {
-    public class Category
+    public class Account
     {
         public int Id { get; set; }
 
@@ -12,10 +14,14 @@
 
         public string? Description { get; set; }
 
+        public decimal CurrentBalance { get; set; }
+
         public DateTime CreatedAt { get; set; }
 
         public DateTime? UpdatedAt { get; set; }
-        
-        public virtual IList<Transaction>? Transactions { get; internal set; }
+
+        public virtual IList<Transaction>? Transactions { get; set; }
+
+        public virtual IList<Subscription>? Subscriptions { get; set; }
     }
 }

@@ -1,14 +1,23 @@
-﻿using FinancialAdvisorTelegramBot.Models.Telegram;
-using Telegram.Bot.Types;
+﻿using FinancialAdvisorTelegramBot.Bot.Args;
+using FinancialAdvisorTelegramBot.Models.Telegram;
 
 namespace FinancialAdvisorTelegramBot.Bot.Commands
 {
     public interface ICommand
     {
-        virtual bool IsFinished => true;
+        static string? COMMAND_TEXT_STYLE { get; }
 
-        bool CanExecute(Update update, TelegramUser user);
+        static string? COMMAND_DEFAULT_STYLE { get; }
 
-        Task Execute(Update update, TelegramUser user);
+        bool IsFinished => true;
+
+        bool CanExecute(UpdateArgs update, TelegramUser user);
+
+        Task Execute(UpdateArgs update, TelegramUser user);
+
+        bool IsCanceled(UpdateArgs update)
+        {
+            return update.GetTextData() == GeneralCommands.Cancel;
+        }
     }
 }

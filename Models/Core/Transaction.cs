@@ -1,6 +1,6 @@
 ﻿using FinancialAdvisorTelegramBot.Models.Operations;
 
-namespace FinancialAdvisorTelegramBot.Models
+namespace FinancialAdvisorTelegramBot.Models.Core
 {
     public class Transaction
     {
@@ -17,7 +17,7 @@ namespace FinancialAdvisorTelegramBot.Models
         public string? Communicator { get; set; }
 
         public int CategoryId { get; set; }
-        
+
         public virtual Category? Category { get; set; }
 
         public DateTime TransactionTime { get; set; }

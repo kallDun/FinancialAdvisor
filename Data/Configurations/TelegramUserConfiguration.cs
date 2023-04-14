@@ -25,6 +25,10 @@ namespace FinancialAdvisorTelegramBot.Data.Configurations
                 .HasColumnName("chat_id")
                 .IsRequired();
 
+            builder.Property(x => x.TelegramId)
+                .HasColumnName("telegram_id")
+                .IsRequired();
+
             builder.Property(x => x.UserId)
                 .HasColumnName("user_id");
             

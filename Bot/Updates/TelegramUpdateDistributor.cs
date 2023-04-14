@@ -1,6 +1,6 @@
-﻿using FinancialAdvisorTelegramBot.Models.Telegram;
+﻿using FinancialAdvisorTelegramBot.Bot.Args;
+using FinancialAdvisorTelegramBot.Models.Telegram;
 using FinancialAdvisorTelegramBot.Services.Telegram;
-using Telegram.Bot.Types;
 
 namespace FinancialAdvisorTelegramBot.Bot.Updates
 {
@@ -16,14 +16,15 @@ namespace FinancialAdvisorTelegramBot.Bot.Updates
             _telegramUserService = telegramUserService;
         }
 
-        public async Task SignIn(Update update)
+        public async Task SignIn(UpdateArgs update)
         {
-            if (update.Message is null) return;
-            var chat = update.Message.Chat;
-            _user = await _telegramUserService.GetExistingOrCreateNewTelegramUser(chat.Id, chat.Username, chat.FirstName, chat.LastName);
+            if (update.From is null) return;
+            _user = await _telegramUserService.GetExistingOrCreateNewTelegramUser(
+                update.ChatId, update.From.Id, update.From.Username, 
+                update.From.FirstName, update.From.LastName);
         }
 
-        public async Task GetUpdate(Update update)
+        public async Task GetUpdate(UpdateArgs update)
         {
             if (update.Message is null || _user is null) return;
 

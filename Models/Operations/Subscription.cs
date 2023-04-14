@@ -1,4 +1,6 @@
-﻿namespace FinancialAdvisorTelegramBot.Models.Operations
+﻿using FinancialAdvisorTelegramBot.Models.Core;
+
+namespace FinancialAdvisorTelegramBot.Models.Operations
 {
     public class Subscription
     {

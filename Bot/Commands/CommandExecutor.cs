@@ -1,7 +1,7 @@
-﻿using FinancialAdvisorTelegramBot.Bot.Updates;
+﻿using FinancialAdvisorTelegramBot.Bot.Args;
+using FinancialAdvisorTelegramBot.Bot.Updates;
 using FinancialAdvisorTelegramBot.Bot.Views;
 using FinancialAdvisorTelegramBot.Models.Telegram;
-using Telegram.Bot.Types;
 
 namespace FinancialAdvisorTelegramBot.Bot.Commands
 {
@@ -18,22 +18,27 @@ namespace FinancialAdvisorTelegramBot.Bot.Commands
             if (_storage == null) _storage = new();
         }
 
-        public async Task GetUpdate(Update update, TelegramUser user)
+        public async Task GetUpdate(UpdateArgs update, TelegramUser user)
         {
-            if (_storage == null || update?.Message == null) return;
-            CommandExecutorData data = _storage.GetById(update.Message.Chat.Id);
+            if (_storage == null) return;
+            CommandExecutorData data = _storage.GetById(update.From.Id);
 
             if (data.CurrentCommand == null || data.CurrentCommand.IsFinished)
             {
                 data.CurrentCommand = GetCommand(update, user);
             }
+            else if (data.CurrentCommand.IsCanceled(update))
+            {
+                data.CurrentCommand = _defaultHelpCommand;
+            }
+            
             if (data.CurrentCommand != null)
             {
                 await data.CurrentCommand.Execute(update, user);
             }
         }
 
-        private ICommand? GetCommand(Update update, TelegramUser user)
+        private ICommand? GetCommand(UpdateArgs update, TelegramUser user)
         {
             foreach (var command in _commandContainer.Commands)
             {

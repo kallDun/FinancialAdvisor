@@ -1,4 +1,4 @@
-﻿using FinancialAdvisorTelegramBot.Models;
+﻿using FinancialAdvisorTelegramBot.Models.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -19,8 +19,8 @@ namespace FinancialAdvisorTelegramBot.Data.Configurations
                 .HasColumnName("id")
                 .ValueGeneratedOnAdd();
 
-            builder.Property(x => x.Name)
-                .HasColumnName("name")
+            builder.Property(x => x.FirstName)
+                .HasColumnName("first_name")
                 .HasMaxLength(20)
                 .IsRequired();
 

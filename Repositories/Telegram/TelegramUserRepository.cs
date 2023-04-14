@@ -27,7 +27,7 @@ namespace FinancialAdvisorTelegramBot.Repositories.Telegram
             await _context.SaveChangesAsync();
         }
 
-        public async Task<TelegramUser?> Get(int id)
+        public async Task<TelegramUser?> GetById(int id)
         {
             return await _context.TelegramUsers.FindAsync(id);
         }
@@ -37,9 +37,9 @@ namespace FinancialAdvisorTelegramBot.Repositories.Telegram
             return await _context.TelegramUsers.ToListAsync();
         }
 
-        public async Task<TelegramUser?> GetByChatId(long chatId)
+        public async Task<TelegramUser?> GetByTelegramId(long telegramId)
         {
-            return await _context.TelegramUsers.FirstOrDefaultAsync(x => x.ChatId == chatId);
+            return await _context.TelegramUsers.FirstOrDefaultAsync(x => x.TelegramId == telegramId);
         }
 
         public async Task<TelegramUser> Update(TelegramUser entity)

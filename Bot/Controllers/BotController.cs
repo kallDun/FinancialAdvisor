@@ -1,4 +1,5 @@
-﻿using FinancialAdvisorTelegramBot.Bot.Updates;
+﻿using FinancialAdvisorTelegramBot.Bot.Args;
+using FinancialAdvisorTelegramBot.Bot.Updates;
 using Microsoft.AspNetCore.Mvc;
 using Telegram.Bot.Types;
 
@@ -20,8 +21,9 @@ namespace FinancialAdvisorTelegramBot.Bot.Controllers
         [HttpPost]
         public async Task Post(Update update)
         {
-            await _updateDistributor.SignIn(update);
-            await _updateDistributor.GetUpdate(update);
+            UpdateArgs updateArgs = new(update);
+            await _updateDistributor.SignIn(updateArgs);
+            await _updateDistributor.GetUpdate(updateArgs);
         }
 
         [HttpGet]

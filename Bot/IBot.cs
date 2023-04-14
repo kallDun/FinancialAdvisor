@@ -1,4 +1,6 @@
-﻿using Telegram.Bot;
+﻿using FinancialAdvisorTelegramBot.Bot.ReplyArgs;
+using FinancialAdvisorTelegramBot.Models.Telegram;
+using Telegram.Bot;
 
 namespace FinancialAdvisorTelegramBot.Bot
 {
@@ -6,6 +8,8 @@ namespace FinancialAdvisorTelegramBot.Bot
     {
         TelegramBotClient BotClient { get; }
 
-        Task Write(string message, long chatId);
+        Task Write(TelegramUser user, TextMessageArgs messageArgs);
+
+        Task SendInlineKeyboard(TelegramUser user, InlineKeyboardArgs keyboardArgs);
     }
 }

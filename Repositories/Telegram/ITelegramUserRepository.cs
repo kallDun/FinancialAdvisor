@@ -4,6 +4,6 @@ namespace FinancialAdvisorTelegramBot.Repositories.Telegram
 {
     public interface ITelegramUserRepository : IRepository<TelegramUser>
     {
-        Task<TelegramUser?> GetByChatId(long chatId);
+        Task<TelegramUser?> GetByTelegramId(long telegramId);
     }
 }

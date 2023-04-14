@@ -1,4 +1,4 @@
-﻿using FinancialAdvisorTelegramBot.Models;
+﻿using FinancialAdvisorTelegramBot.Models.Core;
 using FinancialAdvisorTelegramBot.Models.Operations;
 using FinancialAdvisorTelegramBot.Models.Telegram;
 using Microsoft.EntityFrameworkCore;
@@ -16,7 +16,7 @@ namespace FinancialAdvisorTelegramBot.Data
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) 
         {
-            Database.EnsureDeleted();
+            //Database.EnsureDeleted();
             Database.EnsureCreated();
         }
 

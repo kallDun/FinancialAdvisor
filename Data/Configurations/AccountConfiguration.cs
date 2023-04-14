@@ -1,4 +1,4 @@
-﻿using FinancialAdvisorTelegramBot.Models;
+﻿using FinancialAdvisorTelegramBot.Models.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
