@@ -13,7 +13,7 @@ namespace FinancialAdvisorTelegramBot.Utils.CommandSerializing
             StringBuilder serialized = new();
             foreach (PropertyInfo property in properties)
             {
-                object[] attributes = property.GetCustomAttributes(typeof(CommandSerializeDataAttribute), true);
+                object[] attributes = property.GetCustomAttributes(typeof(CommandPropertySerializableAttribute), true);
                 if (attributes.Length == 0) continue;
                 object? value = property.GetValue(command);
                 //if (value is null) continue;

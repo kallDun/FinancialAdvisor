@@ -5,9 +5,9 @@ namespace FinancialAdvisorTelegramBot.Bot.Commands
 {
     public interface ICommand
     {
-        static string? COMMAND_TEXT_STYLE { get; }
+        static string? TEXT_STYLE { get; }
 
-        static string? COMMAND_DEFAULT_STYLE { get; }
+        static string? DEFAULT_STYLE { get; }
 
         bool IsFinished => true;
 
