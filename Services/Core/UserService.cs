@@ -37,11 +37,8 @@ namespace FinancialAdvisorTelegramBot.Services.Core
             await _repository.Delete(user);
         }
         
-        public async Task<User> Update(User user, string first_name, string? last_name, string? email)
+        public async Task<User> Update(User user)
         {
-            user.FirstName = first_name;
-            user.LastName = last_name;
-            user.Email = email;
             return await _repository.Update(user);
         }
     }

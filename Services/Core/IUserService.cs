@@ -9,7 +9,7 @@ namespace FinancialAdvisorTelegramBot.Services.Core
 
         Task<User> Create(TelegramUser telegramUser, string first_name, string? last_name, string? email);
 
-        Task<User> Update(User user, string first_name, string? last_name, string? email);
+        Task<User> Update(User user);
 
         Task Delete(User user);
     }

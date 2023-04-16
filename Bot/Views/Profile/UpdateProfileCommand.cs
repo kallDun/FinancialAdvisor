@@ -124,7 +124,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Profile
                         if (!SkipName) profile.FirstName = Name;
                         if (!SkipSurname) profile.LastName = Surname;
                         if (!SkipEmail) profile.Email = Email;
-                        //await _userService.Update(profile);
+                        await _userService.Update(profile);
 
                         await _bot.Write(user, new TextMessageArgs
                         {
