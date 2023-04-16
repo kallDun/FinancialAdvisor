@@ -27,6 +27,13 @@ namespace FinancialAdvisorTelegramBot.Repositories.Core
             await _context.SaveChangesAsync();
         }
 
+        public async Task DeleteById(int userId)
+        {
+            _context.Users.Remove(_context.Users.Find(userId) 
+                ?? throw new NullReferenceException("User not found"));
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<User?> GetById(int id)
         {
             return await _context.Users.FindAsync(id);
@@ -37,12 +44,11 @@ namespace FinancialAdvisorTelegramBot.Repositories.Core
             return await _context.Users.ToListAsync();
         }
 
-        public async Task<User> Update(User entity)
+        public async Task Update(User entity)
         {
             entity.UpdatedAt = DateTime.Now;
             _context.Users.Update(entity);
             await _context.SaveChangesAsync();
-            return entity;
         }
     }
 }

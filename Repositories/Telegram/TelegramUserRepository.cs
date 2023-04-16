@@ -46,12 +46,11 @@ namespace FinancialAdvisorTelegramBot.Repositories.Telegram
                 .FirstOrDefaultAsync(x => x.TelegramId == telegramId);
         }
 
-        public async Task<TelegramUser> Update(TelegramUser entity)
+        public async Task Update(TelegramUser entity)
         {
             entity.UpdatedAt = DateTime.Now;
             _context.TelegramUsers.Update(entity);
             await _context.SaveChangesAsync();
-            return entity;
         }
     }
 }

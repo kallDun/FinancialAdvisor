@@ -11,5 +11,7 @@ namespace FinancialAdvisorTelegramBot.Services.Telegram
         Task SaveCurrentCommand(TelegramUser user, ICommand? command);
         
         ICommand? GetCurrentCommand(TelegramUser user);
+
+        /*Task DeleteProfile(TelegramUser user);*/
     }
 }

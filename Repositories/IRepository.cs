@@ -2,7 +2,7 @@
 {
     public interface IRepository<T> : IReadonlyRepository<T>
     {
-        Task<T> Update(T entity);
+        Task Update(T entity);
         
         Task Delete(T entity);
     }

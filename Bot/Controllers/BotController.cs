@@ -1,5 +1,4 @@
 ﻿using FinancialAdvisorTelegramBot.Bot.Args;
-using FinancialAdvisorTelegramBot.Bot.ReplyArgs;
 using FinancialAdvisorTelegramBot.Bot.Updates;
 using Microsoft.AspNetCore.Mvc;
 using Telegram.Bot.Types;
@@ -23,6 +22,10 @@ namespace FinancialAdvisorTelegramBot.Bot.Controllers
         public async Task Post(Update update)
         {
             UpdateArgs updateArgs = new(update);
+            await _bot.WriteByChatId(updateArgs.ChatId, new TextMessageArgs
+            {
+                Text = updateArgs.GetTextData()
+            });
             try
             {
                 await _updateDistributor.SignIn(updateArgs);

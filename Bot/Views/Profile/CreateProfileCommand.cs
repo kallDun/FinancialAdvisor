@@ -1,6 +1,5 @@
 ﻿using FinancialAdvisorTelegramBot.Bot.Args;
 using FinancialAdvisorTelegramBot.Bot.Commands;
-using FinancialAdvisorTelegramBot.Bot.ReplyArgs;
 using FinancialAdvisorTelegramBot.Models.Core;
 using FinancialAdvisorTelegramBot.Models.Telegram;
 using FinancialAdvisorTelegramBot.Services.Core;
@@ -16,18 +15,19 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Profile
             AskName, AskLastname, AskEmail, Finished
         }
 
-        public static string COMMAND_TEXT_STYLE => "New profile";
-        public static string COMMAND_DEFAULT_STYLE => "/profile_create";
+        public static string TEXT_STYLE => "New profile";
+        public static string DEFAULT_STYLE => "/profile_create";
         public virtual bool IsFinished { get; private set; } = false;
 
-        private readonly IBot _bot;
-        private readonly IUserService _userService;
+        [CommandPropertySerializable] public int Status { get; set; }
+        [CommandPropertySerializable] public string Name { get; set; } = "";
+        [CommandPropertySerializable] public string? Surname { get; set; }
+        [CommandPropertySerializable] public string? Email { get; set; }
 
         private CreatingProfileStatus _status => (CreatingProfileStatus)Status;
-        [CommandSerializeData] public int Status { get; set; }
-        [CommandSerializeData] public string? Name { get; set; }
-        [CommandSerializeData] public string? Surname { get; set; }
-        [CommandSerializeData] public string? Email { get; set; }
+        
+        private readonly IBot _bot;
+        private readonly IUserService _userService;
 
         public CreateProfileCommand(IBot bot, IUserService userService)
         {
@@ -36,8 +36,8 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Profile
         }
 
         public bool CanExecute(UpdateArgs update, TelegramUser user)
-            => (update.GetTextData() == COMMAND_DEFAULT_STYLE 
-            || update.GetTextData() == COMMAND_TEXT_STYLE)
+            => (update.GetTextData() == DEFAULT_STYLE 
+            || update.GetTextData() == TEXT_STYLE)
             && user.UserId is null;
 
         public async Task Execute(UpdateArgs update, TelegramUser user)
@@ -45,62 +45,67 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Profile
             switch (_status)
             {
                 case CreatingProfileStatus.AskName:
+                    
                     await _bot.Write(user, new TextMessageArgs
                     {
-                        Text = $"Write your name:",
-                        HideKeyboard = true
+                        Text = $"Write your name:"
                     });
-                    break;
+
+                    Status++;
+                    return;
+
 
                 case CreatingProfileStatus.AskLastname:
+                    
                     string name = update.GetTextData().Trim();
-                    if (name.Length > 20) throw new ArgumentOutOfRangeException("Name is too long!");
+                    Validators.ValidateName(name);
                     Name = name;
                     await _bot.Write(user, new TextMessageArgs
                     {
                         Text = $"Write your surname:" +
-                        $"\n(you can {GeneralCommands.Skip} this field)"
+                        $"\n(you can {GeneralCommands.SetEmpty} this field)"
                     });
-                    break;
+
+                    Status++;
+                    return;
+
 
                 case CreatingProfileStatus.AskEmail:
-                    if (update.GetTextData() != GeneralCommands.Skip)
+                    
+                    if (update.GetTextData() != GeneralCommands.SetEmpty)
                     {
                         string surname = update.GetTextData().Trim();
-                        if (surname.Length > 20) throw new ArgumentOutOfRangeException("Surname is too long!");
+                        Validators.ValidateName(surname);
                         Surname = surname;
                     }
                     await _bot.Write(user, new TextMessageArgs
                     {
                         Text = $"Write your email:" +
-                        $"\n(you can {GeneralCommands.Skip} this field)"
+                        $"\n(you can {GeneralCommands.SetEmpty} this field)"
                     });
-                    break;
+
+                    Status++;
+                    return;
+
 
                 case CreatingProfileStatus.Finished:
-                    if (update.GetTextData() != GeneralCommands.Skip)
+                    
+                    if (update.GetTextData() != GeneralCommands.SetEmpty)
                     {
                         string email = update.GetTextData().Trim();
-                        if (email.Length > 50) throw new ArgumentOutOfRangeException("Email is too long!");
-                        if (!Validators.ValidateEmail(email)) throw new ArgumentException("Email is not correct!");
+                        Validators.ValidateEmail(email); 
                         Email = email;
                     }
-
+                    
                     User profile = await _userService.Create(user, Name, Surname, Email);
                     await _bot.Write(user, new TextMessageArgs
                     {
-                        Text = $"Profile for {profile.FirstName}" +
-                        $"{(profile.LastName is null ? "" : " ")}{profile.LastName} was created!"
+                        Text = $"{profile.FirstName}'s profile has been created!",
+                        MarkupType = ReplyMarkupType.KeyboardRemove
                     });
-                    break;
-            }
-            if (_status is CreatingProfileStatus.Finished)
-            {
-                IsFinished = true;
-            }
-            else
-            {
-                Status += 1;
+                    
+                    IsFinished = true;
+                    return;
             }
         }
     }

@@ -27,10 +27,8 @@ namespace FinancialAdvisorTelegramBot.Bot.Args
             From = Message?.From ?? CallbackQuery?.From ?? throw new ArgumentNullException(nameof(update));
             ChatId = Message?.Chat.Id ?? CallbackQuery?.Message?.Chat.Id ?? throw new ArgumentNullException(nameof(update));
         }
-        
-        public string GetTextData()
-        {
-            return Message?.Text ?? CallbackQuery?.Data ?? string.Empty;
-        }
+
+        public string GetTextData() 
+            => Message?.Text ?? CallbackQuery?.Data ?? throw new ArgumentNullException(nameof(Message));
     }
 }

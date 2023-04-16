@@ -47,7 +47,7 @@ namespace FinancialAdvisorTelegramBot.Services.Telegram
                 telegramUser.Username = username;
                 telegramUser.FirstName = firstName;
                 telegramUser.LastName = lastName;
-                return await _telegramUserRepository.Update(telegramUser);
+                await _telegramUserRepository.Update(telegramUser);
             }
 
             return telegramUser;
@@ -58,7 +58,7 @@ namespace FinancialAdvisorTelegramBot.Services.Telegram
             if (command != null)
             {
                 string commandType = command.GetType().ToString();
-                string commandData = CommandSerializer.Serialize(command);
+                string commandData = CommandDataSerializer.Serialize(command);
                 if (user.CurrentView == null)
                 {
                     user.CurrentView = new TelegramUserView
@@ -95,9 +95,15 @@ namespace FinancialAdvisorTelegramBot.Services.Telegram
             }
             if (currentCommand != null)
             {
-                CommandSerializer.Deserialize(user.CurrentView?.CurrentCommandData ?? string.Empty, currentCommand);
+                CommandDataSerializer.Deserialize(user.CurrentView?.CurrentCommandData ?? string.Empty, currentCommand);
             }
             return currentCommand;
         }
+
+        /*public async Task DeleteProfile(TelegramUser user)
+        {
+            user.UserId = null;
+            await _telegramUserRepository.Update(user);
+        }*/
     }
 }

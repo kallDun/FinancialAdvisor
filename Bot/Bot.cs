@@ -1,9 +1,8 @@
-﻿using FinancialAdvisorTelegramBot.Bot.ReplyArgs;
+﻿using FinancialAdvisorTelegramBot.Bot.Args;
 using FinancialAdvisorTelegramBot.Models.Telegram;
 using FinancialAdvisorTelegramBot.Utils;
 using Microsoft.Extensions.Options;
 using Telegram.Bot;
-using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace FinancialAdvisorTelegramBot.Bot
@@ -18,19 +17,35 @@ namespace FinancialAdvisorTelegramBot.Bot
                 ?? throw new ArgumentNullException(nameof(options.Value.Token)));
         }
 
+        public async Task Write(TelegramUser user, TextMessageArgs messageArgs)
+        {
+            await WriteByChatId(user.ChatId, messageArgs);
+        }
+
+        
         public async Task WriteByChatId(long chatId, TextMessageArgs messageArgs)
         {
             try
             {
                 List<string> messages = new();
                 MessagesExtensions.SplitMessage(messageArgs.Text, ref messages);
-
-                foreach (string message in messages)
+                IReplyMarkup? replyMarkup = GetReplyMarkupFromMessageArgs(messageArgs);
+                
+                for (int i = 0; i < messages.Count; i++)
                 {
-                    await BotClient.SendTextMessageAsync(chatId, message,
-                        parseMode: messageArgs.ParseMode,
-                        replyMarkup: messageArgs.HideKeyboard ? new ReplyKeyboardRemove() : null,
-                        disableWebPagePreview: messageArgs.DisableWebPagePreview);
+                    if (i != messages.Count - 1)
+                    {
+                        await BotClient.SendTextMessageAsync(chatId, messages[i],
+                            parseMode: messageArgs.ParseMode,
+                            disableWebPagePreview: messageArgs.DisableWebPagePreview);
+                    }
+                    else
+                    {
+                        await BotClient.SendTextMessageAsync(chatId, messages[i],
+                            parseMode: messageArgs.ParseMode,
+                            disableWebPagePreview: messageArgs.DisableWebPagePreview, 
+                            replyMarkup: replyMarkup);
+                    }
                 }
                 //Logger.Log($"Bot replied to user {user.Username} with: {messageArgs.Text}");
             }
@@ -41,30 +56,37 @@ namespace FinancialAdvisorTelegramBot.Bot
             }
         }
 
-        public async Task Write(TelegramUser user, TextMessageArgs messageArgs)
-        {
-            await WriteByChatId(user.ChatId, messageArgs);
-        }
 
-        public async Task SendInlineKeyboard(TelegramUser user, InlineKeyboardArgs keyboardArgs)
+        private IReplyMarkup? GetReplyMarkupFromMessageArgs(TextMessageArgs messageArgs)
         {
-            try
+            if (messageArgs.MarkupType == ReplyMarkupType.InlineKeyboard)
             {
-                ReplyKeyboardMarkup replyKeyboardMarkup = new(keyboardArgs.Buttons.Select(x => new KeyboardButton[] { new KeyboardButton(x) }))
-                {
-                    ResizeKeyboard = keyboardArgs.ResizeKeyboard,
-                    InputFieldPlaceholder = keyboardArgs.Placeholder,
-                    OneTimeKeyboard = keyboardArgs.OneTimeKeyboard
-                };
-                await BotClient.SendTextMessageAsync(user.ChatId, keyboardArgs.Text,
-                    replyMarkup: replyKeyboardMarkup,
-                    parseMode: ParseMode.Html);
-                //Logger.Log($"Bot created inline keyboard for user '{user.Username}' with next buttons: {string.Join(", ", keyboardArgs.Buttons)}");
+                InlineKeyboardMarkup inlineKeyboardButton = new(messageArgs.InlineKeyboardButtons
+                    .Select(list => list.Select(item => InlineKeyboardButton.WithCallbackData(item.Text, item.CallbackData))));
+                return inlineKeyboardButton;
             }
-            catch (Exception e)
+            else if (messageArgs.MarkupType == ReplyMarkupType.ReplyKeyboard)
             {
-                Console.WriteLine("Exception occured in 'SendInlineKeyboard' botMessage method: " + e.Message);
-                //Logger.Log($"Exception occured in 'SendInlineKeyboard' bot method in user '{user?.Username}': " + e.Message);
+                ReplyKeyboardMarkup replyKeyboardMarkup = new(messageArgs.ReplyKeyboardButtons
+                    .Select(x => new KeyboardButton[] { new KeyboardButton(x) }))
+                {
+                    ResizeKeyboard = true,
+                    OneTimeKeyboard = true,
+                    InputFieldPlaceholder = messageArgs.Placeholder
+                };
+                return replyKeyboardMarkup;
+            }
+            else if (messageArgs.MarkupType == ReplyMarkupType.KeyboardRemove)
+            {
+                return new ReplyKeyboardRemove();
+            }
+            else if (messageArgs.MarkupType == ReplyMarkupType.ForceReply)
+            {
+                return new ForceReplyMarkup() { InputFieldPlaceholder = messageArgs.Placeholder };
+            }
+            else
+            {
+                return null;
             }
         }
     }
