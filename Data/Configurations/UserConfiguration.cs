@@ -11,10 +11,6 @@ namespace FinancialAdvisorTelegramBot.Data.Configurations
             builder.ToTable("users");
             builder.HasKey(x => x.Id);
 
-            builder.HasOne(x => x.TelegramUser)
-                .WithOne(x => x.User)
-                .OnDelete(DeleteBehavior.Cascade);
-
             builder.Property(x => x.Id)
                 .HasColumnName("id")
                 .ValueGeneratedOnAdd();

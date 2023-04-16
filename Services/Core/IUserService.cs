@@ -11,6 +11,6 @@ namespace FinancialAdvisorTelegramBot.Services.Core
 
         Task<User> Update(User user);
 
-        Task Delete(User user);
+        Task DeleteById(int userId);
     }
 }

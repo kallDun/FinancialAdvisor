@@ -33,13 +33,14 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Profile
                 ? new List<string>()
                 {
                     CreateProfileCommand.TEXT_STYLE,
-                    HelpCommand.TEXT_STYLE
+                    GeneralCommands.BackToMainMenuText
                 }
                 : new List<string>()
                 {
+                    WatchProfileCommand.TEXT_STYLE,
                     UpdateProfileCommand.TEXT_STYLE,
-                    //DeleteProfileCommand.TEXT_STYLE,
-                    HelpCommand.TEXT_STYLE
+                    DeleteProfileCommand.TEXT_STYLE,
+                    GeneralCommands.BackToMainMenuText
                 };
             
             await _bot.Write(user, new TextMessageArgs

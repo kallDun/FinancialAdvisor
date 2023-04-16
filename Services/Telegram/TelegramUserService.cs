@@ -8,14 +8,11 @@ namespace FinancialAdvisorTelegramBot.Services.Telegram
     public class TelegramUserService : ITelegramUserService
     {
         private readonly ITelegramUserRepository _telegramUserRepository;
-        private readonly ICommandContainer _commandContainer;
 
-        public TelegramUserService(ITelegramUserRepository telegramUserRepository, ICommandContainer commandContainer)
+        public TelegramUserService(ITelegramUserRepository telegramUserRepository)
         {
             _telegramUserRepository = telegramUserRepository;
-            _commandContainer = commandContainer;
         }
-
 
         public async Task<TelegramUser> GetExistingOrCreateNewTelegramUser(long chatId, long telegramId,
             string? username, string? firstName, string? lastName)
@@ -83,10 +80,10 @@ namespace FinancialAdvisorTelegramBot.Services.Telegram
             await _telegramUserRepository.Update(user);
         }
         
-        public ICommand? GetCurrentCommand(TelegramUser user)
+        public ICommand? GetCurrentCommand(TelegramUser user, ICommandContainer commandContainer)
         {
             ICommand? currentCommand = null;
-            foreach (var command in _commandContainer.Commands)
+            foreach (var command in commandContainer.Commands)
             {
                 if (command.GetType().ToString() == user.CurrentView?.CurrentCommandType)
                 {
@@ -98,6 +95,12 @@ namespace FinancialAdvisorTelegramBot.Services.Telegram
                 CommandDataSerializer.Deserialize(user.CurrentView?.CurrentCommandData ?? string.Empty, currentCommand);
             }
             return currentCommand;
+        }
+
+        public async Task DeleteProfile(TelegramUser user)
+        {
+            user.UserId = null;
+            await _telegramUserRepository.Update(user);
         }
     }
 }

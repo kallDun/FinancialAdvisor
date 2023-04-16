@@ -33,7 +33,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Commands
                 }
                 else
                 {
-                    currentCommand = _userService.GetCurrentCommand(user);
+                    currentCommand = _userService.GetCurrentCommand(user, _commandContainer);
                     if (currentCommand != null && currentCommand.IsCanceled(update))
                     {
                         currentCommand = _defaultHelpCommand;

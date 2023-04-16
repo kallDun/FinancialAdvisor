@@ -32,9 +32,10 @@ namespace FinancialAdvisorTelegramBot.Services.Core
             return await _repository.GetById(userId) ?? throw new Exception("User not found");
         }
 
-        public async Task Delete(User user)
+        public async Task DeleteById(int userId)
         {
-            await _repository.Delete(user);
+            var user = await _repository.GetById(userId);
+            await _repository.Delete(user ?? throw new InvalidDataException("User not found"));
         }
         
         public async Task<User> Update(User user)

@@ -61,8 +61,15 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Profile
                     Name = name;
                     await _bot.Write(user, new TextMessageArgs
                     {
-                        Text = $"Write your surname:" +
-                        $"\n(you can {GeneralCommands.SetEmpty} this field)"
+                        Text = $"Write your surname:",
+                        MarkupType = ReplyMarkupType.InlineKeyboard,
+                        InlineKeyboardButtons = new()
+                        {
+                            new()
+                            {
+                                new InlineButton("Set surname empty", GeneralCommands.SetEmpty)
+                            }
+                        }
                     });
 
                     Status++;
@@ -80,8 +87,15 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Profile
                     }
                     await _bot.Write(user, new TextMessageArgs
                     {
-                        Text = $"Write your email:" +
-                        $"\n(you can {GeneralCommands.SetEmpty} this field)"
+                        Text = $"Write your email:",
+                        MarkupType = ReplyMarkupType.InlineKeyboard,
+                        InlineKeyboardButtons = new()
+                        {
+                            new()
+                            {
+                                new InlineButton("Set email empty", GeneralCommands.SetEmpty)
+                            }
+                        }
                     });
 
                     Status++;
@@ -97,14 +111,16 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Profile
                         Validators.ValidateEmail(email);
                         Email = email;
                     }
-
+                    if (Name is null) throw new ArgumentException("Name cannot be empty!");
 
                     User profile = await _userService.Create(user, Name, Surname, Email);
+                    
                     await _bot.Write(user, new TextMessageArgs
                     {
-                        Text = $"{profile.FirstName}'s profile has been created!",
-                        MarkupType = ReplyMarkupType.KeyboardRemove
+                        Text = $"{profile.FirstName}'s profile has been created!"
                     });
+                    await HelpCommand.ExecuteStatic(_bot, user);
+
 
                     IsFinished = true;
                     return;

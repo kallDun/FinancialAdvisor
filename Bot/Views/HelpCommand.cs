@@ -1,9 +1,7 @@
 ﻿using FinancialAdvisorTelegramBot.Bot.Args;
 using FinancialAdvisorTelegramBot.Bot.Commands;
 using FinancialAdvisorTelegramBot.Bot.Views.Profile;
-using FinancialAdvisorTelegramBot.Models.Core;
 using FinancialAdvisorTelegramBot.Models.Telegram;
-using FinancialAdvisorTelegramBot.Services.Core;
 
 namespace FinancialAdvisorTelegramBot.Bot.Views
 {
@@ -13,12 +11,10 @@ namespace FinancialAdvisorTelegramBot.Bot.Views
         public static string DEFAULT_STYLE => GeneralCommands.Help;
 
         private readonly IBot _bot;
-        private readonly IUserService _userService;
 
-        public HelpCommand(IBot bot, IUserService userService)
+        public HelpCommand(IBot bot)
         {
             _bot = bot;
-            _userService = userService;
         }
 
         public bool CanExecute(UpdateArgs update, TelegramUser user) 
@@ -27,10 +23,12 @@ namespace FinancialAdvisorTelegramBot.Bot.Views
 
         public async Task Execute(UpdateArgs update, TelegramUser user)
         {
-            User? profile = user.UserId != null
-                ? await _userService.GetById((int)user.UserId) : null;
-            
-            List<string> buttons = profile == null
+            await ExecuteStatic(_bot, user);
+        }
+        
+        public static async Task ExecuteStatic(IBot bot, TelegramUser user)
+        {
+            List<string> buttons = user.UserId != null
                 ? new List<string>()
                 {
                     OpenProfileMenuCommand.TEXT_STYLE
@@ -39,8 +37,8 @@ namespace FinancialAdvisorTelegramBot.Bot.Views
                 {
                     OpenProfileMenuCommand.TEXT_STYLE
                 };
-            
-            await _bot.Write(user, new TextMessageArgs
+
+            await bot.Write(user, new TextMessageArgs
             {
                 Text = "<b>↓ Available commands ↓</b>",
                 Placeholder = "Type command",

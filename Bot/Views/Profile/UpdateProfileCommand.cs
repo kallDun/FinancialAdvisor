@@ -50,7 +50,15 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Profile
                 case CreatingProfileStatus.AskName:
                     await _bot.Write(user, new TextMessageArgs
                     {
-                        Text = $"Write your new name:\n(you can {GeneralCommands.Skip} for update this field)"
+                        Text = $"Write your new name:",
+                        MarkupType = ReplyMarkupType.InlineKeyboard,
+                        InlineKeyboardButtons = new()
+                        {
+                            new()
+                            {
+                                new InlineButton("Do not update name", GeneralCommands.Skip)
+                            }
+                        }
                     });
 
                     Status++;
@@ -69,8 +77,19 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Profile
 
                     await _bot.Write(user, new TextMessageArgs
                     {
-                        Text = $"Write your new surname:" +
-                        $"\n(you can {GeneralCommands.SetEmpty} or {GeneralCommands.Skip} for update this field)",
+                        Text = $"Write your new surname:",
+                        MarkupType = ReplyMarkupType.InlineKeyboard, 
+                        InlineKeyboardButtons = new()
+                        {
+                            new()
+                            {
+                                new InlineButton("Set surname empty", GeneralCommands.SetEmpty)
+                            },
+                            new()
+                            {
+                                new InlineButton("Do not update surname", GeneralCommands.Skip)
+                            }
+                        }
                     });
 
                     Status++;
@@ -90,8 +109,19 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Profile
 
                     await _bot.Write(user, new TextMessageArgs
                     {
-                        Text = $"Write your new email:" +
-                        $"\n(you can {GeneralCommands.SetEmpty} or {GeneralCommands.Skip} for update this field)",
+                        Text = $"Write your new email:",
+                        MarkupType = ReplyMarkupType.InlineKeyboard,
+                        InlineKeyboardButtons = new()
+                        {
+                            new()
+                            {
+                                new InlineButton("Set email empty", GeneralCommands.SetEmpty)
+                            },
+                            new()
+                            {
+                                new InlineButton("Do not update email", GeneralCommands.Skip)
+                            }
+                        }
                     });
 
                     Status++;
