@@ -96,11 +96,5 @@ namespace FinancialAdvisorTelegramBot.Services.Telegram
             }
             return currentCommand;
         }
-
-        public async Task DeleteProfile(TelegramUser user)
-        {
-            user.UserId = null;
-            await _telegramUserRepository.Update(user);
-        }
     }
 }
