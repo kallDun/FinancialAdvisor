@@ -58,7 +58,7 @@ namespace FinancialAdvisorTelegramBot.Services.Telegram
             if (command != null)
             {
                 string commandType = command.GetType().ToString();
-                string commandData = CommandSerializer.Serialize(command);
+                string commandData = CommandDataSerializer.Serialize(command);
                 if (user.CurrentView == null)
                 {
                     user.CurrentView = new TelegramUserView
@@ -95,7 +95,7 @@ namespace FinancialAdvisorTelegramBot.Services.Telegram
             }
             if (currentCommand != null)
             {
-                CommandSerializer.Deserialize(user.CurrentView?.CurrentCommandData ?? string.Empty, currentCommand);
+                CommandDataSerializer.Deserialize(user.CurrentView?.CurrentCommandData ?? string.Empty, currentCommand);
             }
             return currentCommand;
         }
