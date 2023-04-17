@@ -1,6 +1,5 @@
 ﻿using FinancialAdvisorTelegramBot.Bot.Args;
 using FinancialAdvisorTelegramBot.Bot.Updates;
-using FinancialAdvisorTelegramBot.Bot.Views;
 using FinancialAdvisorTelegramBot.Models.Telegram;
 using FinancialAdvisorTelegramBot.Services.Telegram;
 
@@ -8,51 +7,58 @@ namespace FinancialAdvisorTelegramBot.Bot.Commands
 {
     public class CommandExecutor : ITelegramUpdateListener
     {
-        private readonly IBot _bot;
         private readonly ICommandContainer _commandContainer;
-        private readonly ITelegramUserService _userService;
-        private readonly HelpCommand _defaultHelpCommand;
+        private readonly ITelegramUserService _telegramUserService;
 
-        public CommandExecutor(IBot bot, ICommandContainer commandContainer, ITelegramUserService telegramUserService, HelpCommand defaultHelpCommand)
+        public CommandExecutor(ICommandContainer commandContainer, ITelegramUserService telegramUserService)
         {
-            _bot = bot;
             _commandContainer = commandContainer;
-            _userService = telegramUserService;
-            _defaultHelpCommand = defaultHelpCommand;
+            _telegramUserService = telegramUserService;
         }
 
         public async Task GetUpdate(UpdateArgs update, TelegramUser user)
         {
             try
             {
-                ICommand? currentCommand;
+                ICommand? commandToExecute;
 
-                if (user.CurrentView is null)
+                if (user.CurrentCommand is null)
                 {
-                    currentCommand = GetCommand(update, user);
+                    commandToExecute = GetCommand(update, user);
+                    commandToExecute ??= GetContextMenu(user);
                 }
                 else
                 {
-                    currentCommand = _userService.GetCurrentCommand(user, _commandContainer);
-                    if (currentCommand != null && currentCommand.IsCanceled(update))
+                    commandToExecute = _telegramUserService.GetCurrentCommand(user, _commandContainer);
+                    if (commandToExecute != null && commandToExecute.IsCanceled(update))
                     {
-                        currentCommand = _defaultHelpCommand;
+                        commandToExecute = GetContextMenu(user);
                     }
                 }
 
-                if (currentCommand != null)
+                if (commandToExecute is null) throw new ArgumentException("Command or context not found");
+
+                await commandToExecute.Execute(update, user);
+                if (commandToExecute.IsFinished)
                 {
-                    await currentCommand.Execute(update, user);
-                    if (currentCommand.IsFinished)
+                    if (commandToExecute.ShowContextMenuAfterExecution)
                     {
-                        currentCommand = null;
+                        commandToExecute = await ShowContextMenu(update, user);
+                        if (commandToExecute is not null && commandToExecute.IsFinished)
+                        {
+                            commandToExecute = null;
+                        }
                     }
-                    await _userService.SaveCurrentCommand(user, currentCommand);
+                    else
+                    {
+                        commandToExecute = null;
+                    }
                 }
+                await _telegramUserService.SaveCurrentCommand(user, commandToExecute);
             }
             catch (Exception)
             {
-                await _userService.SaveCurrentCommand(user, null);
+                await _telegramUserService.SaveCurrentCommand(user, null);
                 throw;
             }
         }
@@ -66,7 +72,29 @@ namespace FinancialAdvisorTelegramBot.Bot.Commands
                     return command;
                 }
             }
-            return _defaultHelpCommand;
+            return null;
+        }
+
+        private ICommand? GetContextMenu(TelegramUser user)
+        {
+            foreach (var command in _commandContainer.Commands)
+            {
+                if (command.IsFinished && command.IsContextMenu(user))
+                {
+                    return command;
+                }
+            }
+            return null;
+        }
+
+        private async Task<ICommand?> ShowContextMenu(UpdateArgs update, TelegramUser user)
+        {
+            ICommand? commandToExecute = GetContextMenu(user);
+            if (commandToExecute is not null)
+            {
+                await commandToExecute.Execute(update, user);
+            }
+            return commandToExecute;
         }
     }
 }

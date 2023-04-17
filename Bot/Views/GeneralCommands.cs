@@ -1,4 +1,4 @@
-﻿namespace FinancialAdvisorTelegramBot.Bot.Commands
+﻿namespace FinancialAdvisorTelegramBot.Bot.Views
 {
     public static class GeneralCommands
     {
@@ -6,6 +6,5 @@
         public static string Cancel => "/cancel";
         public static string Skip => "/skip";
         public static string SetEmpty => "/set_empty";
-        public static string BackToMainMenuText => "Back to main menu";
     }
 }

@@ -1,4 +1,5 @@
 ﻿using FinancialAdvisorTelegramBot.Bot.Commands;
+using FinancialAdvisorTelegramBot.Bot.Views;
 using FinancialAdvisorTelegramBot.Models.Telegram;
 using FinancialAdvisorTelegramBot.Repositories.Telegram;
 using FinancialAdvisorTelegramBot.Utils.CommandSerializing;
@@ -15,7 +16,7 @@ namespace FinancialAdvisorTelegramBot.Services.Telegram
         }
 
         public async Task<TelegramUser> GetExistingOrCreateNewTelegramUser(long chatId, long telegramId,
-            string? username, string? firstName, string? lastName)
+            string? username, string? firstName, string? lastName, string languageCode)
         {
             TelegramUser? telegramUser = await _telegramUserRepository.GetByTelegramId(telegramId);
             if (telegramUser == null)
@@ -26,7 +27,9 @@ namespace FinancialAdvisorTelegramBot.Services.Telegram
                     TelegramId = telegramId,
                     Username = username,
                     FirstName = firstName,
-                    LastName = lastName
+                    LastName = lastName,
+                    LanguageCode = languageCode,
+                    ContextMenu = ContextMenus.MainMenu
                 };
                 int id = await _telegramUserRepository.Add(telegramUser);
                 telegramUser = await _telegramUserRepository.GetById(id);
@@ -39,15 +42,26 @@ namespace FinancialAdvisorTelegramBot.Services.Telegram
 
             if (telegramUser.Username != username
                 || telegramUser.FirstName != firstName
-                || telegramUser.LastName != lastName)
+                || telegramUser.LastName != lastName
+                || telegramUser.LanguageCode != languageCode)
             {
                 telegramUser.Username = username;
                 telegramUser.FirstName = firstName;
                 telegramUser.LastName = lastName;
+                telegramUser.LanguageCode = languageCode;
                 return await _telegramUserRepository.Update(telegramUser);
             }
 
             return telegramUser;
+        }
+
+        public async Task SetContextMenu(TelegramUser user, string contextMenu)
+        {
+            if (user.ContextMenu != contextMenu)
+            {
+                user.ContextMenu = contextMenu;
+                await _telegramUserRepository.Update(user);
+            }
         }
 
         public async Task SaveCurrentCommand(TelegramUser user, ICommand? command)
@@ -56,25 +70,25 @@ namespace FinancialAdvisorTelegramBot.Services.Telegram
             {
                 string commandType = command.GetType().ToString();
                 string commandData = CommandDataSerializer.Serialize(command);
-                if (user.CurrentView == null)
+                if (user.CurrentCommand == null)
                 {
-                    user.CurrentView = new TelegramUserView
+                    user.CurrentCommand = new TelegramCurrentCommand
                     {
-                        CurrentCommandType = commandType,
-                        CurrentCommandData = commandData,
+                        Type = commandType,
+                        DataJson = commandData,
                         CreatedAt = DateTime.Now
                     };
                 }
                 else
                 {
-                    user.CurrentView.CurrentCommandType = commandType;
-                    user.CurrentView.CurrentCommandData = commandData;
-                    user.CurrentView.UpdatedAt = DateTime.Now;
+                    user.CurrentCommand.Type = commandType;
+                    user.CurrentCommand.DataJson = commandData;
+                    user.CurrentCommand.UpdatedAt = DateTime.Now;
                 }
             }
             else
             {
-                user.CurrentView = null;
+                user.CurrentCommand = null;
             }
 
             await _telegramUserRepository.Update(user);
@@ -85,14 +99,14 @@ namespace FinancialAdvisorTelegramBot.Services.Telegram
             ICommand? currentCommand = null;
             foreach (var command in commandContainer.Commands)
             {
-                if (command.GetType().ToString() == user.CurrentView?.CurrentCommandType)
+                if (command.GetType().ToString() == user.CurrentCommand?.Type)
                 {
                     currentCommand = command;
                 }
             }
             if (currentCommand != null)
             {
-                CommandDataSerializer.Deserialize(user.CurrentView?.CurrentCommandData ?? string.Empty, currentCommand);
+                CommandDataSerializer.Deserialize(user.CurrentCommand?.DataJson ?? string.Empty, currentCommand);
             }
             return currentCommand;
         }

@@ -4,16 +4,16 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace FinancialAdvisorTelegramBot.Data.Configurations
 {
-    public class TelegramUserViewConfiguration : IEntityTypeConfiguration<TelegramUserView>
+    public class TelegramCurrentCommandConfiguration : IEntityTypeConfiguration<TelegramCurrentCommand>
     {
-        public void Configure(EntityTypeBuilder<TelegramUserView> builder)
+        public void Configure(EntityTypeBuilder<TelegramCurrentCommand> builder)
         {
-            builder.ToTable("telegram_user_views");
+            builder.ToTable("telegram_current_commands");
             builder.HasKey(t => t.Id);
 
             builder.HasOne(x => x.TelegramUser)
-                .WithOne(x => x.CurrentView)
-                .HasForeignKey<TelegramUserView>(x => x.TelegramUserId);
+                .WithOne(x => x.CurrentCommand)
+                .HasForeignKey<TelegramCurrentCommand>(x => x.TelegramUserId);
 
             builder.Property(x => x.Id)
                 .HasColumnName("id")
@@ -23,13 +23,13 @@ namespace FinancialAdvisorTelegramBot.Data.Configurations
                 .HasColumnName("telegram_user_id")
                 .IsRequired();
 
-            builder.Property(x => x.CurrentCommandType)
-                .HasColumnName("current_command_type")
+            builder.Property(x => x.Type)
+                .HasColumnName("command_type")
                 .HasColumnType("text")
                 .IsRequired();
 
-            builder.Property(x => x.CurrentCommandData)
-                .HasColumnName("current_command_data")
+            builder.Property(x => x.DataJson)
+                .HasColumnName("command_data_json")
                 .HasColumnType("text")
                 .IsRequired();
 

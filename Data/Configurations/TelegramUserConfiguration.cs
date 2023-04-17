@@ -1,4 +1,5 @@
-﻿using FinancialAdvisorTelegramBot.Models.Telegram;
+﻿using FinancialAdvisorTelegramBot.Bot.Views;
+using FinancialAdvisorTelegramBot.Models.Telegram;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -43,6 +44,17 @@ namespace FinancialAdvisorTelegramBot.Data.Configurations
             builder.Property(x => x.Username)
                 .HasColumnName("username")
                 .HasMaxLength(100);
+
+            builder.Property(x => x.LanguageCode)
+                .HasColumnName("language_code")
+                .HasMaxLength(10)
+                .HasDefaultValue("en")
+                .IsRequired();
+
+            builder.Property(x => x.ContextMenu)
+                .HasColumnName("context_menu")
+                .HasColumnType("text")
+                .IsRequired();
 
             builder.Property(x => x.CreatedAt)
                 .HasColumnName("created_at")

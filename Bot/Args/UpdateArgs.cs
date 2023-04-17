@@ -29,5 +29,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Args
         }
 
         public string GetTextData() => Message?.Text ?? CallbackQuery?.Data ?? string.Empty;
+
+        public string GetLanguageCode() => From.LanguageCode ?? "en";
     }
 }

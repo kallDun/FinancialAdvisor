@@ -8,8 +8,8 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Profile
 {
     public class WatchProfileCommand : ICommand
     {
-        public static string TEXT_STYLE => "Watch profile";
-        public static string DEFAULT_STYLE => "/profile_watch";
+        public static string TEXT_STYLE => "View profile";
+        public static string DEFAULT_STYLE => "/view";
 
         private readonly IBot _bot;
         private readonly IUserService _userService;
@@ -21,8 +21,8 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Profile
         }
 
         public bool CanExecute(UpdateArgs update, TelegramUser user)
-            => (update.GetTextData() == DEFAULT_STYLE
-            || update.GetTextData() == TEXT_STYLE)
+            => user.ContextMenu == ContextMenus.Profile
+            && (update.GetTextData() == DEFAULT_STYLE || update.GetTextData() == TEXT_STYLE)
             && user.UserId != null;
 
         public async Task Execute(UpdateArgs update, TelegramUser user)

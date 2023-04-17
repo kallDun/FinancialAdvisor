@@ -30,7 +30,7 @@ namespace FinancialAdvisorTelegramBot.Repositories.Telegram
         public async Task<TelegramUser?> GetById(int id)
         {
             return await _context.TelegramUsers
-                .Include(x => x.CurrentView)
+                .Include(x => x.CurrentCommand)
                 .FirstOrDefaultAsync(x => x.Id == id);
         }
 
@@ -42,7 +42,7 @@ namespace FinancialAdvisorTelegramBot.Repositories.Telegram
         public async Task<TelegramUser?> GetByTelegramId(long telegramId)
         {
             return await _context.TelegramUsers
-                .Include(x => x.CurrentView)
+                .Include(x => x.CurrentCommand)
                 .FirstOrDefaultAsync(x => x.TelegramId == telegramId);
         }
 

@@ -15,9 +15,10 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Profile
             AskName, AskLastname, AskEmail, Finished
         }
 
-        public static string TEXT_STYLE => "New profile";
-        public static string DEFAULT_STYLE => "/profile_create";
-        public virtual bool IsFinished { get; private set; } = false;
+        public static string TEXT_STYLE => "Create new profile";
+        public static string DEFAULT_STYLE => "/create";
+        public bool IsFinished { get; private set; } = false;
+        public bool ShowContextMenuAfterExecution => true;
 
         private readonly IBot _bot;
         private readonly IUserService _userService;
@@ -35,8 +36,8 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Profile
         }
 
         public bool CanExecute(UpdateArgs update, TelegramUser user)
-            => (update.GetTextData() == DEFAULT_STYLE 
-            || update.GetTextData() == TEXT_STYLE)
+            => user.ContextMenu == ContextMenus.Profile
+            && (update.GetTextData() == DEFAULT_STYLE || update.GetTextData() == TEXT_STYLE)
             && user.UserId is null;
 
         public async Task Execute(UpdateArgs update, TelegramUser user)
@@ -119,8 +120,6 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Profile
                     {
                         Text = $"{profile.FirstName}'s profile has been created!"
                     });
-                    await HelpCommand.ExecuteStatic(_bot, user);
-
 
                     IsFinished = true;
                     return;

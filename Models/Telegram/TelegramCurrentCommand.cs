@@ -1,6 +1,6 @@
 ﻿namespace FinancialAdvisorTelegramBot.Models.Telegram
 {
-    public class TelegramUserView
+    public class TelegramCurrentCommand
     {
         public int Id { get; set; }
 
@@ -8,9 +8,9 @@
 
         public virtual TelegramUser? TelegramUser { get; set; }
 
-        public string? CurrentCommandType { get; set; }
+        public string? Type { get; set; }
 
-        public string? CurrentCommandData { get; set; }
+        public string? DataJson { get; set; }
 
         public DateTime CreatedAt { get; set; }
 

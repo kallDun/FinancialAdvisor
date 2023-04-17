@@ -2,31 +2,31 @@
 using FinancialAdvisorTelegramBot.Bot.Commands;
 using FinancialAdvisorTelegramBot.Bot.Views.Profile;
 using FinancialAdvisorTelegramBot.Models.Telegram;
+using FinancialAdvisorTelegramBot.Services.Telegram;
 
 namespace FinancialAdvisorTelegramBot.Bot.Views
 {
     public class HelpCommand : ICommand
     {
-        public static string TEXT_STYLE => "Help";
+        public static string TEXT_STYLE => "Main menu";
         public static string DEFAULT_STYLE => GeneralCommands.Help;
 
         private readonly IBot _bot;
+        private readonly ITelegramUserService _telegramUserService;
 
-        public HelpCommand(IBot bot)
+        public HelpCommand(IBot bot, ITelegramUserService telegramUserService)
         {
             _bot = bot;
+            _telegramUserService = telegramUserService;
         }
+
+        public bool IsContextMenu(TelegramUser user) => user.ContextMenu == ContextMenus.MainMenu;
 
         public bool CanExecute(UpdateArgs update, TelegramUser user) 
             => update.GetTextData() == DEFAULT_STYLE
             || update.GetTextData() == TEXT_STYLE;
 
         public async Task Execute(UpdateArgs update, TelegramUser user)
-        {
-            await ExecuteStatic(_bot, user);
-        }
-        
-        public static async Task ExecuteStatic(IBot bot, TelegramUser user)
         {
             List<string> buttons = user.UserId != null
                 ? new List<string>()
@@ -38,7 +38,9 @@ namespace FinancialAdvisorTelegramBot.Bot.Views
                     OpenProfileMenuCommand.TEXT_STYLE
                 };
 
-            await bot.Write(user, new TextMessageArgs
+            await _telegramUserService.SetContextMenu(user, ContextMenus.MainMenu);
+
+            await _bot.Write(user, new TextMessageArgs
             {
                 Text = "<b>↓ Available commands ↓</b>",
                 Placeholder = "Type command",

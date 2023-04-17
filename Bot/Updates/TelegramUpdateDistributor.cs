@@ -21,7 +21,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Updates
             if (update.From is null) return;
             _user = await _telegramUserService.GetExistingOrCreateNewTelegramUser(
                 update.ChatId, update.From.Id, update.From.Username, 
-                update.From.FirstName, update.From.LastName);
+                update.From.FirstName, update.From.LastName, update.GetLanguageCode());
         }
 
         public async Task GetUpdate(UpdateArgs update)

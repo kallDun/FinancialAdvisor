@@ -20,10 +20,14 @@ namespace FinancialAdvisorTelegramBot.Models.Telegram
 
         public string? Username { get; set; }
 
+        public string? LanguageCode { get; set; }
+
+        public string? ContextMenu { get; set; }
+
         public DateTime? CreatedAt { get; set; }
 
         public DateTime? UpdatedAt { get; set; }
 
-        public virtual TelegramUserView? CurrentView { get; set; }
+        public virtual TelegramCurrentCommand? CurrentCommand { get; set; }
     }
 }
