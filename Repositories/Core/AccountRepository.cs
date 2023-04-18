@@ -38,6 +38,11 @@ namespace FinancialAdvisorTelegramBot.Repositories.Core
             return await _context.Accounts.FindAsync(id);
         }
 
+        public Task<Account?> GetAccountByName(int userId, string name)
+        {
+            return _context.Accounts.FirstOrDefaultAsync(a => a.UserId == userId && a.Name == name);
+        }
+
         public async Task<Account> Update(Account entity)
         {
             entity.UpdatedAt = DateTime.Now;
