@@ -6,13 +6,16 @@ using FinancialAdvisorTelegramBot.Repositories.Telegram;
 using FinancialAdvisorTelegramBot.Services.Core;
 using FinancialAdvisorTelegramBot.Services.Telegram;
 using FinancialAdvisorTelegramBot.Utils;
+using Laraue.EfCoreTriggers.PostgreSql.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // database init
 builder.Services.AddDbContext<AppDbContext>(
-    options => options.UseNpgsql(builder.Configuration.GetConnectionString("AppDatabaseConnection")));
+    options => options
+        .UseNpgsql(builder.Configuration.GetConnectionString("AppDatabaseConnection"))
+        .UsePostgreSqlTriggers());
 builder.Services.AddScoped<DbContext>(provider => provider.GetRequiredService<AppDbContext>());
 
 
