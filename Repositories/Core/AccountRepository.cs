@@ -1,61 +1,39 @@
 ﻿using FinancialAdvisorTelegramBot.Data;
 using FinancialAdvisorTelegramBot.Models.Core;
+using FinancialAdvisorTelegramBot.Utils.Attributes;
 using Microsoft.EntityFrameworkCore;
 
 namespace FinancialAdvisorTelegramBot.Repositories.Core
 {
+    [CustomRepository]
     public class AccountRepository : IAccountRepository
     {
         private readonly AppDbContext _context;
-
+        
         public AccountRepository(AppDbContext context)
         {
             _context = context;
         }
 
+        public DbContext DatabaseContext => _context;
 
-        public async Task<int> Add(Account entity)
-        {
-            entity.CreatedAt = DateTime.Now;
-            _context.Accounts.Add(entity);
-            await _context.SaveChangesAsync();
-            return entity.Id;
-        }
-
-        public async Task Delete(Account entity)
-        {
-            _context.Accounts.Remove(entity);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task<IList<Account>> GetAll()
-        {
-            return await _context.Accounts.ToListAsync();
-        }
-
-        public async Task<Account?> GetById(int id)
-        {
-            return await _context.Accounts.FindAsync(id);
-        }
+        public DbSet<Account> DbSet => _context.Accounts;
 
         public Task<Account?> GetAccountByName(int userId, string name)
         {
             return _context.Accounts.FirstOrDefaultAsync(a => a.UserId == userId && a.Name == name);
         }
 
-        public async Task<Account> Update(Account entity)
-        {
-            entity.UpdatedAt = DateTime.Now;
-            _context.Accounts.Update(entity);
-            await _context.SaveChangesAsync();
-            return entity;
-        }
-
         public async Task<IList<Account>> GetAccountsByUserId(int userId)
         {
-            return await _context.Accounts
+            return await DbSet
                 .Where(x => x.UserId == userId)
                 .ToListAsync();
+        }
+
+        public async Task<bool> IsAccountNameUnique(int userId, string name)
+        {
+            return !(await DbSet.AnyAsync(x => x.UserId == userId && x.Name == name));
         }
     }
 }

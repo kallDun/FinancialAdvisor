@@ -1,9 +1,18 @@
 ﻿namespace FinancialAdvisorTelegramBot.Repositories
 {
-    public interface IRepository<T> : IReadonlyRepository<T>
+    public interface IRepository<T> : IReadonlyRepository<T> where T : class
     {
-        Task<T> Update(T entity);
+        async Task<T> Update(T entity)
+        {
+            DbSet.Update(entity);
+            await DatabaseContext.SaveChangesAsync();
+            return entity;
+        }
         
-        Task Delete(T entity);
+        async Task Delete(T entity)
+        {
+            DbSet.Remove(entity);
+            await DatabaseContext.SaveChangesAsync();
+        }
     }
 }

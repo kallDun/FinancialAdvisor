@@ -1,12 +1,14 @@
 ﻿using FinancialAdvisorTelegramBot.Bot.Args;
 using FinancialAdvisorTelegramBot.Models.Telegram;
 using FinancialAdvisorTelegramBot.Utils;
+using FinancialAdvisorTelegramBot.Utils.Attributes;
 using Microsoft.Extensions.Options;
 using Telegram.Bot;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace FinancialAdvisorTelegramBot.Bot
 {
+    [CustomService(LifeTimeServiceType.Singleton)]
     public class Bot : IBot
     {
         public TelegramBotClient BotClient { get; private set; }

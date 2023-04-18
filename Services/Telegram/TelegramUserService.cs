@@ -2,10 +2,12 @@
 using FinancialAdvisorTelegramBot.Bot.Views;
 using FinancialAdvisorTelegramBot.Models.Telegram;
 using FinancialAdvisorTelegramBot.Repositories.Telegram;
+using FinancialAdvisorTelegramBot.Utils.Attributes;
 using FinancialAdvisorTelegramBot.Utils.CommandSerializing;
 
 namespace FinancialAdvisorTelegramBot.Services.Telegram
 {
+    [CustomService]
     public class TelegramUserService : ITelegramUserService
     {
         private readonly ITelegramUserRepository _telegramUserRepository;
@@ -31,13 +33,8 @@ namespace FinancialAdvisorTelegramBot.Services.Telegram
                     LanguageCode = languageCode,
                     ContextMenu = ContextMenus.MainMenu
                 };
-                int id = await _telegramUserRepository.Add(telegramUser);
-                telegramUser = await _telegramUserRepository.GetById(id);
-                if (telegramUser == null)
-                {
-                    throw new Exception("Telegram user was not created");
-                }
-                return telegramUser;
+                TelegramUser created = await _telegramUserRepository.Add(telegramUser);
+                return await _telegramUserRepository.GetById(created.Id) ?? throw new Exception("Telegram user was not created");
             }
 
             if (telegramUser.Username != username
@@ -49,6 +46,7 @@ namespace FinancialAdvisorTelegramBot.Services.Telegram
                 telegramUser.FirstName = firstName;
                 telegramUser.LastName = lastName;
                 telegramUser.LanguageCode = languageCode;
+
                 return await _telegramUserRepository.Update(telegramUser);
             }
 

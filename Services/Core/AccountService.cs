@@ -1,28 +1,47 @@
 ﻿using FinancialAdvisorTelegramBot.Models.Core;
+using FinancialAdvisorTelegramBot.Models.Core.Enumerations;
 using FinancialAdvisorTelegramBot.Repositories.Core;
+using FinancialAdvisorTelegramBot.Utils.Attributes;
 
 namespace FinancialAdvisorTelegramBot.Services.Core
 {
+    [CustomService]
     public class AccountService : IAccountService
     {
         private readonly IAccountRepository _repository;
-        public AccountService(IAccountRepository accountRepository)
+        private readonly ITransactionService _transactionService;
+        private readonly ICategoryService _categoryService;
+
+        public AccountService(IAccountRepository accountRepository, ITransactionService transactionService, ICategoryService categoryService)
         {
             _repository = accountRepository;
+            _transactionService = transactionService;
+            _categoryService = categoryService;
         }
         
 
         public async Task<Account> Create(User user, string name, string? description, decimal startBalance)
         {
+            using var transaction = await _repository.DatabaseContext.Database.BeginTransactionAsync();
+
             Account entity = new()
             {
                 User = user,
                 Name = name,
                 Description = description
             };
-            int id = await _repository.Add(entity);
-            Account account = await _repository.GetById(id) ?? throw new Exception("Account not found");
-            // add first transaction
+            Account added = await _repository.Add(entity);
+
+            Category defaultCategory = await _categoryService.GetOtherwiseCreateDefaultCategory(user.Id);
+
+            Transaction addedStartBalanceTransaction = await _transactionService.Create(
+                startBalance, TransactionType.Income, "Start balance", 
+                added.Id, defaultCategory.Id, DateTime.Now, null);
+            
+            Account account = await _repository.GetById(added.Id) ?? throw new Exception("Account was not created");
+            if (account.CurrentBalance != startBalance) throw new Exception("Start balance transaction was not created");
+
+            await transaction.CommitAsync();
             return account;
         }
 

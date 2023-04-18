@@ -7,5 +7,7 @@ namespace FinancialAdvisorTelegramBot.Repositories.Core
         Task<IList<Account>> GetAccountsByUserId(int userId);
 
         Task<Account?> GetAccountByName(int userId, string name);
+
+        Task<bool> IsAccountNameUnique(int userId, string name);
     }
 }

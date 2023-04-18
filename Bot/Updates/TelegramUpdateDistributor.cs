@@ -1,9 +1,11 @@
 ﻿using FinancialAdvisorTelegramBot.Bot.Args;
 using FinancialAdvisorTelegramBot.Models.Telegram;
 using FinancialAdvisorTelegramBot.Services.Telegram;
+using FinancialAdvisorTelegramBot.Utils.Attributes;
 
 namespace FinancialAdvisorTelegramBot.Bot.Updates
 {
+    [CustomService]
     public class TelegramUpdateDistributor : ITelegramUpdateDistributor
     {
         private readonly ITelegramAvailableListeners _availableListeners;

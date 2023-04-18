@@ -1,9 +1,11 @@
 ﻿using FinancialAdvisorTelegramBot.Models.Core;
 using FinancialAdvisorTelegramBot.Models.Telegram;
 using FinancialAdvisorTelegramBot.Repositories.Core;
+using FinancialAdvisorTelegramBot.Utils.Attributes;
 
 namespace FinancialAdvisorTelegramBot.Services.Core
 {
+    [CustomService]
     public class UserService : IUserService
     {
         private readonly IUserRepository _repository;
@@ -28,8 +30,8 @@ namespace FinancialAdvisorTelegramBot.Services.Core
                 TelegramUser = telegramUser
             };
 
-            var userId = await _repository.Add(user);
-            return await _repository.GetById(userId) ?? throw new Exception("User not found");
+            User created = await _repository.Add(user);
+            return await _repository.GetById(created.Id) ?? throw new Exception("User was not created");
         }
 
         public async Task DeleteById(int userId)
