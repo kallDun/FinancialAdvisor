@@ -5,7 +5,7 @@
         public static string MainMenu => "MainMenu";
 
         public static string Profile => "Profile";
-
-        public static string Account => "Account";
+        
+        public static string Accounts => "Accounts";
     }
 }

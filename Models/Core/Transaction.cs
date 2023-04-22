@@ -11,9 +11,7 @@ namespace FinancialAdvisorTelegramBot.Models.Core
         public virtual Account? Account { get; set; }
 
         public decimal Amount { get; set; }
-
-        public string? Type { get; set; }
-
+        
         public string? Communicator { get; set; }
 
         public int CategoryId { get; set; }

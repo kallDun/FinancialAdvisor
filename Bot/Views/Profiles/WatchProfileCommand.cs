@@ -4,7 +4,7 @@ using FinancialAdvisorTelegramBot.Models.Core;
 using FinancialAdvisorTelegramBot.Models.Telegram;
 using FinancialAdvisorTelegramBot.Services.Core;
 
-namespace FinancialAdvisorTelegramBot.Bot.Views.Profile
+namespace FinancialAdvisorTelegramBot.Bot.Views.Profiles
 {
     public class WatchProfileCommand : ICommand
     {

@@ -6,7 +6,7 @@ using FinancialAdvisorTelegramBot.Services.Core;
 using FinancialAdvisorTelegramBot.Utils;
 using FinancialAdvisorTelegramBot.Utils.CommandSerializing;
 
-namespace FinancialAdvisorTelegramBot.Bot.Views.Profile
+namespace FinancialAdvisorTelegramBot.Bot.Views.Profiles
 {
     public class UpdateProfileCommand : ICommand
     {

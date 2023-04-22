@@ -5,7 +5,7 @@ using FinancialAdvisorTelegramBot.Models.Telegram;
 using FinancialAdvisorTelegramBot.Services.Core;
 using FinancialAdvisorTelegramBot.Services.Telegram;
 
-namespace FinancialAdvisorTelegramBot.Bot.Views.Profile
+namespace FinancialAdvisorTelegramBot.Bot.Views.Profiles
 {
     public class OpenProfileMenuCommand : ICommand
     {
@@ -52,8 +52,8 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Profile
 
             await _bot.Write(user, new TextMessageArgs
             {
-                Text = "<b>↓ profile ↓ menu ↓</b>",
-                Placeholder = "Type profile command",
+                Text = "<b>↓ Profile menu ↓</b>",
+                Placeholder = "Select command",
                 MarkupType = ReplyMarkupType.ReplyKeyboard,
                 ReplyKeyboardButtons = buttons,
             });

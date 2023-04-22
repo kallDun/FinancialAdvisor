@@ -27,7 +27,8 @@ namespace FinancialAdvisorTelegramBot.Services.Core
                 FirstName = first_name,
                 LastName = last_name,
                 Email = email,
-                TelegramUser = telegramUser
+                TelegramUser = telegramUser,
+                CreatedAt = DateTime.Now,
             };
 
             User created = await _repository.Add(user);
@@ -42,6 +43,7 @@ namespace FinancialAdvisorTelegramBot.Services.Core
         
         public async Task<User> Update(User user)
         {
+            user.UpdatedAt = DateTime.Now;
             return await _repository.Update(user);
         }
     }

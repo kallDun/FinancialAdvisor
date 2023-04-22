@@ -1,5 +1,4 @@
 ﻿using FinancialAdvisorTelegramBot.Models.Core;
-using FinancialAdvisorTelegramBot.Models.Core.Enumerations;
 using FinancialAdvisorTelegramBot.Repositories.Core;
 using FinancialAdvisorTelegramBot.Utils.Attributes;
 
@@ -16,12 +15,11 @@ namespace FinancialAdvisorTelegramBot.Services.Core
         }
 
 
-        public async Task<Transaction> Create(decimal amount, TransactionType type, string communicator, int accountId, int categoryId, DateTime transactionTime, string? details)
+        public async Task<Transaction> Create(decimal amount, string communicator, int accountId, int categoryId, DateTime transactionTime, string? details)
         {
             Transaction transaction = new()
             {
                 Amount = amount,
-                Type = type.ToString(),
                 Communicator = communicator,
                 AccountId = accountId,
                 CategoryId = categoryId,

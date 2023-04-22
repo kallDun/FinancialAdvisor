@@ -4,14 +4,16 @@ namespace FinancialAdvisorTelegramBot.Services.Core
 {
     public interface IAccountService
     {
-        Task<IList<Account>> GetByUser(User user);
+        Task<IList<Account>> GetByUser(int userId);
 
-        Task<Account?> GetByName(User user, string accountName);
+        Task<bool> HasAny(int userId);
+
+        Task<Account?> GetByName(int userId, string accountName);
 
         Task<Account> Create(User user, string name, string? description, decimal startBalance);
 
         Task<Account> Update(Account account);
 
-        Task DeleteByName(User user, string accountName);
+        Task DeleteByName(int userId, string accountName);
     }
 }

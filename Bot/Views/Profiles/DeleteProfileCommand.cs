@@ -4,7 +4,7 @@ using FinancialAdvisorTelegramBot.Models.Telegram;
 using FinancialAdvisorTelegramBot.Services.Core;
 using FinancialAdvisorTelegramBot.Utils.CommandSerializing;
 
-namespace FinancialAdvisorTelegramBot.Bot.Views.Profile
+namespace FinancialAdvisorTelegramBot.Bot.Views.Profiles
 {
     public class DeleteProfileCommand : ICommand
     {

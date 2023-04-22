@@ -31,7 +31,8 @@ namespace FinancialAdvisorTelegramBot.Services.Telegram
                     FirstName = firstName,
                     LastName = lastName,
                     LanguageCode = languageCode,
-                    ContextMenu = ContextMenus.MainMenu
+                    ContextMenu = ContextMenus.MainMenu,
+                    CreatedAt = DateTime.Now,
                 };
                 TelegramUser created = await _telegramUserRepository.Add(telegramUser);
                 return await _telegramUserRepository.GetById(created.Id) ?? throw new Exception("Telegram user was not created");
@@ -47,6 +48,7 @@ namespace FinancialAdvisorTelegramBot.Services.Telegram
                 telegramUser.LastName = lastName;
                 telegramUser.LanguageCode = languageCode;
 
+                telegramUser.UpdatedAt = DateTime.Now;
                 return await _telegramUserRepository.Update(telegramUser);
             }
 
@@ -58,6 +60,7 @@ namespace FinancialAdvisorTelegramBot.Services.Telegram
             if (user.ContextMenu != contextMenu)
             {
                 user.ContextMenu = contextMenu;
+                user.UpdatedAt = DateTime.Now;
                 await _telegramUserRepository.Update(user);
             }
         }
@@ -89,6 +92,7 @@ namespace FinancialAdvisorTelegramBot.Services.Telegram
                 user.CurrentCommand = null;
             }
 
+            user.UpdatedAt = DateTime.Now;
             await _telegramUserRepository.Update(user);
         }
         

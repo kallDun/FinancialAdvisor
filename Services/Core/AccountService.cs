@@ -1,5 +1,4 @@
 ﻿using FinancialAdvisorTelegramBot.Models.Core;
-using FinancialAdvisorTelegramBot.Models.Core.Enumerations;
 using FinancialAdvisorTelegramBot.Repositories.Core;
 using FinancialAdvisorTelegramBot.Utils.Attributes;
 
@@ -26,44 +25,49 @@ namespace FinancialAdvisorTelegramBot.Services.Core
 
             Account entity = new()
             {
-                User = user,
+                UserId = user.Id,
                 Name = name,
-                Description = description
+                Description = description,
+                CurrentBalance = 0,
+                CreatedAt = DateTime.Now
             };
             Account added = await _repository.Add(entity);
-
-            Category defaultCategory = await _categoryService.GetOtherwiseCreateDefaultCategory(user.Id);
+            Account account = await _repository.GetById(added.Id) ?? throw new Exception("Account was not created");
+            
+            Category defaultCategory = await _categoryService.GetOrOtherwiseCreateDefaultCategory(user.Id);
 
             Transaction addedStartBalanceTransaction = await _transactionService.Create(
-                startBalance, TransactionType.Income, "Start balance", 
-                added.Id, defaultCategory.Id, DateTime.Now, null);
-            
-            Account account = await _repository.GetById(added.Id) ?? throw new Exception("Account was not created");
-            if (account.CurrentBalance != startBalance) throw new Exception("Start balance transaction was not created");
+                startBalance, "Start balance transaction", added.Id, defaultCategory.Id, DateTime.Now, null);
 
             await transaction.CommitAsync();
             return account;
         }
 
-        public async Task DeleteByName(User user, string accountName)
+        public async Task DeleteByName(int userId, string accountName)
         {
-            Account? account = await _repository.GetAccountByName(user.Id, accountName);
+            Account? account = await _repository.GetAccountByName(userId, accountName);
             if (account is null) throw new ArgumentNullException($"Account with name {accountName} not found");
             await _repository.Delete(account);
         }
 
-        public async Task<Account?> GetByName(User user, string accountName)
+        public async Task<Account?> GetByName(int userId, string accountName)
         {
-            return await _repository.GetAccountByName(user.Id, accountName);
+            return await _repository.GetAccountByName(userId, accountName);
         }
 
-        public async Task<IList<Account>> GetByUser(User user)
+        public async Task<IList<Account>> GetByUser(int userId)
         {
-            return await _repository.GetAccountsByUserId(user.Id);
+            return await _repository.GetAccountsByUserId(userId);
+        }
+
+        public async Task<bool> HasAny(int userId)
+        {
+            return await _repository.HasAny(userId);
         }
 
         public async Task<Account> Update(Account account)
         {
+            account.UpdatedAt = DateTime.Now;
             return await _repository.Update(account);
         }
     }

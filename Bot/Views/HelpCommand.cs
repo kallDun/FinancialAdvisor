@@ -1,6 +1,7 @@
 ﻿using FinancialAdvisorTelegramBot.Bot.Args;
 using FinancialAdvisorTelegramBot.Bot.Commands;
-using FinancialAdvisorTelegramBot.Bot.Views.Profile;
+using FinancialAdvisorTelegramBot.Bot.Views.Accounts;
+using FinancialAdvisorTelegramBot.Bot.Views.Profiles;
 using FinancialAdvisorTelegramBot.Models.Telegram;
 using FinancialAdvisorTelegramBot.Services.Telegram;
 
@@ -31,7 +32,8 @@ namespace FinancialAdvisorTelegramBot.Bot.Views
             List<string> buttons = user.UserId != null
                 ? new List<string>()
                 {
-                    OpenProfileMenuCommand.TEXT_STYLE
+                    OpenProfileMenuCommand.TEXT_STYLE,
+                    OpenAccountsMenuCommand.TEXT_STYLE
                 }
                 : new List<string>()
                 {
@@ -42,8 +44,8 @@ namespace FinancialAdvisorTelegramBot.Bot.Views
 
             await _bot.Write(user, new TextMessageArgs
             {
-                Text = "<b>↓ Available commands ↓</b>",
-                Placeholder = "Type command",
+                Text = "<b>↓ Main menu ↓</b>",
+                Placeholder = "Select menu",
                 MarkupType = ReplyMarkupType.ReplyKeyboard,
                 ReplyKeyboardButtons = buttons,
             });

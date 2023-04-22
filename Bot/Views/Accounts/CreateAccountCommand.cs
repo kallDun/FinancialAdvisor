@@ -6,69 +6,71 @@ using FinancialAdvisorTelegramBot.Services.Core;
 using FinancialAdvisorTelegramBot.Utils;
 using FinancialAdvisorTelegramBot.Utils.CommandSerializing;
 
-namespace FinancialAdvisorTelegramBot.Bot.Views.Profile
+namespace FinancialAdvisorTelegramBot.Bot.Views.Accounts
 {
-    public class CreateProfileCommand : ICommand
+    public class CreateAccountCommand : ICommand
     {
-        private enum CreatingProfileStatus
+        private enum CreatingAccountStatus
         {
-            AskName, AskLastname, AskEmail, Finished
+            AskName, AskDescription, AskCurrentBalance, Finished
         }
 
-        public static string TEXT_STYLE => "Create new profile";
+        public static string TEXT_STYLE => "Create new account";
         public static string DEFAULT_STYLE => "/create";
         public bool IsFinished { get; private set; } = false;
         public bool ShowContextMenuAfterExecution => true;
 
         private readonly IBot _bot;
+        private readonly IAccountService _accountService;
         private readonly IUserService _userService;
 
-        private CreatingProfileStatus _status => (CreatingProfileStatus)Status;
+        private CreatingAccountStatus _status => (CreatingAccountStatus)Status;
         [CommandPropertySerializable] public int Status { get; set; }
         [CommandPropertySerializable] public string? Name { get; set; }
-        [CommandPropertySerializable] public string? Surname { get; set; }
-        [CommandPropertySerializable] public string? Email { get; set; }
+        [CommandPropertySerializable] public string? Description { get; set; }
+        [CommandPropertySerializable] public decimal StartBalance { get; set; }
 
-        public CreateProfileCommand(IBot bot, IUserService userService)
+        public CreateAccountCommand(IBot bot, IAccountService accountService, IUserService userService)
         {
             _bot = bot;
+            _accountService = accountService;
             _userService = userService;
         }
 
         public bool CanExecute(UpdateArgs update, TelegramUser user)
-            => user.ContextMenu == ContextMenus.Profile
+            => user.ContextMenu == ContextMenus.Accounts
             && (update.GetTextData() == DEFAULT_STYLE || update.GetTextData() == TEXT_STYLE)
-            && user.UserId is null;
+            && user.UserId is not null;
 
         public async Task Execute(UpdateArgs update, TelegramUser user)
         {
             switch (_status)
             {
-                case CreatingProfileStatus.AskName:
+                case CreatingAccountStatus.AskName:
 
                     await _bot.Write(user, new TextMessageArgs
                     {
-                        Text = $"Write your name:"
+                        Text = $"Write account name:"
                     });
 
                     Status++;
                     return;
 
 
-                case CreatingProfileStatus.AskLastname:
+                case CreatingAccountStatus.AskDescription:
 
                     string name = update.GetTextData().Trim();
                     Validators.ValidateName(name);
                     Name = name;
                     await _bot.Write(user, new TextMessageArgs
                     {
-                        Text = $"Write your surname:",
+                        Text = $"Write account description:",
                         MarkupType = ReplyMarkupType.InlineKeyboard,
                         InlineKeyboardButtons = new()
                         {
                             new()
                             {
-                                new InlineButton("Set surname empty", GeneralCommands.SetEmpty)
+                                new InlineButton("Set description empty", GeneralCommands.SetEmpty)
                             }
                         }
                     });
@@ -77,48 +79,45 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Profile
                     return;
 
 
-                case CreatingProfileStatus.AskEmail:
-                    if (update.GetTextData() != GeneralCommands.Skip)
-
-                    if (update.GetTextData() != GeneralCommands.SetEmpty)
-                    {
-                        string surname = update.GetTextData().Trim();
-                        Validators.ValidateName(surname);
-                        Surname = surname;
-                    }
-                    await _bot.Write(user, new TextMessageArgs
-                    {
-                        Text = $"Write your email:",
-                        MarkupType = ReplyMarkupType.InlineKeyboard,
-                        InlineKeyboardButtons = new()
-                        {
-                            new()
-                            {
-                                new InlineButton("Set email empty", GeneralCommands.SetEmpty)
-                            }
-                        }
-                    });
-
-                    Status++;
-                    return;
-
-
-                case CreatingProfileStatus.Finished:
-                    if (update.GetTextData() != GeneralCommands.Skip)
-
-                    if (update.GetTextData() != GeneralCommands.SetEmpty)
-                    {
-                        string email = update.GetTextData().Trim();
-                        Validators.ValidateEmail(email);
-                        Email = email;
-                    }
-                    if (Name is null) throw new ArgumentException("Name cannot be empty!");
-
-                    User profile = await _userService.Create(user, Name, Surname, Email);
+                case CreatingAccountStatus.AskCurrentBalance:
                     
+                    if (update.GetTextData() != GeneralCommands.SetEmpty)
+                    {
+                        string description = update.GetTextData().Trim();
+                        Description = description;
+                    }
                     await _bot.Write(user, new TextMessageArgs
                     {
-                        Text = $"{profile.FirstName}'s profile has been created!"
+                        Text = $"Write account start balance:",
+                        MarkupType = ReplyMarkupType.InlineKeyboard,
+                        InlineKeyboardButtons = new()
+                        {
+                            new()
+                            {
+                                new InlineButton("Set start balance to 0", GeneralCommands.SetEmpty)
+                            }
+                        }
+                    });
+
+                    Status++;
+                    return;
+
+
+                case CreatingAccountStatus.Finished:
+                    
+                    StartBalance = update.GetTextData() != GeneralCommands.SetEmpty
+                        ? Converters.ToDecimal(update.GetTextData().Trim()) : 0;
+
+                    if (Name is null) throw new ArgumentNullException("Name cannot be empty");
+
+                    User profile = await _userService.GetById(user.UserId 
+                        ?? throw new ArgumentNullException("Profile id cannot be null"))
+                        ?? throw new InvalidDataException("Profile cannot be null");
+                    Account account = await _accountService.Create(profile, Name, Description, StartBalance);
+
+                    await _bot.Write(user, new TextMessageArgs
+                    {
+                        Text = $"{account.Name} account has been created"
                     });
 
                     IsFinished = true;

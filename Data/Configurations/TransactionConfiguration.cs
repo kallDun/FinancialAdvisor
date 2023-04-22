@@ -36,11 +36,6 @@ namespace FinancialAdvisorTelegramBot.Data.Configurations
                 .HasColumnType("decimal(12,4)")
                 .IsRequired();
 
-            builder.Property(x => x.Type)
-                .HasColumnName("type")
-                .HasMaxLength(10)
-                .IsRequired();
-
             builder.Property(x => x.Communicator)
                 .HasColumnName("communicator")
                 .HasMaxLength(100)
