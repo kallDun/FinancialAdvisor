@@ -6,7 +6,7 @@ using FinancialAdvisorTelegramBot.Services.Telegram;
 
 namespace FinancialAdvisorTelegramBot.Bot.Views.Accounts
 {
-    public class OpenAccountsMenuCommand : ICommand
+    public class AccountsMenuCommand : ICommand
     {
         public static string TEXT_STYLE => "Accounts menu";
         public static string DEFAULT_STYLE => "/accounts_menu";
@@ -15,14 +15,14 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Accounts
         private readonly ITelegramUserService _telegramUserService;
         private readonly IAccountService _accountService;
 
-        public OpenAccountsMenuCommand(IBot bot, ITelegramUserService telegramUserService, IAccountService accountService)
+        public AccountsMenuCommand(IBot bot, ITelegramUserService telegramUserService, IAccountService accountService)
         {
             _bot = bot;
             _telegramUserService = telegramUserService;
             _accountService = accountService;
         }
 
-        public bool IsContextMenu(TelegramUser user) => user.ContextMenu == ContextMenus.Accounts;
+        public bool IsContextMenu(string contextMenu) => contextMenu == ContextMenus.Accounts;
 
         public bool CanExecute(UpdateArgs update, TelegramUser user)
             => (update.GetTextData() == DEFAULT_STYLE
@@ -35,11 +35,15 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Accounts
                 ?? throw new ArgumentNullException("User id cannot be null"))
                 ? new()
                 {
-                    CreateAccountCommand.TEXT_STYLE
+                    SelectAccountCommand.TEXT_STYLE,
+                    ViewAccountsInfoCommand.TEXT_STYLE,
+                    CreateAccountCommand.TEXT_STYLE,
+                    MainMenuCommand.TEXT_STYLE
                 }
                 : new()
                 {
-                    CreateAccountCommand.TEXT_STYLE
+                    CreateAccountCommand.TEXT_STYLE,
+                    MainMenuCommand.TEXT_STYLE
                 };
 
             await _telegramUserService.SetContextMenu(user, ContextMenus.Accounts);

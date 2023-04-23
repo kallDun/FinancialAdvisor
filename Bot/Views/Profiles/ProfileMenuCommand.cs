@@ -7,7 +7,7 @@ using FinancialAdvisorTelegramBot.Services.Telegram;
 
 namespace FinancialAdvisorTelegramBot.Bot.Views.Profiles
 {
-    public class OpenProfileMenuCommand : ICommand
+    public class ProfileMenuCommand : ICommand
     {
         public static string TEXT_STYLE => "Profile menu";
         public static string DEFAULT_STYLE => "/profile_menu";
@@ -16,14 +16,14 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Profiles
         private readonly IUserService _userService;
         private readonly ITelegramUserService _telegramUserService;
 
-        public OpenProfileMenuCommand(IBot bot, IUserService userService, ITelegramUserService telegramUserService)
+        public ProfileMenuCommand(IBot bot, IUserService userService, ITelegramUserService telegramUserService)
         {
             _bot = bot;
             _userService = userService;
             _telegramUserService = telegramUserService;
         }
 
-        public bool IsContextMenu(TelegramUser user) => user.ContextMenu == ContextMenus.Profile;
+        public bool IsContextMenu(string contextMenu) => contextMenu == ContextMenus.Profile;
 
         public bool CanExecute(UpdateArgs update, TelegramUser user) 
             => update.GetTextData() == DEFAULT_STYLE 
@@ -38,14 +38,14 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Profiles
                 ? new List<string>()
                 {
                     CreateProfileCommand.TEXT_STYLE,
-                    HelpCommand.TEXT_STYLE
+                    MainMenuCommand.TEXT_STYLE
                 }
                 : new List<string>()
                 {
-                    WatchProfileCommand.TEXT_STYLE,
+                    ViewProfileCommand.TEXT_STYLE,
                     UpdateProfileCommand.TEXT_STYLE,
                     DeleteProfileCommand.TEXT_STYLE,
-                    HelpCommand.TEXT_STYLE
+                    MainMenuCommand.TEXT_STYLE
                 };
 
             await _telegramUserService.SetContextMenu(user, ContextMenus.Profile);

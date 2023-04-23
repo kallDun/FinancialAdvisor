@@ -7,5 +7,7 @@
         public static string Profile => "Profile";
         
         public static string Accounts => "Accounts";
+        
+        public static string Subscription => "Subscription";
     }
 }

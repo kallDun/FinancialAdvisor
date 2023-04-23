@@ -7,7 +7,7 @@ using FinancialAdvisorTelegramBot.Services.Telegram;
 
 namespace FinancialAdvisorTelegramBot.Bot.Views
 {
-    public class HelpCommand : ICommand
+    public class MainMenuCommand : ICommand
     {
         public static string TEXT_STYLE => "Main menu";
         public static string DEFAULT_STYLE => GeneralCommands.Help;
@@ -15,13 +15,13 @@ namespace FinancialAdvisorTelegramBot.Bot.Views
         private readonly IBot _bot;
         private readonly ITelegramUserService _telegramUserService;
 
-        public HelpCommand(IBot bot, ITelegramUserService telegramUserService)
+        public MainMenuCommand(IBot bot, ITelegramUserService telegramUserService)
         {
             _bot = bot;
             _telegramUserService = telegramUserService;
         }
 
-        public bool IsContextMenu(TelegramUser user) => user.ContextMenu == ContextMenus.MainMenu;
+        public bool IsContextMenu(string contextMenu) => contextMenu == ContextMenus.MainMenu;
 
         public bool CanExecute(UpdateArgs update, TelegramUser user) 
             => update.GetTextData() == DEFAULT_STYLE
@@ -32,12 +32,12 @@ namespace FinancialAdvisorTelegramBot.Bot.Views
             List<string> buttons = user.UserId != null
                 ? new List<string>()
                 {
-                    OpenProfileMenuCommand.TEXT_STYLE,
-                    OpenAccountsMenuCommand.TEXT_STYLE
+                    ProfileMenuCommand.TEXT_STYLE,
+                    AccountsMenuCommand.TEXT_STYLE
                 }
                 : new List<string>()
                 {
-                    OpenProfileMenuCommand.TEXT_STYLE
+                    ProfileMenuCommand.TEXT_STYLE
                 };
 
             await _telegramUserService.SetContextMenu(user, ContextMenus.MainMenu);

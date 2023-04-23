@@ -23,6 +23,8 @@ namespace FinancialAdvisorTelegramBot.Services.Core
         {
             using var transaction = await _repository.DatabaseContext.Database.BeginTransactionAsync();
 
+            if (await GetByName(user.Id, name) is not null) throw new ArgumentException("Account with this name already exists");
+            
             Account entity = new()
             {
                 UserId = user.Id,

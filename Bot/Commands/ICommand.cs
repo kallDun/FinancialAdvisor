@@ -30,6 +30,6 @@ namespace FinancialAdvisorTelegramBot.Bot.Commands
         /// <summary>
         /// Context menu is a command that shows a list of available commands in current context to the user
         /// </summary>
-        bool IsContextMenu(TelegramUser user) => false;
+        bool IsContextMenu(string contextMenu) => false;
     }
 }

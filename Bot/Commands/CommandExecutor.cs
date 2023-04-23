@@ -77,9 +77,10 @@ namespace FinancialAdvisorTelegramBot.Bot.Commands
 
         private ICommand? GetContextMenu(TelegramUser user)
         {
+            if (user.ContextMenu is null) return null;
             foreach (var command in _commandContainer.Commands)
             {
-                if (command.IsFinished && command.IsContextMenu(user))
+                if (command.IsFinished && command.IsContextMenu(user.ContextMenu))
                 {
                     return command;
                 }

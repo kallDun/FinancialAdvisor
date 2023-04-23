@@ -6,7 +6,7 @@ using FinancialAdvisorTelegramBot.Services.Core;
 
 namespace FinancialAdvisorTelegramBot.Bot.Views.Profiles
 {
-    public class WatchProfileCommand : ICommand
+    public class ViewProfileCommand : ICommand
     {
         public static string TEXT_STYLE => "View profile";
         public static string DEFAULT_STYLE => "/view";
@@ -14,7 +14,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Profiles
         private readonly IBot _bot;
         private readonly IUserService _userService;
 
-        public WatchProfileCommand(IBot bot, IUserService userService)
+        public ViewProfileCommand(IBot bot, IUserService userService)
         {
             _bot = bot;
             _userService = userService;
