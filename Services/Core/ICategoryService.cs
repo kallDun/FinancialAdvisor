@@ -12,6 +12,6 @@ namespace FinancialAdvisorTelegramBot.Services.Core
 
         Task DeleteCategory(Category category);
 
-        Task<Category> GetOrOtherwiseCreateDefaultCategory(int userId);
+        Task<Category> GetOrOtherwiseCreateCategory(int userId, string categoryName);
     }
 }

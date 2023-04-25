@@ -28,5 +28,15 @@
                 throw new ArgumentException("Name can't contain '/'");
             }
         }
+
+        public static void ValidateLongName(string name)
+        {
+            if (string.IsNullOrEmpty(name) || name.Length < 3) throw new ArgumentException("Name must contain at least 3 characters!");
+            if (name.Length > 100) throw new ArgumentException("Name is too long!");
+            if (name.Contains('/'))
+            {
+                throw new ArgumentException("Name can't contain '/'");
+            }
+        }
     }
 }

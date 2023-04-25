@@ -7,8 +7,6 @@ namespace FinancialAdvisorTelegramBot.Services.Core
     [CustomService]
     public class CategoryService : ICategoryService
     {
-        private const string DefaultCategoryName = "Default";
-
         private readonly ICategoryRepository _repository;
         private readonly ITransactionRepository _transactionRepository;
 
@@ -54,10 +52,10 @@ namespace FinancialAdvisorTelegramBot.Services.Core
             return await _repository.GetCategoriesByUser(userId);
         }
 
-        public async Task<Category> GetOrOtherwiseCreateDefaultCategory(int userId)
+        public async Task<Category> GetOrOtherwiseCreateCategory(int userId, string categoryName)
         {
-            return await _repository.GetCategoryByName(userId, DefaultCategoryName) 
-                ?? await CreateCategory(userId, DefaultCategoryName, null);
+            return await _repository.GetCategoryByName(userId, categoryName) 
+                ?? await CreateCategory(userId, categoryName, null);
         }
     }
 }

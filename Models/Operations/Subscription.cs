@@ -13,12 +13,16 @@ namespace FinancialAdvisorTelegramBot.Models.Operations
         public int? AccountId { get; set; }
         
         public virtual Account? Account { get; set; }
-                
+
+        public string? Name { get; set; }
+
         public decimal Amount { get; set; }
 
         public byte PaymentDay { get; set; }
 
         public virtual IList<Transaction>? Transactions { get; set; }
+
+        public DateTime? LastPaymentDate { get; set; }
 
         public DateTime? CreatedAt { get; set; }
 

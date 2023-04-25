@@ -2,7 +2,9 @@
 using FinancialAdvisorTelegramBot.Bot.Commands;
 using FinancialAdvisorTelegramBot.Bot.Views.Accounts;
 using FinancialAdvisorTelegramBot.Bot.Views.Profiles;
+using FinancialAdvisorTelegramBot.Bot.Views.Subscriptions;
 using FinancialAdvisorTelegramBot.Models.Telegram;
+using FinancialAdvisorTelegramBot.Services.Core;
 using FinancialAdvisorTelegramBot.Services.Telegram;
 
 namespace FinancialAdvisorTelegramBot.Bot.Views
@@ -14,11 +16,13 @@ namespace FinancialAdvisorTelegramBot.Bot.Views
 
         private readonly IBot _bot;
         private readonly ITelegramUserService _telegramUserService;
+        private readonly IAccountService _accountService;
 
-        public MainMenuCommand(IBot bot, ITelegramUserService telegramUserService)
+        public MainMenuCommand(IBot bot, ITelegramUserService telegramUserService, IAccountService accountService)
         {
             _bot = bot;
             _telegramUserService = telegramUserService;
+            _accountService = accountService;
         }
 
         public bool IsContextMenu(string contextMenu) => contextMenu == ContextMenus.MainMenu;
@@ -39,6 +43,14 @@ namespace FinancialAdvisorTelegramBot.Bot.Views
                 {
                     ProfileMenuCommand.TEXT_STYLE
                 };
+
+            if (user.UserId != null && await _accountService.HasAny(user.UserId.Value))
+            {
+                buttons.AddRange(new List<string>()
+                {
+                    SubscriptionMenuCommand.TEXT_STYLE
+                });
+            }
 
             await _telegramUserService.SetContextMenu(user, ContextMenus.MainMenu);
 

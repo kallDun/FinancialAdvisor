@@ -57,7 +57,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Accounts
 
             await _bot.Write(user, new TextMessageArgs
             {
-                Text = $"<b>↓ Account {name} ↓</b>",
+                Text = $"<b>↓ Account <code>{name}</code> ↓</b>",
                 Placeholder = "Select command",
                 MarkupType = ReplyMarkupType.ReplyKeyboard,
                 ReplyKeyboardButtons = buttons,

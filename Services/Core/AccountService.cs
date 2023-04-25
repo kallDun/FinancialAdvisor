@@ -36,7 +36,7 @@ namespace FinancialAdvisorTelegramBot.Services.Core
             Account added = await _repository.Add(entity);
             Account account = await _repository.GetById(added.Id) ?? throw new Exception("Account was not created");
             
-            Category defaultCategory = await _categoryService.GetOrOtherwiseCreateDefaultCategory(user.Id);
+            Category defaultCategory = await _categoryService.GetOrOtherwiseCreateCategory(user.Id, CategoryNames.Default);
 
             Transaction addedStartBalanceTransaction = await _transactionService.Create(
                 startBalance, "Start balance transaction", added.Id, defaultCategory.Id, DateTime.Now, null);

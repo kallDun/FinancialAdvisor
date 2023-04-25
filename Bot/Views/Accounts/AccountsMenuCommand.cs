@@ -36,7 +36,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Accounts
                 ? new()
                 {
                     SelectAccountCommand.TEXT_STYLE,
-                    ViewAccountsInfoCommand.TEXT_STYLE,
+                    ViewAccountsShortInfoCommand.TEXT_STYLE,
                     CreateAccountCommand.TEXT_STYLE,
                     MainMenuCommand.TEXT_STYLE
                 }

@@ -6,15 +6,15 @@ using FinancialAdvisorTelegramBot.Services.Core;
 
 namespace FinancialAdvisorTelegramBot.Bot.Views.Accounts
 {
-    public class ViewAccountsInfoCommand : ICommand
+    public class ViewAccountsShortInfoCommand : ICommand
     {
-        public static string TEXT_STYLE => "View accounts info";
+        public static string TEXT_STYLE => "View accounts short info";
         public static string DEFAULT_STYLE => "/view";
 
         private readonly IBot _bot;
         private readonly IAccountService _accountService;
 
-        public ViewAccountsInfoCommand(IBot bot, IAccountService accountService)
+        public ViewAccountsShortInfoCommand(IBot bot, IAccountService accountService)
         {
             _bot = bot;
             _accountService = accountService;

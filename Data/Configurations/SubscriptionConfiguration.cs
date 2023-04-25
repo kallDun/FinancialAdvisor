@@ -37,6 +37,11 @@ namespace FinancialAdvisorTelegramBot.Data.Configurations
             builder.Property(x => x.AccountId)
                 .HasColumnName("account_id");
 
+            builder.Property(x => x.Name)
+                .HasColumnName("name")
+                .HasMaxLength(100)
+                .IsRequired();
+
             builder.Property(x => x.Amount)
                 .HasColumnName("amount")
                 .HasColumnType("decimal(12,4)")
@@ -44,6 +49,11 @@ namespace FinancialAdvisorTelegramBot.Data.Configurations
 
             builder.Property(x => x.PaymentDay)
                 .HasColumnName("payment_day")
+                .IsRequired();
+
+            builder.Property(x => x.LastPaymentDate)
+                .HasColumnName("last_payment_date")
+                .HasColumnType("timestamp with time zone")
                 .IsRequired();
 
             builder.Property(x => x.CreatedAt)

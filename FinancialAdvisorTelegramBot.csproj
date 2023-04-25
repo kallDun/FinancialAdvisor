@@ -23,7 +23,6 @@
   <ItemGroup>
     <Folder Include="Bot\Views\Categories\" />
     <Folder Include="Bot\Views\Transactions\" />
-    <Folder Include="Repositories\Operations\" />
   </ItemGroup>
 
 </Project>
