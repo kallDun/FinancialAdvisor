@@ -1,4 +1,6 @@
-﻿namespace FinancialAdvisorTelegramBot.Utils
+﻿using System.Runtime.CompilerServices;
+
+namespace FinancialAdvisorTelegramBot.Utils
 {
     public static class Validators
     {
@@ -19,23 +21,17 @@
             if (email.Length > 50) throw new ArgumentException("Email is too long!");
         }
 
-        public static void ValidateName(string name)
+        public static void ValidateName(string name, bool isLong = false)
         {
             if (string.IsNullOrEmpty(name) || name.Length < 3) throw new ArgumentException("Name must contain at least 3 characters!");
-            if (name.Length > 20) throw new ArgumentException("Name is too long!");
+            if (name.Length > (isLong ? 100 : 20)) throw new ArgumentException("Name is too long!");
             if (name.Contains('/'))
             {
                 throw new ArgumentException("Name can't contain '/'");
             }
-        }
-
-        public static void ValidateLongName(string name)
-        {
-            if (string.IsNullOrEmpty(name) || name.Length < 3) throw new ArgumentException("Name must contain at least 3 characters!");
-            if (name.Length > 100) throw new ArgumentException("Name is too long!");
-            if (name.Contains('/'))
+            if (name.Contains('!'))
             {
-                throw new ArgumentException("Name can't contain '/'");
+                throw new ArgumentException("Name can't contain '!'");
             }
         }
     }

@@ -32,14 +32,41 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Profiles
         public async Task Execute(UpdateArgs update, TelegramUser user)
         {
             const string CONFIRM_COMMAND = "/profile_delete_confirm";
+            string text = update.GetTextData();
 
             if (Status == 0)
             {
+                await AskForDelete(user, CONFIRM_COMMAND);
+                Status++;
+            }
+            else
+            {
+                await ProcessDeletion(user, CONFIRM_COMMAND, text);
+                IsFinished = true;
+            }
+        }
+
+        private async Task ProcessDeletion(TelegramUser user, string CONFIRM_COMMAND, string text)
+        {
+            if (text == CONFIRM_COMMAND)
+            {
+                if (user.UserId is null) throw new InvalidOperationException("User id is null");
+                await _userService.DeleteById((int)user.UserId);
+
                 await _bot.Write(user, new TextMessageArgs
                 {
-                    Text = "Are you sure you want to delete your profile with ALL data?",
-                    MarkupType = ReplyMarkupType.InlineKeyboard,
-                    InlineKeyboardButtons = new()
+                    Text = "Your profile has been deleted"
+                });
+            }
+        }
+
+        private async Task AskForDelete(TelegramUser user, string CONFIRM_COMMAND)
+        {
+            await _bot.Write(user, new TextMessageArgs
+            {
+                Text = "Are you sure you want to delete your profile with ALL data?",
+                MarkupType = ReplyMarkupType.InlineKeyboard,
+                InlineKeyboardButtons = new()
                     {
                         new()
                         {
@@ -50,26 +77,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Profiles
                             new InlineButton("No", GeneralCommands.Cancel)
                         }
                     }
-                });
-
-                Status++;
-            }
-            else
-            {
-                if (update.GetTextData() == CONFIRM_COMMAND)
-                {
-                    if (user.UserId is null) throw new InvalidOperationException("User id is null");
-                    await _userService.DeleteById((int)user.UserId);
-
-                    await _bot.Write(user, new TextMessageArgs
-                    {
-                        Text = "Your profile has been deleted"
-                    });
-                }
-
-                IsFinished = true;
-            }
+            });
         }
-
     }
 }

@@ -6,5 +6,7 @@
         public static string Cancel => "/cancel";
         public static string Skip => "/skip";
         public static string SetEmpty => "/set_empty";
+        public static string Yes => "/yes";
+        public static string No => "/no";
     }
 }

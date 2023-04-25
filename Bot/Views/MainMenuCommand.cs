@@ -25,7 +25,9 @@ namespace FinancialAdvisorTelegramBot.Bot.Views
             _accountService = accountService;
         }
 
-        public bool IsContextMenu(string contextMenu) => contextMenu == ContextMenus.MainMenu;
+        public bool IsContextMenu(string[] contextMenu) 
+            => contextMenu.Length == 1
+            && contextMenu[0] == ContextMenus.MainMenu;
 
         public bool CanExecute(UpdateArgs update, TelegramUser user) 
             => update.GetTextData() == DEFAULT_STYLE
@@ -48,7 +50,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views
             {
                 buttons.AddRange(new List<string>()
                 {
-                    SubscriptionMenuCommand.TEXT_STYLE
+                    SubscriptionsMenuCommand.TEXT_STYLE
                 });
             }
 

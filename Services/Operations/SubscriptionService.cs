@@ -15,8 +15,13 @@ namespace FinancialAdvisorTelegramBot.Services.Operations
         }
 
         
-        public async Task<Subscription> Create(int userId, int? accountId, string name, decimal amount, byte paymentDay)
+        public async Task<Subscription> Create(int userId, int? accountId, string name, decimal amount, byte paymentDay, bool autoPay)
         {
+            if (paymentDay < 1 || paymentDay > 31) 
+                throw new ArgumentException("Payment day must be between 1 and 31", nameof(paymentDay));
+            if (await _repository.GetByName(userId, name) is not null) 
+                throw new ArgumentException("Subscription with this name already exists", nameof(name));
+
             Subscription entity = new()
             {
                 UserId = userId,
@@ -24,12 +29,18 @@ namespace FinancialAdvisorTelegramBot.Services.Operations
                 Name = name,
                 Amount = amount,
                 PaymentDay = paymentDay,
+                AutoPay = autoPay,
                 LastPaymentDate = DateTime.Now,
                 CreatedAt = DateTime.Now,
             };
             var added = await _repository.Add(entity);
             return await _repository.GetById(added.Id) 
                 ?? throw new Exception("Subscription was not created");
+        }
+
+        public async Task<Subscription?> GetByName(int userId, string name)
+        {
+            return await _repository.GetByName(userId, name);
         }
 
         public DateTime GetNextPaymentDate(byte paymentDay, DateTime lastPaymentDay)

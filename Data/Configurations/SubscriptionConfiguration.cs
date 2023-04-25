@@ -51,6 +51,10 @@ namespace FinancialAdvisorTelegramBot.Data.Configurations
                 .HasColumnName("payment_day")
                 .IsRequired();
 
+            builder.Property(x => x.AutoPay)
+                .HasColumnName("auto_pay")
+                .IsRequired();
+
             builder.Property(x => x.LastPaymentDate)
                 .HasColumnName("last_payment_date")
                 .HasColumnType("timestamp with time zone")

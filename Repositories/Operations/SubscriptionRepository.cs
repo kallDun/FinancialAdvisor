@@ -18,7 +18,13 @@ namespace FinancialAdvisorTelegramBot.Repositories.Operations
         public DbContext DatabaseContext => _context;
 
         public DbSet<Subscription> DbSet => _context.Subscriptions;
+
         
+        public async Task<Subscription?> GetByName(int userId, string name)
+        {
+            return await _context.Subscriptions
+                .FirstOrDefaultAsync(s => s.UserId == userId && s.Name == name);
+        }
 
         public async Task<bool> HasAny(int userId, string? accountName = null)
         {

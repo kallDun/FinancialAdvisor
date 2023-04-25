@@ -45,126 +45,131 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Profiles
 
         public async Task Execute(UpdateArgs update, TelegramUser user)
         {
-            switch (_status)
+            string text = update.GetTextData();
+            Task function = _status switch
             {
-                case CreatingProfileStatus.AskName:
-                    await _bot.Write(user, new TextMessageArgs
-                    {
-                        Text = $"Write your new name:",
-                        MarkupType = ReplyMarkupType.InlineKeyboard,
-                        InlineKeyboardButtons = new()
-                        {
-                            new()
-                            {
-                                new InlineButton("Do not update name", GeneralCommands.Skip)
-                            }
-                        }
-                    });
+                CreatingProfileStatus.AskName => AskName(user),
+                CreatingProfileStatus.AskLastname => AskLastName(user, text),
+                CreatingProfileStatus.AskEmail => AskEmail(user, text),
+                CreatingProfileStatus.Finished => ProcessResult(user, text),
+                _ => throw new NotImplementedException()
+            };
+            
+            await function;
 
-                    Status++;
-                    return;
-
-
-                case CreatingProfileStatus.AskLastname:
-
-                    if (update.GetTextData() != GeneralCommands.Skip)
-                    {
-                        string name = update.GetTextData().Trim();
-                        Validators.ValidateName(name);
-                        Name = name;
-                    }
-                    SkipName = update.GetTextData() == GeneralCommands.Skip;
-
-                    await _bot.Write(user, new TextMessageArgs
-                    {
-                        Text = $"Write your new surname:",
-                        MarkupType = ReplyMarkupType.InlineKeyboard, 
-                        InlineKeyboardButtons = new()
-                        {
-                            new()
-                            {
-                                new InlineButton("Set surname empty", GeneralCommands.SetEmpty)
-                            },
-                            new()
-                            {
-                                new InlineButton("Do not update surname", GeneralCommands.Skip)
-                            }
-                        }
-                    });
-
-                    Status++;
-                    return;
-
-
-                case CreatingProfileStatus.AskEmail:
-
-                    if (update.GetTextData() != GeneralCommands.SetEmpty
-                        && update.GetTextData() != GeneralCommands.Skip)
-                    {
-                        string surname = update.GetTextData().Trim();
-                        Validators.ValidateName(surname);
-                        Surname = surname;
-                    }
-                    SkipSurname = update.GetTextData() == GeneralCommands.Skip;
-
-                    await _bot.Write(user, new TextMessageArgs
-                    {
-                        Text = $"Write your new email:",
-                        MarkupType = ReplyMarkupType.InlineKeyboard,
-                        InlineKeyboardButtons = new()
-                        {
-                            new()
-                            {
-                                new InlineButton("Set email empty", GeneralCommands.SetEmpty)
-                            },
-                            new()
-                            {
-                                new InlineButton("Do not update email", GeneralCommands.Skip)
-                            }
-                        }
-                    });
-
-                    Status++;
-                    return;
-
-
-                case CreatingProfileStatus.Finished:
-
-                    if (update.GetTextData() != GeneralCommands.SetEmpty
-                        && update.GetTextData() != GeneralCommands.Skip)
-                    {
-                        string email = update.GetTextData().Trim();
-                        Validators.ValidateEmail(email);
-                        Email = email;
-                    }
-                    SkipEmail = update.GetTextData() == GeneralCommands.Skip;
-
-                    if (SkipName && SkipSurname && SkipEmail)
-                    {
-                        await _bot.Write(user, new TextMessageArgs
-                        {
-                            Text = "You didn't update any field!"
-                        });
-                    }
-                    else
-                    {
-                        if (user.UserId is null) throw new InvalidOperationException("User id is null!");
-                        User profile = await _userService.GetById((int)user.UserId) ?? throw new InvalidOperationException("Cannot find profile!");
-
-                        if (!SkipName) profile.FirstName = Name;
-                        if (!SkipSurname) profile.LastName = Surname;
-                        if (!SkipEmail) profile.Email = Email;
-                        await _userService.Update(profile);
-
-                        await _bot.Write(user, new TextMessageArgs
-                        {
-                            Text = $"{profile.FirstName}'s profile has been updated"
-                        });
-                    }
-
-                    IsFinished = true;
-                    return;
+            if (_status is CreatingProfileStatus.Finished)
+            {
+                IsFinished = true;
             }
+            Status++;
+        }
+
+        private async Task ProcessResult(TelegramUser user, string text)
+        {
+            if (text != GeneralCommands.SetEmpty
+                && text != GeneralCommands.Skip)
+            {
+                string email = text.Trim();
+                Validators.ValidateEmail(email);
+                Email = email;
+            }
+            SkipEmail = text == GeneralCommands.Skip;
+
+            if (SkipName && SkipSurname && SkipEmail)
+            {
+                await _bot.Write(user, new TextMessageArgs
+                {
+                    Text = "You didn't update any field!"
+                });
+            }
+            else
+            {
+                if (user.UserId is null) throw new InvalidOperationException("User id is null!");
+                User profile = await _userService.GetById((int)user.UserId) ?? throw new InvalidOperationException("Cannot find profile!");
+
+                if (!SkipName) profile.FirstName = Name;
+                if (!SkipSurname) profile.LastName = Surname;
+                if (!SkipEmail) profile.Email = Email;
+                await _userService.Update(profile);
+
+                await _bot.Write(user, new TextMessageArgs
+                {
+                    Text = $"{profile.FirstName}'s profile has been updated"
+                });
+            }
+        }
+
+        private async Task AskEmail(TelegramUser user, string text)
+        {
+            if (text != GeneralCommands.SetEmpty
+                && text != GeneralCommands.Skip)
+            {
+                string surname = text.Trim();
+                Validators.ValidateName(surname);
+                Surname = surname;
+            }
+            SkipSurname = text == GeneralCommands.Skip;
+
+            await _bot.Write(user, new TextMessageArgs
+            {
+                Text = $"Write your new email:",
+                MarkupType = ReplyMarkupType.InlineKeyboard,
+                InlineKeyboardButtons = new()
+                {
+                    new()
+                    {
+                        new InlineButton("Set email empty", GeneralCommands.SetEmpty)
+                    },
+                    new()
+                    {
+                        new InlineButton("Do not update email", GeneralCommands.Skip)
+                    }
+                }
+            });
+        }
+
+        private async Task AskLastName(TelegramUser user, string text)
+        {
+            if (text != GeneralCommands.Skip)
+            {
+                string name = text.Trim();
+                Validators.ValidateName(name);
+                Name = name;
+            }
+            SkipName = text == GeneralCommands.Skip;
+
+            await _bot.Write(user, new TextMessageArgs
+            {
+                Text = $"Write your new surname:",
+                MarkupType = ReplyMarkupType.InlineKeyboard,
+                InlineKeyboardButtons = new()
+                {
+                    new()
+                    {
+                        new InlineButton("Set surname empty", GeneralCommands.SetEmpty)
+                    },
+                    new()
+                    {
+                        new InlineButton("Do not update surname", GeneralCommands.Skip)
+                    }
+                }
+            });
+        }
+
+        private async Task AskName(TelegramUser user)
+        {
+            await _bot.Write(user, new TextMessageArgs
+            {
+                Text = $"Write your new name:",
+                MarkupType = ReplyMarkupType.InlineKeyboard,
+                InlineKeyboardButtons = new()
+                {
+                    new()
+                    {
+                        new InlineButton("Do not update name", GeneralCommands.Skip)
+                    }
+                }
+            });
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using FinancialAdvisorTelegramBot.Bot.Args;
 using FinancialAdvisorTelegramBot.Bot.Updates;
+using FinancialAdvisorTelegramBot.Bot.Views;
 using FinancialAdvisorTelegramBot.Models.Telegram;
 using FinancialAdvisorTelegramBot.Services.Telegram;
 
@@ -36,7 +37,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Commands
                     }
                 }
 
-                if (commandToExecute is null) throw new ArgumentException("Command or context not found");
+                if (commandToExecute is null) throw new ArgumentException($"Command or context not found. Try {MainMenuCommand.DEFAULT_STYLE}");
 
                 await commandToExecute.Execute(update, user);
                 if (commandToExecute.IsFinished)
@@ -80,7 +81,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Commands
             if (user.ContextMenu is null) return null;
             foreach (var command in _commandContainer.Commands)
             {
-                if (command.IsFinished && command.IsContextMenu(user.ContextMenu))
+                if (command.IsFinished && command.IsContextMenu(user.ContextMenu.Split('/')))
                 {
                     return command;
                 }

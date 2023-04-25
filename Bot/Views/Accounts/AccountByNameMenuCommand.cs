@@ -24,7 +24,9 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Accounts
             _accountService = accountService;
         }
 
-        public bool IsContextMenu(string contextMenu) => Regex.IsMatch(contextMenu, $"^({ContextMenus.Accounts})[/](.*?)$");
+        public bool IsContextMenu(string[] contextMenu) 
+            => contextMenu.Length == 2 
+            && contextMenu[0] == ContextMenus.Accounts;
 
         public bool CanExecute(UpdateArgs update, TelegramUser user)
         {
@@ -45,7 +47,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Accounts
                 ? new()
                 {
                     ViewAccountCommand.TEXT_STYLE,
-                    SubscriptionMenuCommand.TEXT_STYLE,
+                    SubscriptionsMenuCommand.TEXT_STYLE,
                     AccountsMenuCommand.TEXT_STYLE
                 }
                 : new()

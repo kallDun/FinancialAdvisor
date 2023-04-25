@@ -4,36 +4,35 @@ using FinancialAdvisorTelegramBot.Bot.Views.Accounts;
 using FinancialAdvisorTelegramBot.Models.Telegram;
 using FinancialAdvisorTelegramBot.Services.Operations;
 using FinancialAdvisorTelegramBot.Services.Telegram;
-using System.Text.RegularExpressions;
 
 namespace FinancialAdvisorTelegramBot.Bot.Views.Subscriptions
 {
-    public class SubscriptionMenuCommand : ICommand
+    public class SubscriptionsMenuCommand : ICommand
     {
-        public static string TEXT_STYLE => "Subscription menu";
-        public static string DEFAULT_STYLE => "/subscription_menu";
+        public static string TEXT_STYLE => "Subscriptions menu";
+        public static string DEFAULT_STYLE => "/subscriptions_menu";
 
         private readonly IBot _bot;
         private readonly ITelegramUserService _telegramUserService;
         private readonly ISubscriptionService _subscriptionService;
 
-        public SubscriptionMenuCommand(IBot bot, ITelegramUserService telegramUserService, ISubscriptionService subscriptionService)
+        public SubscriptionsMenuCommand(IBot bot, ITelegramUserService telegramUserService, ISubscriptionService subscriptionService)
         {
             _bot = bot;
             _telegramUserService = telegramUserService;
             _subscriptionService = subscriptionService;
         }
 
-        public bool IsContextMenu(string contextMenu) => 
-            Regex.IsMatch(contextMenu, $"^({ContextMenus.Accounts})[/](.*?)[/]({ContextMenus.Subscription})$")
-            || contextMenu == ContextMenus.Subscription;
+        public bool IsContextMenu(string[] contextMenu)
+            => (contextMenu.Length == 1 && contextMenu[0] == ContextMenus.Subscription)
+            || (contextMenu.Length == 3 && contextMenu[0] == ContextMenus.Accounts && contextMenu[2] == ContextMenus.Subscription);
 
         public bool CanExecute(UpdateArgs update, TelegramUser user)
         {
             var split = (string.IsNullOrEmpty(user.ContextMenu) ? string.Empty : user.ContextMenu).Split('/');
             return ((split.Length >= 2 && split[0] == ContextMenus.Accounts)
                 || split.Length == 1 && split[0] == ContextMenus.MainMenu
-                || split.Length == 1 && split[0] == ContextMenus.Subscription)
+                || split.Length >= 1 && split[0] == ContextMenus.Subscription)
                 && (update.GetTextData() == DEFAULT_STYLE
                 || update.GetTextData() == TEXT_STYLE)
                 && user.UserId is not null;
@@ -44,7 +43,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Subscriptions
             if (user.UserId is null) throw new InvalidDataException("User id cannot be null");
             var split = user.ContextMenu?.Split('/') ?? throw new InvalidDataException("Missing context menu");
             if (!((split.Length >= 2 && split[0] == ContextMenus.Accounts)
-                || split.Length == 1 && split[0] == ContextMenus.Subscription
+                || split.Length >= 1 && split[0] == ContextMenus.Subscription
                 || split.Length == 1 && split[0] == ContextMenus.MainMenu)) throw new InvalidDataException("Invalid context menu");
 
             bool contextMenuWithAccount = split.Length >= 2 && split[0] == ContextMenus.Accounts;
@@ -55,8 +54,9 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Subscriptions
             List<string> buttons = hasAnySubscriptions
                 ? new()
                 {
-                    CreateSubscriptionCommand.TEXT_STYLE,
-                    ViewSubscriptionsCommand.TEXT_STYLE
+                    SelectSubscriptionCommand.TEXT_STYLE,
+                    ViewSubscriptionsCommand.TEXT_STYLE,
+                    CreateSubscriptionCommand.TEXT_STYLE
                 }
                 : new()
                 {

@@ -6,9 +6,11 @@ namespace FinancialAdvisorTelegramBot.Services.Operations
     {
         Task<bool> HasAny(int userId, string? accountName = null);
 
+        Task<Subscription?> GetByName(int userId, string name);
+
         Task<IList<Subscription>> LoadAllWithAccounts(int userId, string? accountName = null);
 
-        Task<Subscription> Create(int userId, int? accountId, string name, decimal amount, byte paymentDay);
+        Task<Subscription> Create(int userId, int? accountId, string name, decimal amount, byte paymentDay, bool autoPay);
 
         DateTime GetNextPaymentDate(byte paymentDay, DateTime lastPaymentDay);
     }

@@ -42,84 +42,89 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Profiles
 
         public async Task Execute(UpdateArgs update, TelegramUser user)
         {
-            switch (_status)
+            string text = update.GetTextData();
+            Task function = _status switch
             {
-                case CreatingProfileStatus.AskName:
+                CreatingProfileStatus.AskName => AskName(user),
+                CreatingProfileStatus.AskLastname => AskLastname(user, text),
+                CreatingProfileStatus.AskEmail => AskEmail(user, text),
+                CreatingProfileStatus.Finished => ProcessResult(user, text),
+                _ => throw new InvalidDataException("Invalid status")
+            };
+            await function;
 
-                    await _bot.Write(user, new TextMessageArgs
-                    {
-                        Text = $"Write your name:"
-                    });
-
-                    Status++;
-                    return;
-
-
-                case CreatingProfileStatus.AskLastname:
-
-                    string name = update.GetTextData().Trim();
-                    Validators.ValidateName(name);
-                    Name = name;
-                    await _bot.Write(user, new TextMessageArgs
-                    {
-                        Text = $"Write your surname:",
-                        MarkupType = ReplyMarkupType.InlineKeyboard,
-                        InlineKeyboardButtons = new()
-                        {
-                            new()
-                            {
-                                new InlineButton("Set surname empty", GeneralCommands.SetEmpty)
-                            }
-                        }
-                    });
-
-                    Status++;
-                    return;
-
-
-                case CreatingProfileStatus.AskEmail:
-                    if (update.GetTextData() != GeneralCommands.SetEmpty)
-                    {
-                        string surname = update.GetTextData().Trim();
-                        Validators.ValidateName(surname);
-                        Surname = surname;
-                    }
-                    await _bot.Write(user, new TextMessageArgs
-                    {
-                        Text = $"Write your email:",
-                        MarkupType = ReplyMarkupType.InlineKeyboard,
-                        InlineKeyboardButtons = new()
-                        {
-                            new()
-                            {
-                                new InlineButton("Set email empty", GeneralCommands.SetEmpty)
-                            }
-                        }
-                    });
-
-                    Status++;
-                    return;
-
-
-                case CreatingProfileStatus.Finished:
-                    if (update.GetTextData() != GeneralCommands.SetEmpty)
-                    {
-                        string email = update.GetTextData().Trim();
-                        Validators.ValidateEmail(email);
-                        Email = email;
-                    }
-                    if (Name is null) throw new ArgumentException("Name cannot be empty!");
-
-                    User profile = await _userService.Create(user, Name, Surname, Email);
-                    
-                    await _bot.Write(user, new TextMessageArgs
-                    {
-                        Text = $"{profile.FirstName}'s profile has been created!"
-                    });
-
-                    IsFinished = true;
-                    return;
+            if (_status is CreatingProfileStatus.Finished)
+            {
+                IsFinished = true;
             }
+            Status++;
+        }
+
+        private async Task ProcessResult(TelegramUser user, string text)
+        {
+            if (text != GeneralCommands.SetEmpty)
+            {
+                string email = text.Trim();
+                Validators.ValidateEmail(email);
+                Email = email;
+            }
+            if (Name is null) throw new ArgumentException("Name cannot be empty!");
+
+            User profile = await _userService.Create(user, Name, Surname, Email);
+
+            await _bot.Write(user, new TextMessageArgs
+            {
+                Text = $"{profile.FirstName}'s profile has been created!"
+            });
+        }
+
+        private async Task AskEmail(TelegramUser user, string text)
+        {
+            if (text != GeneralCommands.SetEmpty)
+            {
+                string surname = text.Trim();
+                Validators.ValidateName(surname);
+                Surname = surname;
+            }
+            await _bot.Write(user, new TextMessageArgs
+            {
+                Text = $"Write your email:",
+                MarkupType = ReplyMarkupType.InlineKeyboard,
+                InlineKeyboardButtons = new()
+                {
+                    new()
+                    {
+                        new InlineButton("Set email empty", GeneralCommands.SetEmpty)
+                    }
+                }
+            });
+        }
+
+        private async Task AskLastname(TelegramUser user, string text)
+        {
+            string name = text.Trim();
+            Validators.ValidateName(name);
+            Name = name;
+            await _bot.Write(user, new TextMessageArgs
+            {
+                Text = $"Write your surname:",
+                MarkupType = ReplyMarkupType.InlineKeyboard,
+                InlineKeyboardButtons = new()
+                {
+                    new()
+                    {
+                        new InlineButton("Set surname empty", GeneralCommands.SetEmpty)
+                    }
+                }
+            });
+        }
+
+        private async Task AskName(TelegramUser user)
+        {
+            await _bot.Write(user, new TextMessageArgs
+            {
+                Text = $"Write your name:"
+            });
         }
     }
 }

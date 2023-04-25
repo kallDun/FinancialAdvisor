@@ -20,6 +20,8 @@ namespace FinancialAdvisorTelegramBot.Models.Operations
 
         public byte PaymentDay { get; set; }
 
+        public bool AutoPay { get; set; }
+
         public virtual IList<Transaction>? Transactions { get; set; }
 
         public DateTime? LastPaymentDate { get; set; }

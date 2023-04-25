@@ -22,7 +22,9 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Accounts
             _accountService = accountService;
         }
 
-        public bool IsContextMenu(string contextMenu) => contextMenu == ContextMenus.Accounts;
+        public bool IsContextMenu(string[] contextMenu) 
+            => contextMenu.Length == 1 
+            && contextMenu[0] == ContextMenus.Accounts;
 
         public bool CanExecute(UpdateArgs update, TelegramUser user)
             => (update.GetTextData() == DEFAULT_STYLE
