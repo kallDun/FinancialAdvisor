@@ -1,6 +1,7 @@
 ﻿using FinancialAdvisorTelegramBot.Bot.Args;
 using FinancialAdvisorTelegramBot.Bot.Commands;
 using FinancialAdvisorTelegramBot.Bot.Views.Subscriptions;
+using FinancialAdvisorTelegramBot.Bot.Views.Transactions;
 using FinancialAdvisorTelegramBot.Models.Telegram;
 using FinancialAdvisorTelegramBot.Services.Core;
 using FinancialAdvisorTelegramBot.Services.Telegram;
@@ -39,7 +40,6 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Accounts
         public async Task Execute(UpdateArgs update, TelegramUser user)
         {
             var split = user.ContextMenu?.Split('/') ?? throw new InvalidDataException("Missing context menu");
-            if (split.Length < 2) throw new InvalidDataException("Invalid context menu");
             string name = split[1];
 
             List<string> buttons = await _accountService.GetByName(user.UserId 
@@ -47,6 +47,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Accounts
                 ? new()
                 {
                     ViewAccountCommand.TEXT_STYLE,
+                    TransactionMenuCommand.TEXT_STYLE,
                     SubscriptionsMenuCommand.TEXT_STYLE,
                     AccountsMenuCommand.TEXT_STYLE
                 }

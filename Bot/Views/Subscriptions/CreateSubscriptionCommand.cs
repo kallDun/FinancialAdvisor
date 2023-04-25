@@ -52,10 +52,8 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Subscriptions
         {
             if (user.UserId is null) throw new InvalidDataException("Profile id cannot be null");
             var contextMenuSplit = user.ContextMenu?.Split('/') ?? throw new InvalidDataException("Missing context menu");
-            if (!((contextMenuSplit.Length == 3 && contextMenuSplit[2] == ContextMenus.Subscription)
-                || contextMenuSplit.Length == 1 && contextMenuSplit[0] == ContextMenus.Subscription)) throw new InvalidDataException("Invalid context menu");
-
             string text = update.GetTextData();
+            
             Task function = _status switch
             {
                 CreatingSubscriptionStatus.AskAccountName => AskAccountName(user, text, contextMenuSplit),

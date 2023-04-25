@@ -4,6 +4,8 @@ namespace FinancialAdvisorTelegramBot.Services.Core
 {
     public interface IAccountService
     {
+        Task<Account?> GetById(int id);
+
         Task<IList<Account>> GetByUser(int userId);
 
         Task<bool> HasAny(int userId);

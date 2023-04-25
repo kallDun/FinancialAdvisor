@@ -37,10 +37,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Subscriptions
         public async Task Execute(UpdateArgs update, TelegramUser user)
         {
             if (user.UserId is null) throw new InvalidDataException("Profile id cannot be null");
-            var contextMenuSplit = user.ContextMenu?.Split('/') ?? throw new InvalidDataException("Missing context menu");
-            if (!((contextMenuSplit.Length >= 4 && contextMenuSplit[2] == ContextMenus.Subscription && contextMenuSplit[0] == ContextMenus.Accounts)
-                || contextMenuSplit.Length >= 2 && contextMenuSplit[0] == ContextMenus.Subscription)) throw new InvalidDataException("Invalid context menu");
-            
+            var contextMenuSplit = user.ContextMenu?.Split('/') ?? throw new InvalidDataException("Missing context menu");            
             bool contextMenuWithAccount = contextMenuSplit.Length >= 4 && contextMenuSplit[2] == ContextMenus.Subscription && contextMenuSplit[0] == ContextMenus.Accounts;
             string name = contextMenuWithAccount ? contextMenuSplit[3] : contextMenuSplit[1];
 

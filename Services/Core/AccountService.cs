@@ -55,6 +55,11 @@ namespace FinancialAdvisorTelegramBot.Services.Core
             await _repository.Delete(account);
         }
 
+        public async Task<Account?> GetById(int id)
+        {
+            return await _repository.GetById(id);
+        }
+
         public async Task<Account?> GetByName(int userId, string accountName)
         {
             return await _repository.GetAccountByName(userId, accountName);

@@ -40,9 +40,6 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Subscriptions
         public async Task Execute(UpdateArgs update, TelegramUser user)
         {
             var contextMenuSplit = user.ContextMenu?.Split('/') ?? throw new InvalidDataException("Missing context menu");
-            if (!((contextMenuSplit.Length == 3 && contextMenuSplit[2] == ContextMenus.Subscription)
-                || contextMenuSplit.Length == 1 && contextMenuSplit[0] == ContextMenus.Subscription)) throw new InvalidDataException("Invalid context menu");
-
             if (Status == 0)
             {
                 await AskSubscriptionName(user, contextMenuSplit);

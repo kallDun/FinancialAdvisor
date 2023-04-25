@@ -9,5 +9,7 @@
         public static string Accounts => "Accounts!";
         
         public static string Subscription => "Subscription!";
+                
+        public static string Transaction => "Transaction!";
     }
 }

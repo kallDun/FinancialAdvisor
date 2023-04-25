@@ -21,16 +21,19 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Accounts
             _accountService = accountService;
         }
 
-        public bool CanExecute(UpdateArgs update, TelegramUser user) =>
-            Regex.IsMatch(user.ContextMenu ?? string.Empty, $"^({ContextMenus.Accounts})[/](.*?)$")
-            && (update.GetTextData() == DEFAULT_STYLE || update.GetTextData() == TEXT_STYLE)
-            && user.UserId != null;
+        public bool CanExecute(UpdateArgs update, TelegramUser user)
+        {
+            var splitContextMenu = user.ContextMenu?.Split('/') ?? throw new InvalidDataException("Missing context menu");
+            return (splitContextMenu.Length == 2 && splitContextMenu[0] == ContextMenus.Accounts)
+                && (update.GetTextData() == DEFAULT_STYLE || update.GetTextData() == TEXT_STYLE)
+                && user.UserId != null;
+        }
 
         public async Task Execute(UpdateArgs update, TelegramUser user)
         {
-            var split = user.ContextMenu?.Split('/') ?? throw new InvalidDataException("Missing context menu");
-            if (split.Length < 2) throw new InvalidDataException("Invalid context menu");
-            string name = split[1];
+            var splitContextMenu = user.ContextMenu?.Split('/') ?? throw new InvalidDataException("Missing context menu");
+            string name = splitContextMenu[1];
+            
             Account account = await _accountService.GetByName(user.UserId
                 ?? throw new InvalidDataException("User id cannot be null"), name)
                 ?? throw new InvalidDataException($"Cannot find account with name {name}");

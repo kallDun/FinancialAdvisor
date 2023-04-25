@@ -33,8 +33,6 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Subscriptions
         {
             if (user.UserId is null) throw new InvalidDataException("User id cannot be null");
             var split = user.ContextMenu?.Split('/') ?? throw new InvalidDataException("Missing context menu");
-            if (!((split.Length == 3 && split[2] == ContextMenus.Subscription)
-                || split.Length == 1 && split[0] == ContextMenus.Subscription)) throw new InvalidDataException("Invalid context menu");
 
             IList<Subscription> subscriptions = await _subscriptionService.LoadAllWithAccounts(user.UserId.Value,
                 split.Length == 3 ? split[1] : null);
