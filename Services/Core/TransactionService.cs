@@ -17,6 +17,7 @@ namespace FinancialAdvisorTelegramBot.Services.Core
 
         public async Task<Transaction> Create(decimal amount, string communicator, int accountId, int categoryId, DateTime transactionTime, string? details)
         {
+            if (Math.Abs(amount) > 100000) throw new Exception("Amount in transaction cannot be more than 100000");
             Transaction transaction = new()
             {
                 Amount = amount,
