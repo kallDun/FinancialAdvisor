@@ -6,7 +6,7 @@ using FinancialAdvisorTelegramBot.Services.Core;
 
 namespace FinancialAdvisorTelegramBot.Bot.Views.Accounts
 {
-    public class ViewAccountsShortInfoCommand : ICommand
+    public class ViewManyAccountsCommand : ICommand
     {
         public static string TEXT_STYLE => "View accounts short info";
         public static string DEFAULT_STYLE => "/view";
@@ -14,14 +14,14 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Accounts
         private readonly IBot _bot;
         private readonly IAccountService _accountService;
 
-        public ViewAccountsShortInfoCommand(IBot bot, IAccountService accountService)
+        public ViewManyAccountsCommand(IBot bot, IAccountService accountService)
         {
             _bot = bot;
             _accountService = accountService;
         }
 
         public bool CanExecute(UpdateArgs update, TelegramUser user)
-            => user.ContextMenu == ContextMenus.Accounts
+            => user.ContextMenu == ContextMenus.Account
             && (update.GetTextData() == DEFAULT_STYLE || update.GetTextData() == TEXT_STYLE);
 
         public async Task Execute(UpdateArgs update, TelegramUser user)

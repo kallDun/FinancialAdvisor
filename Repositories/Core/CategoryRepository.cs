@@ -29,6 +29,11 @@ namespace FinancialAdvisorTelegramBot.Repositories.Core
             return await DbSet.FirstOrDefaultAsync(x => x.UserId == userId && x.Name == name);
         }
 
+        public async Task<bool> HasAny(int userId)
+        {
+            return await DbSet.AnyAsync(x => x.UserId == userId);
+        }
+
         public async Task<bool> IsCategoryNameUnique(int userId, string name)
         {
             return !(await DbSet.AnyAsync(x => x.UserId == userId && x.Name == name));

@@ -24,12 +24,12 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Transactions
         }
 
         public bool IsContextMenu(string[] contextMenu)
-            => (contextMenu.Length == 3 && contextMenu[0] == ContextMenus.Accounts && contextMenu[2] == ContextMenus.Transaction);
+            => (contextMenu.Length == 3 && contextMenu[0] == ContextMenus.Account && contextMenu[2] == ContextMenus.Transaction);
 
         public bool CanExecute(UpdateArgs update, TelegramUser user)
         {
             var splitContextMenu = (string.IsNullOrEmpty(user.ContextMenu) ? string.Empty : user.ContextMenu).Split('/');
-            return splitContextMenu.Length >= 2 && splitContextMenu[0] == ContextMenus.Accounts
+            return splitContextMenu.Length >= 2 && splitContextMenu[0] == ContextMenus.Account
                 && (update.GetTextData() == DEFAULT_STYLE
                 || update.GetTextData() == TEXT_STYLE)
                 && user.UserId is not null;
@@ -55,7 +55,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Transactions
                 };
 
             await _telegramUserService.SetContextMenu(user, 
-                $"{ContextMenus.Accounts}/{splitContextMenu[1]}/{ContextMenus.Transaction}");
+                $"{ContextMenus.Account}/{splitContextMenu[1]}/{ContextMenus.Transaction}");
             
             await _bot.Write(user, new TextMessageArgs
             {

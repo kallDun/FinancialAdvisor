@@ -9,7 +9,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Subscriptions
 {
     public class SubscriptionsMenuCommand : ICommand
     {
-        public static string TEXT_STYLE => "Subscriptions menu";
+        public static string TEXT_STYLE => "Subscriptions";
         public static string DEFAULT_STYLE => "/subscriptions_menu";
 
         private readonly IBot _bot;
@@ -25,12 +25,12 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Subscriptions
 
         public bool IsContextMenu(string[] contextMenu)
             => (contextMenu.Length == 1 && contextMenu[0] == ContextMenus.Subscription)
-            || (contextMenu.Length == 3 && contextMenu[0] == ContextMenus.Accounts && contextMenu[2] == ContextMenus.Subscription);
+            || (contextMenu.Length == 3 && contextMenu[0] == ContextMenus.Account && contextMenu[2] == ContextMenus.Subscription);
 
         public bool CanExecute(UpdateArgs update, TelegramUser user)
         {
             var split = (string.IsNullOrEmpty(user.ContextMenu) ? string.Empty : user.ContextMenu).Split('/');
-            return ((split.Length >= 2 && split[0] == ContextMenus.Accounts)
+            return ((split.Length >= 2 && split[0] == ContextMenus.Account)
                 || split.Length == 1 && split[0] == ContextMenus.MainMenu
                 || split.Length >= 1 && split[0] == ContextMenus.Subscription)
                 && (update.GetTextData() == DEFAULT_STYLE
@@ -43,7 +43,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Subscriptions
             if (user.UserId is null) throw new InvalidDataException("User id cannot be null");
             var split = user.ContextMenu?.Split('/') ?? throw new InvalidDataException("Missing context menu");
 
-            bool contextMenuWithAccount = split.Length >= 2 && split[0] == ContextMenus.Accounts;
+            bool contextMenuWithAccount = split.Length >= 2 && split[0] == ContextMenus.Account;
             bool hasAnySubscriptions = contextMenuWithAccount 
                 ? await _subscriptionService.HasAny(user.UserId.Value, split[1])
                 : await _subscriptionService.HasAny(user.UserId.Value);
@@ -52,7 +52,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Subscriptions
                 ? new()
                 {
                     SelectSubscriptionCommand.TEXT_STYLE,
-                    ViewSubscriptionsCommand.TEXT_STYLE,
+                    ViewManySubscriptionsCommand.TEXT_STYLE,
                     CreateSubscriptionCommand.TEXT_STYLE
                 }
                 : new()

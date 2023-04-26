@@ -65,7 +65,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Subscriptions
         private async Task AskSubscriptionName(TelegramUser user, string[] contextMenuSplit)
         {
             if (user.UserId is null) throw new InvalidDataException("Profile id cannot be null");
-            bool contextMenuWithAccount = contextMenuSplit.Length == 3 && contextMenuSplit[0] == ContextMenus.Accounts;
+            bool contextMenuWithAccount = contextMenuSplit.Length == 3 && contextMenuSplit[0] == ContextMenus.Account;
             string? accountName = contextMenuWithAccount ? contextMenuSplit[1] : null;
 
             var subscriptions = await _subscriptionService.LoadAllWithAccounts(user.UserId.Value, accountName);

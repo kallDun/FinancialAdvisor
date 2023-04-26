@@ -38,7 +38,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Accounts
         }
 
         public bool CanExecute(UpdateArgs update, TelegramUser user)
-            => user.ContextMenu == ContextMenus.Accounts
+            => user.ContextMenu == ContextMenus.Account
             && (update.GetTextData() == DEFAULT_STYLE || update.GetTextData() == TEXT_STYLE);
         
         public async Task Execute(UpdateArgs update, TelegramUser user)

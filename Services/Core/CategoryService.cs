@@ -47,7 +47,7 @@ namespace FinancialAdvisorTelegramBot.Services.Core
             return await _repository.Update(category);
         }
 
-        public async Task<IList<Category>> GetUserCategories(int userId)
+        public async Task<IList<Category>> GetAll(int userId)
         {
             return await _repository.GetCategoriesByUser(userId);
         }
@@ -56,6 +56,16 @@ namespace FinancialAdvisorTelegramBot.Services.Core
         {
             return await _repository.GetCategoryByName(userId, categoryName) 
                 ?? await CreateCategory(userId, categoryName, null);
+        }
+
+        public async Task<bool> HasAny(int userId)
+        {
+            return await _repository.HasAny(userId);
+        }
+
+        public async Task<Category?> GetByName(int userId, string name)
+        {
+            return await _repository.GetCategoryByName(userId, name);
         }
     }
 }

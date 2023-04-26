@@ -4,7 +4,11 @@ namespace FinancialAdvisorTelegramBot.Services.Core
 {
     public interface ICategoryService
     {
-        Task<IList<Category>> GetUserCategories(int userId);
+        Task<bool> HasAny(int userId);
+        
+        Task<IList<Category>> GetAll(int userId);
+
+        Task<Category?> GetByName(int userId, string name);
 
         Task<Category> CreateCategory(int userId, string name, string? description);
         

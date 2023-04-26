@@ -1,6 +1,7 @@
 ﻿using FinancialAdvisorTelegramBot.Bot.Args;
 using FinancialAdvisorTelegramBot.Bot.Commands;
 using FinancialAdvisorTelegramBot.Bot.Views.Accounts;
+using FinancialAdvisorTelegramBot.Bot.Views.Categories;
 using FinancialAdvisorTelegramBot.Bot.Views.Profiles;
 using FinancialAdvisorTelegramBot.Bot.Views.Subscriptions;
 using FinancialAdvisorTelegramBot.Models.Telegram;
@@ -39,7 +40,8 @@ namespace FinancialAdvisorTelegramBot.Bot.Views
                 ? new List<string>()
                 {
                     ProfileMenuCommand.TEXT_STYLE,
-                    AccountsMenuCommand.TEXT_STYLE
+                    AccountsMenuCommand.TEXT_STYLE,
+                    CategoriesMenuCommand.TEXT_STYLE,
                 }
                 : new List<string>()
                 {

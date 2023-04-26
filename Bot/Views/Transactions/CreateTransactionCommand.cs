@@ -50,7 +50,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Transactions
         {
             var splitContextMenu = (string.IsNullOrEmpty(user.ContextMenu) ? string.Empty : user.ContextMenu).Split('/');
             return (splitContextMenu.Length == 3 
-                && splitContextMenu[0] == ContextMenus.Accounts 
+                && splitContextMenu[0] == ContextMenus.Account 
                 && splitContextMenu[2] == ContextMenus.Transaction)
                 && (update.GetTextData() == DEFAULT_STYLE
                 || update.GetTextData() == TEXT_STYLE)
@@ -141,7 +141,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Transactions
             Validators.ValidateName(communicator, isLong: true);
             Communicator = communicator;
 
-            var categories = await _categoryService.GetUserCategories(user.UserId 
+            var categories = await _categoryService.GetAll(user.UserId 
                 ?? throw new InvalidDataException("User id cannot be null"));
             if (categories.Count == 0)
             {

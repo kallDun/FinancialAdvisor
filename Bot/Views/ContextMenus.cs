@@ -6,10 +6,12 @@
 
         public static string Profile => "Profile!";
         
-        public static string Accounts => "Accounts!";
+        public static string Account => "Account!";
         
         public static string Subscription => "Subscription!";
                 
         public static string Transaction => "Transaction!";
+
+        public static string Category => "Category!";
     }
 }

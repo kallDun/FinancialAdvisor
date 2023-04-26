@@ -9,5 +9,7 @@ namespace FinancialAdvisorTelegramBot.Repositories.Core
         Task<IList<Category>> GetCategoriesByUser(int userId);
 
         Task<bool> IsCategoryNameUnique(int userId, string name);
+        
+        Task<bool> HasAny(int userId);
     }
 }

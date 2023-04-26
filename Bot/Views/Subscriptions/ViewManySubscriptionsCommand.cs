@@ -6,15 +6,15 @@ using FinancialAdvisorTelegramBot.Services.Operations;
 
 namespace FinancialAdvisorTelegramBot.Bot.Views.Subscriptions
 {
-    public class ViewSubscriptionsCommand : ICommand
+    public class ViewManySubscriptionsCommand : ICommand
     {
-        public static string TEXT_STYLE => "View subscriptions";
+        public static string TEXT_STYLE => "View subscriptions short info";
         public static string DEFAULT_STYLE => "/view";
 
         private readonly IBot _bot;
         private readonly ISubscriptionService _subscriptionService;
 
-        public ViewSubscriptionsCommand(IBot bot, ISubscriptionService subscriptionService)
+        public ViewManySubscriptionsCommand(IBot bot, ISubscriptionService subscriptionService)
         {
             _bot = bot;
             _subscriptionService = subscriptionService;
@@ -23,7 +23,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Subscriptions
         public bool CanExecute(UpdateArgs update, TelegramUser user)
         {
             var split = (string.IsNullOrEmpty(user.ContextMenu) ? string.Empty : user.ContextMenu).Split('/');
-            return ((split.Length >= 2 && split[0] == ContextMenus.Accounts)
+            return ((split.Length >= 2 && split[0] == ContextMenus.Account)
                 || split.Length == 1 && split[0] == ContextMenus.Subscription)
                 && (update.GetTextData() == DEFAULT_STYLE
                 || update.GetTextData() == TEXT_STYLE);

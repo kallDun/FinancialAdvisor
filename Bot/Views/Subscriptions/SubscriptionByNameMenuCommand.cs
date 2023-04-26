@@ -24,13 +24,13 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Subscriptions
 
         public bool IsContextMenu(string[] contextMenu)
             => (contextMenu.Length == 2 && contextMenu[0] == ContextMenus.Subscription)
-            || (contextMenu.Length == 4 && contextMenu[0] == ContextMenus.Accounts && contextMenu[2] == ContextMenus.Subscription);
+            || (contextMenu.Length == 4 && contextMenu[0] == ContextMenus.Account && contextMenu[2] == ContextMenus.Subscription);
         
         public bool CanExecute(UpdateArgs update, TelegramUser user)
         {
             var contextMenu = (string.IsNullOrEmpty(user.ContextMenu) ? string.Empty : user.ContextMenu).Split('/');            
             return ((contextMenu.Length >= 2 && contextMenu[0] == ContextMenus.Subscription)
-                || (contextMenu.Length >= 4 && contextMenu[0] == ContextMenus.Accounts && contextMenu[2] == ContextMenus.Subscription))
+                || (contextMenu.Length >= 4 && contextMenu[0] == ContextMenus.Account && contextMenu[2] == ContextMenus.Subscription))
                 && (update.GetTextData() == DEFAULT_STYLE || update.GetTextData() == TEXT_STYLE);
         }
         
@@ -38,7 +38,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Subscriptions
         {
             if (user.UserId is null) throw new InvalidDataException("Profile id cannot be null");
             var contextMenuSplit = user.ContextMenu?.Split('/') ?? throw new InvalidDataException("Missing context menu");            
-            bool contextMenuWithAccount = contextMenuSplit.Length >= 4 && contextMenuSplit[2] == ContextMenus.Subscription && contextMenuSplit[0] == ContextMenus.Accounts;
+            bool contextMenuWithAccount = contextMenuSplit.Length >= 4 && contextMenuSplit[2] == ContextMenus.Subscription && contextMenuSplit[0] == ContextMenus.Account;
             string name = contextMenuWithAccount ? contextMenuSplit[3] : contextMenuSplit[1];
 
             List<string> buttons = await _subscriptionService.GetByName(user.UserId.Value, name) is not null
@@ -53,7 +53,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Subscriptions
 
             await _telegramUserService.SetContextMenu(user,
                 contextMenuWithAccount
-                ? $"{ContextMenus.Accounts}/{contextMenuSplit[1]}/{ContextMenus.Subscription}/{name}"
+                ? $"{ContextMenus.Account}/{contextMenuSplit[1]}/{ContextMenus.Subscription}/{name}"
                 : $"{ContextMenus.Subscription}/{name}");
 
             await _bot.Write(user, new TextMessageArgs

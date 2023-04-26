@@ -9,7 +9,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Profiles
 {
     public class ProfileMenuCommand : ICommand
     {
-        public static string TEXT_STYLE => "Profile menu";
+        public static string TEXT_STYLE => "Profile";
         public static string DEFAULT_STYLE => "/profile_menu";
 
         private readonly IBot _bot;
