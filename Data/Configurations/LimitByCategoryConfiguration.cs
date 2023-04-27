@@ -4,27 +4,30 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace FinancialAdvisorTelegramBot.Data.Configurations
 {
-    public class SubscriptionConfiguration : IEntityTypeConfiguration<Subscription>
+    public class LimitByCategoryConfiguration : IEntityTypeConfiguration<LimitByCategory>
     {
-        public void Configure(EntityTypeBuilder<Subscription> builder)
+        public void Configure(EntityTypeBuilder<LimitByCategory> builder)
         {
-            builder.ToTable("subscriptions");
+            builder.ToTable("limit_by_categories");
             builder.HasKey(x => x.Id);
 
             builder.HasOne(x => x.User)
-                .WithMany(x => x.Subscriptions)
+                .WithMany(x => x.LimitByCategories)
                 .HasForeignKey(x => x.UserId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(x => x.Account)
-                .WithMany(x => x.Subscriptions)
+                .WithMany(x => x.LimitByCategories)
                 .HasForeignKey(x => x.AccountId)
+                .IsRequired(false)
                 .OnDelete(DeleteBehavior.SetNull);
 
-            builder.HasMany(x => x.Transactions)
-                .WithMany(x => x.Subscriptions)
-                .UsingEntity(entity => entity.ToTable("subscriptions_to_transactions"));
+            builder.HasOne(x => x.Category)
+                .WithMany(x => x.LimitByCategories)
+                .HasForeignKey(x => x.CategoryId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.Property(x => x.Id)
                 .HasColumnName("id")
@@ -37,27 +40,25 @@ namespace FinancialAdvisorTelegramBot.Data.Configurations
             builder.Property(x => x.AccountId)
                 .HasColumnName("account_id");
 
-            builder.Property(x => x.Name)
-                .HasColumnName("name")
-                .HasMaxLength(50)
+            builder.Property(x => x.CategoryId)
+                .HasColumnName("category_id")
                 .IsRequired();
 
-            builder.Property(x => x.Amount)
-                .HasColumnName("amount")
-                .HasColumnType("decimal(12,4)")
+            builder.Property(x => x.Limit)
+                .HasColumnName("limit")
+                .HasColumnType("decimal(12,2)")
                 .IsRequired();
 
-            builder.Property(x => x.PaymentDay)
-                .HasColumnName("payment_day")
+            builder.Property(x => x.GroupCount)
+                .HasColumnName("group_count")
                 .IsRequired();
 
-            builder.Property(x => x.AutoPay)
-                .HasColumnName("auto_pay")
+            builder.Property(x => x.GroupIndexFrom)
+                .HasColumnName("group_index_from")
                 .IsRequired();
 
-            builder.Property(x => x.LastPaymentDate)
-                .HasColumnName("last_payment_date")
-                .HasColumnType("timestamp with time zone")
+            builder.Property(x => x.Enabled)
+                .HasColumnName("enabled")
                 .IsRequired();
 
             builder.Property(x => x.CreatedAt)

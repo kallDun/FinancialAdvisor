@@ -21,10 +21,10 @@ namespace FinancialAdvisorTelegramBot.Utils
             if (email.Length > 50) throw new ArgumentException("Email is too long!");
         }
 
-        public static void ValidateName(string name, bool isLong = false)
+        public static void ValidateName(string name)
         {
             if (string.IsNullOrEmpty(name) || name.Length < 3) throw new ArgumentException("Name must contain at least 3 characters!");
-            if (name.Length > (isLong ? 100 : 20)) throw new ArgumentException("Name is too long!");
+            if (name.Length > 50) throw new ArgumentException("Name is too long!");
             if (name.Contains('/'))
             {
                 throw new ArgumentException("Name can't contain '/'");

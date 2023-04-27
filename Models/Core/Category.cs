@@ -1,4 +1,6 @@
-﻿namespace FinancialAdvisorTelegramBot.Models.Core
+﻿using FinancialAdvisorTelegramBot.Models.Operations;
+
+namespace FinancialAdvisorTelegramBot.Models.Core
 {
     public class Category
     {
@@ -15,6 +17,8 @@
         public DateTime CreatedAt { get; set; }
 
         public DateTime? UpdatedAt { get; set; }
+
+        public virtual IList<LimitByCategory>? LimitByCategories { get; set; }
 
         public virtual IList<Transaction>? Transactions { get; internal set; }
     }

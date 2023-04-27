@@ -77,7 +77,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Categories
         private async Task AskDescription(TelegramUser user, string text)
         {
             string name = text.Trim();
-            Validators.ValidateName(name, isLong: true);
+            Validators.ValidateName(name);
             Name = name;
 
             await _bot.Write(user, new TextMessageArgs

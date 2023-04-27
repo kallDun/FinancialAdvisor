@@ -1,36 +1,30 @@
 ﻿using FinancialAdvisorTelegramBot.Models.Core;
+using FinancialAdvisorTelegramBot.Models.Operations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace FinancialAdvisorTelegramBot.Data.Configurations
 {
-    public class UserConfiguration : IEntityTypeConfiguration<User>
+    public class TargetAccountConfiguration : IEntityTypeConfiguration<TargetAccount>
     {
-        public void Configure(EntityTypeBuilder<User> builder)
+        public void Configure(EntityTypeBuilder<TargetAccount> builder)
         {
-            builder.ToTable("users");
+            builder.ToTable("target_accounts");
             builder.HasKey(x => x.Id);
+
+            builder.HasOne(x => x.Account)
+                .WithOne(x => x.TargetAccount)
+                .HasForeignKey<Account>(x => x.TargetAccountId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.SetNull);
 
             builder.Property(x => x.Id)
                 .HasColumnName("id")
                 .ValueGeneratedOnAdd();
 
-            builder.Property(x => x.FirstName)
-                .HasColumnName("first_name")
-                .HasMaxLength(50)
-                .IsRequired();
-
-            builder.Property(x => x.LastName)
-                .HasColumnName("last_name")
-                .HasMaxLength(50);
-
-            builder.Property(x => x.Email)
-                .HasColumnName("email")
-                .HasMaxLength(50);
-
-            builder.Property(x => x.DaysInGroup)
-                .HasColumnName("days_in_group")
-                .HasDefaultValue(7)
+            builder.Property(x => x.GoalAmount)
+                .HasColumnName("goal_amount")
+                .HasColumnType("decimal(12,2)")
                 .IsRequired();
 
             builder.Property(x => x.CreatedAt)

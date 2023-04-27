@@ -41,9 +41,10 @@ namespace FinancialAdvisorTelegramBot.Services.Core
                 Category defaultCategory = await _categoryService.GetOrOtherwiseCreateCategory(user.Id, CategoryNames.Default);
 
                 Transaction addedStartBalanceTransaction = await _transactionService.Create(
-                    startBalance, "Start balance transaction", added.Id, defaultCategory.Id, DateTime.Now, null);
+                    user, startBalance, "Start balance transaction", added.Id, defaultCategory.Id, DateTime.Now, null, 
+                    useDbTransaction: false);
             }
-
+            
             await transaction.CommitAsync();
             return account;
         }

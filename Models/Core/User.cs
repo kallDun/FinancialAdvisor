@@ -13,6 +13,8 @@ namespace FinancialAdvisorTelegramBot.Models.Core
 
         public string? Email { get; set; }
 
+        public int DaysInGroup { get; set; }
+
         public DateTime CreatedAt { get; set; }
 
         public DateTime? UpdatedAt { get; set; }
@@ -24,5 +26,7 @@ namespace FinancialAdvisorTelegramBot.Models.Core
         public virtual IList<Category>? Categories { get; set; }
 
         public virtual IList<Subscription>? Subscriptions { get; set; }
+
+        public virtual IList<LimitByCategory>? LimitByCategories { get; set; }
     }
 }

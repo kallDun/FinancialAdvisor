@@ -35,13 +35,15 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Transactions
 
         private readonly IBot _bot;
         private readonly IAccountService _accountService;
+        private readonly IUserService _userService;
         private readonly ITransactionService _transactionService;
         private readonly ICategoryService _categoryService;
 
-        public CreateTransactionCommand(IBot bot, IAccountService accountService, ITransactionService transactionService, ICategoryService categoryService)
+        public CreateTransactionCommand(IBot bot, IAccountService accountService, IUserService userService, ITransactionService transactionService, ICategoryService categoryService)
         {
             _bot = bot;
             _accountService = accountService;
+            _userService = userService;
             _transactionService = transactionService;
             _categoryService = categoryService;
         }
@@ -83,20 +85,23 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Transactions
             Status++;
         }
 
-        private async Task ProcessResult(TelegramUser user, string text, string[] splitContextMenu)
+        private async Task ProcessResult(TelegramUser telegramUser, string text, string[] splitContextMenu)
         {
             Details = text == GeneralCommands.SetEmpty ? null : text;
 
             if (Communicator is null) throw new InvalidDataException("Communicator cannot be null");
 
-            int accountId = (await _accountService.GetByName(user.UserId 
+            int accountId = (await _accountService.GetByName(telegramUser.UserId 
                 ?? throw new InvalidDataException("User id cannot be null"), splitContextMenu[1])
                 ?? throw new InvalidDataException("Account not found")).Id;
 
-            Transaction transaction = await _transactionService.Create(IsIncomeType ? Amount : -Amount, 
+            User user = await _userService.GetById(telegramUser.UserId.Value)
+                ?? throw new InvalidDataException("User not found");
+
+            Transaction transaction = await _transactionService.Create(user, IsIncomeType ? Amount : -Amount, 
                 Communicator, accountId, CategoryId, TransactionTime, Details);
 
-            await _bot.Write(user, new TextMessageArgs
+            await _bot.Write(telegramUser, new TextMessageArgs
             {
                 Text = $"Transaction has been created successfully." +
                 $"\n({(IsIncomeType ? "Received" : "Sent")} <code>{Math.Abs(transaction.Amount)}</code> " +
@@ -138,7 +143,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Transactions
         private async Task AskCategory(TelegramUser user, string text, string[] splitContextMenu)
         {
             string communicator = text.Trim();
-            Validators.ValidateName(communicator, isLong: true);
+            Validators.ValidateName(communicator);
             Communicator = communicator;
 
             var categories = await _categoryService.GetAll(user.UserId 

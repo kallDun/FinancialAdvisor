@@ -11,6 +11,8 @@ namespace FinancialAdvisorTelegramBot.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Account> Accounts { get; set; }
         public DbSet<Category> Categories { get; set; }
+        public DbSet<LimitByCategory> CategoryLimits { get; set; }
+        public DbSet<TransactionGroup> TransactionGroups { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<Subscription> Subscriptions { get; set; }
 

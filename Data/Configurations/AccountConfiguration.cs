@@ -27,7 +27,7 @@ namespace FinancialAdvisorTelegramBot.Data.Configurations
 
             builder.Property(x => x.Name)
                 .HasColumnName("name")
-                .HasMaxLength(100)
+                .HasMaxLength(50)
                 .IsRequired();
 
             builder.Property(x => x.Description)
@@ -38,6 +38,9 @@ namespace FinancialAdvisorTelegramBot.Data.Configurations
                 .HasColumnName("balance")
                 .HasColumnType("decimal(18,8)")
                 .IsRequired();
+
+            builder.Property(x => x.TargetAccountId)
+                .HasColumnName("target_account_id");
 
             builder.Property(x => x.CreatedAt)
                 .HasColumnName("created_at")

@@ -16,6 +16,10 @@ namespace FinancialAdvisorTelegramBot.Models.Core
 
         public decimal CurrentBalance { get; set; }
 
+        public int? TargetAccountId { get; set; }
+
+        public virtual TargetAccount? TargetAccount { get; set; }
+
         public DateTime CreatedAt { get; set; }
 
         public DateTime? UpdatedAt { get; set; }
@@ -23,5 +27,9 @@ namespace FinancialAdvisorTelegramBot.Models.Core
         public virtual IList<Transaction>? Transactions { get; set; }
 
         public virtual IList<Subscription>? Subscriptions { get; set; }
+
+        public virtual IList<TransactionGroup>? TransactionGroups { get; set; }
+
+        public virtual IList<LimitByCategory>? LimitByCategories { get; set; }
     }
 }
