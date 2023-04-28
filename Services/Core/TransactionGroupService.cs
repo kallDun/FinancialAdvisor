@@ -8,10 +8,12 @@ namespace FinancialAdvisorTelegramBot.Services.Core
     public class TransactionGroupService : ITransactionGroupService
     {
         private readonly ITransactionGroupRepository _repository;
+        private readonly ITransactionGroupToCategoryRepository _groupByCategoryRepository;
 
-        public TransactionGroupService(ITransactionGroupRepository repository)
+        public TransactionGroupService(ITransactionGroupRepository repository, ITransactionGroupToCategoryRepository groupByCategoryRepository)
         {
             _repository = repository;
+            _groupByCategoryRepository = groupByCategoryRepository;
         }
 
         public async Task<TransactionGroup> Create(int accountId, int index, DateTime dateFrom, DateTime dateTo)
@@ -56,6 +58,18 @@ namespace FinancialAdvisorTelegramBot.Services.Core
             var dateTo = dateFrom.AddDays(user.DaysInGroup);
 
             return (index, dateFrom, dateTo);
+        }
+
+        public async Task CreateTransactionGroupByCategoryIfNotExist(int transactionGroupId, int categoryId)
+        {
+            if (await _groupByCategoryRepository.Find(transactionGroupId, categoryId) == false)
+            {
+                await _groupByCategoryRepository.Add(new TransactionGroupToCategory()
+                {
+                    TransactionGroupId = transactionGroupId,
+                    CategoryId = categoryId
+                });
+            }
         }
     }
 }

@@ -6,6 +6,8 @@ namespace FinancialAdvisorTelegramBot.Services.Core
     {
         Task<TransactionGroup> Create(int accountId, int index, DateTime dateFrom, DateTime dateTo);
 
+        Task CreateTransactionGroupByCategoryIfNotExist(int transactionGroupId, int categoryId);
+
         Task<TransactionGroup> GetOtherwiseCreate(int accountId, int index, DateTime dateFrom, DateTime dateTo);
 
         (int Index, DateTime DateFrom, DateTime DateTo) CalculateGroupIndexForDateByUser(User user, DateTime date);

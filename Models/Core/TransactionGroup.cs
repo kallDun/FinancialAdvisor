@@ -19,5 +19,7 @@
         public DateTime CreatedAt { get; set; }
 
         public virtual IList<Transaction>? Transactions { get; set; }
+
+        public virtual IList<TransactionGroupToCategory>? TransactionGroupToCategories { get; set; }
     }
 }

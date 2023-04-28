@@ -17,6 +17,10 @@ namespace FinancialAdvisorTelegramBot.Data.Triggers
                 .Update<TransactionGroup>(
                     (tableRefs, group) => group.Id == tableRefs.New.TransactionGroupId,
                     (tableRefs, group) => new TransactionGroup() { TotalAmount = group.TotalAmount + tableRefs.New.Amount })
+                .Update<TransactionGroupToCategory>(
+                    (tableRefs, groupToCategory) => groupToCategory.TransactionGroupId == tableRefs.New.TransactionGroupId &&
+                        groupToCategory.CategoryId == tableRefs.New.CategoryId,
+                    (tableRefs, groupToCategory) => new TransactionGroupToCategory() { TotalAmount = groupToCategory.TotalAmount + tableRefs.New.Amount })
                 ));
         }
     }

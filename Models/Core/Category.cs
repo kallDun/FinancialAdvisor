@@ -21,5 +21,7 @@ namespace FinancialAdvisorTelegramBot.Models.Core
         public virtual IList<LimitByCategory>? LimitByCategories { get; set; }
 
         public virtual IList<Transaction>? Transactions { get; internal set; }
+
+        public virtual IList<TransactionGroupToCategory>? TransactionGroupToCategories { get; set; }
     }
 }

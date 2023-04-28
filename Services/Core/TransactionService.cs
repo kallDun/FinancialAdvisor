@@ -37,6 +37,7 @@ namespace FinancialAdvisorTelegramBot.Services.Core
         {
             (int index, DateTime groupDateFrom, DateTime groupDateTo) = _transactionGroupService.CalculateGroupIndexForDateByUser(user, transactionTime);
             TransactionGroup group = await _transactionGroupService.GetOtherwiseCreate(accountId, index, groupDateFrom, groupDateTo);
+            await _transactionGroupService.CreateTransactionGroupByCategoryIfNotExist(group.Id, categoryId);
 
             if (Math.Abs(amount) > 100000) throw new ArgumentException("Amount in transaction cannot be more than 100000");
             Transaction transaction = new()
