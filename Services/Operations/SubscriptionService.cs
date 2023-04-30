@@ -1,5 +1,6 @@
 ﻿using FinancialAdvisorTelegramBot.Models.Operations;
 using FinancialAdvisorTelegramBot.Repositories.Operations;
+using FinancialAdvisorTelegramBot.Services.Auxiliary;
 using FinancialAdvisorTelegramBot.Utils.Attributes;
 
 namespace FinancialAdvisorTelegramBot.Services.Operations
@@ -8,10 +9,12 @@ namespace FinancialAdvisorTelegramBot.Services.Operations
     public class SubscriptionService : ISubscriptionService
     {
         private readonly ISubscriptionRepository _repository;
+        private readonly IBoundaryUnitsService _boundaryUnitsService;
 
-        public SubscriptionService(ISubscriptionRepository repository)
+        public SubscriptionService(ISubscriptionRepository repository, IBoundaryUnitsService boundaryUnitsService)
         {
             _repository = repository;
+            _boundaryUnitsService = boundaryUnitsService;
         }
 
         
@@ -21,6 +24,11 @@ namespace FinancialAdvisorTelegramBot.Services.Operations
                 throw new ArgumentException("Payment day must be between 1 and 31", nameof(paymentDay));
             if (await _repository.GetByName(userId, name) is not null) 
                 throw new ArgumentException("Subscription with this name already exists", nameof(name));
+            
+            var minBoundaryAmount = _boundaryUnitsService.GetMinSubscriptionAmount(userId, accountId);
+            var maxBoundaryAmount = _boundaryUnitsService.GetMaxSubscriptionAmount(userId, accountId);
+            if (amount < minBoundaryAmount || amount > maxBoundaryAmount)
+                throw new ArgumentException($"Subscription amount must be between {minBoundaryAmount} and {maxBoundaryAmount}");
 
             Subscription entity = new()
             {

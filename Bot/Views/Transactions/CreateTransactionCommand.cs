@@ -133,7 +133,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Transactions
             await _bot.Write(user, new TextMessageArgs
             {
                 Text = $"Write transaction time:" +
-                $"\n<code>(in next time format '{Converters.DateTimeFormat}')</code>",
+                $"\n<code>(time format '{Converters.DateTimeFormat}')</code>",
                 Placeholder = "Write time",
                 MarkupType = ReplyMarkupType.InlineKeyboard,
                 InlineKeyboardButtons = new() { new() { new("Set transaction time to now", TimeNowCommand) } }

@@ -51,7 +51,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Transactions
                 }
                 : new()
                 {
-                    AccountByNameMenuCommand.TEXT_STYLE
+                    AccountsMenuCommand.TEXT_STYLE
                 };
 
             await _telegramUserService.SetContextMenu(user, 

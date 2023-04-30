@@ -1,22 +1,22 @@
 ﻿using FinancialAdvisorTelegramBot.Bot.Args;
 using FinancialAdvisorTelegramBot.Bot.Commands;
-using FinancialAdvisorTelegramBot.Bot.Views.LimitByCategories;
+using FinancialAdvisorTelegramBot.Bot.Views.Categories;
 using FinancialAdvisorTelegramBot.Models.Telegram;
 using FinancialAdvisorTelegramBot.Services.Core;
 using FinancialAdvisorTelegramBot.Services.Telegram;
 
-namespace FinancialAdvisorTelegramBot.Bot.Views.Categories
+namespace FinancialAdvisorTelegramBot.Bot.Views.LimitByCategories
 {
-    public class CategoryByNameMenuCommand : ICommand
+    public class LimitByCategoryMenuCommand : ICommand
     {
-        public static string TEXT_STYLE => "Category menu";
-        public static string DEFAULT_STYLE => "/category_menu";
+        public static string TEXT_STYLE => "Limits";
+        public static string DEFAULT_STYLE => "/limits_menu";
 
         private readonly IBot _bot;
         private readonly ITelegramUserService _telegramUserService;
         private readonly ICategoryService _categoryService;
 
-        public CategoryByNameMenuCommand(IBot bot, ITelegramUserService telegramUserService, ICategoryService categoryService)
+        public LimitByCategoryMenuCommand(IBot bot, ITelegramUserService telegramUserService, ICategoryService categoryService)
         {
             _bot = bot;
             _telegramUserService = telegramUserService;
@@ -24,15 +24,16 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Categories
         }
 
         public bool IsContextMenu(string[] contextMenu)
-            => contextMenu.Length == 2
-            && contextMenu[0] == ContextMenus.Category;
+            => contextMenu.Length == 3
+            && contextMenu[0] == ContextMenus.Category
+            && contextMenu[2] == ContextMenus.LimitByCategory;
 
         public bool CanExecute(UpdateArgs update, TelegramUser user)
         {
             var split = (string.IsNullOrEmpty(user.ContextMenu) ? string.Empty : user.ContextMenu).Split('/');
-            return split.Length >= 1 && split[0] == ContextMenus.Category
-                && (update.GetTextData() == DEFAULT_STYLE || update.GetTextData() == TEXT_STYLE)
-                && user.UserId != null;
+            return split.Length >= 2 && split[0] == ContextMenus.Category
+                && (update.GetTextData() == DEFAULT_STYLE
+                || update.GetTextData() == TEXT_STYLE);
         }
 
         public async Task Execute(UpdateArgs update, TelegramUser user)
@@ -44,20 +45,18 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Categories
                 ?? throw new InvalidDataException("User id cannot be null"), name) is not null
                 ? new()
                 {
-                    ViewCategoryCommand.TEXT_STYLE,
-                    LimitByCategoryMenuCommand.TEXT_STYLE,
-                    CategoriesMenuCommand.TEXT_STYLE
+                    CategoryByNameMenuCommand.TEXT_STYLE
                 }
                 : new()
                 {
                     CategoriesMenuCommand.TEXT_STYLE
                 };
 
-            await _telegramUserService.SetContextMenu(user, $"{ContextMenus.Category}/{name}");
+            await _telegramUserService.SetContextMenu(user, ContextMenus.Category);
 
             await _bot.Write(user, new TextMessageArgs
             {
-                Text = $"<b>↓ Category <code>{name}</code> ↓</b>",
+                Text = $"<b>↓ Limits by category {name} ↓</b>",
                 Placeholder = "Select command",
                 MarkupType = ReplyMarkupType.ReplyKeyboard,
                 ReplyKeyboardButtons = buttons,

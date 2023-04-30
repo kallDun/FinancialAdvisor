@@ -21,7 +21,7 @@ namespace FinancialAdvisorTelegramBot.Data.Configurations
                 .WithMany(x => x.LimitByCategories)
                 .HasForeignKey(x => x.AccountId)
                 .IsRequired(false)
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(x => x.Category)
                 .WithMany(x => x.LimitByCategories)
@@ -44,8 +44,8 @@ namespace FinancialAdvisorTelegramBot.Data.Configurations
                 .HasColumnName("category_id")
                 .IsRequired();
 
-            builder.Property(x => x.Limit)
-                .HasColumnName("limit")
+            builder.Property(x => x.ExpenseLimit)
+                .HasColumnName("expense_limit")
                 .HasColumnType("decimal(12,2)")
                 .IsRequired();
 
@@ -55,10 +55,6 @@ namespace FinancialAdvisorTelegramBot.Data.Configurations
 
             builder.Property(x => x.GroupIndexFrom)
                 .HasColumnName("group_index_from")
-                .IsRequired();
-
-            builder.Property(x => x.Enabled)
-                .HasColumnName("enabled")
                 .IsRequired();
 
             builder.Property(x => x.CreatedAt)

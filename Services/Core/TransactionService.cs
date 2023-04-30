@@ -1,5 +1,6 @@
 ﻿using FinancialAdvisorTelegramBot.Models.Core;
 using FinancialAdvisorTelegramBot.Repositories.Core;
+using FinancialAdvisorTelegramBot.Services.Auxiliary;
 using FinancialAdvisorTelegramBot.Utils.Attributes;
 
 namespace FinancialAdvisorTelegramBot.Services.Core
@@ -9,11 +10,13 @@ namespace FinancialAdvisorTelegramBot.Services.Core
     {
         private readonly ITransactionRepository _repository;
         private readonly ITransactionGroupService _transactionGroupService;
+        private readonly IBoundaryUnitsService _boundaryUnitsService;
 
-        public TransactionService(ITransactionRepository repository, ITransactionGroupService transactionGroupService)
+        public TransactionService(ITransactionRepository repository, ITransactionGroupService transactionGroupService, IBoundaryUnitsService boundaryUnitsService)
         {
             _repository = repository;
             _transactionGroupService = transactionGroupService;
+            _boundaryUnitsService = boundaryUnitsService;
         }
 
         public async Task<Transaction> Create(User user, decimal amount, string communicator, int accountId, 
@@ -33,13 +36,18 @@ namespace FinancialAdvisorTelegramBot.Services.Core
             return transaction;
         }
 
-        private async Task<Transaction> CreateMethodWithoutDbTransaction(User user, decimal amount, string communicator, int accountId, int categoryId, DateTime transactionTime, string? details)
+        private async Task<Transaction> CreateMethodWithoutDbTransaction(User user, decimal amount, string communicator, 
+            int accountId, int categoryId, DateTime transactionTime, string? details)
         {
             (int index, DateTime groupDateFrom, DateTime groupDateTo) = _transactionGroupService.CalculateGroupIndexForDateByUser(user, transactionTime);
             TransactionGroup group = await _transactionGroupService.GetOtherwiseCreate(accountId, index, groupDateFrom, groupDateTo);
             await _transactionGroupService.CreateTransactionGroupByCategoryIfNotExist(group.Id, categoryId);
 
-            if (Math.Abs(amount) > 100000) throw new ArgumentException("Amount in transaction cannot be more than 100000");
+            var transactionMax = _boundaryUnitsService.GetMaxTransactionAmount(accountId);
+            var transactionMin = _boundaryUnitsService.GetMinTransactionAmount(accountId);
+            if (amount > transactionMax || amount < transactionMin) 
+                throw new ArgumentException($"Amount in transaction cannot be more than {transactionMax} and less than {transactionMin}");
+            
             Transaction transaction = new()
             {
                 Amount = amount,

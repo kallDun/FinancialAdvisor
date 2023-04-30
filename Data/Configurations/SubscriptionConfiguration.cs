@@ -20,8 +20,8 @@ namespace FinancialAdvisorTelegramBot.Data.Configurations
             builder.HasOne(x => x.Account)
                 .WithMany(x => x.Subscriptions)
                 .HasForeignKey(x => x.AccountId)
-                .OnDelete(DeleteBehavior.SetNull);
-
+                .OnDelete(DeleteBehavior.Cascade);
+            
             builder.HasMany(x => x.Transactions)
                 .WithMany(x => x.Subscriptions)
                 .UsingEntity(entity => entity.ToTable("subscriptions_to_transactions"));
@@ -53,6 +53,11 @@ namespace FinancialAdvisorTelegramBot.Data.Configurations
 
             builder.Property(x => x.AutoPay)
                 .HasColumnName("auto_pay")
+                .IsRequired();
+
+            builder.Property(x => x.OverduePaymentNumber)
+                .HasColumnName("overdue_payment_number")
+                .HasDefaultValue(0)
                 .IsRequired();
 
             builder.Property(x => x.LastPaymentDate)

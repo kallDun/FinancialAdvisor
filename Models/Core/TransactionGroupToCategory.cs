@@ -10,6 +10,8 @@
 
         public virtual Category? Category { get; set; }
         
-        public decimal TotalAmount { get; set; }
+        public decimal TotalIncome { get; set; }
+
+        public decimal TotalExpense { get; set; }
     }
 }

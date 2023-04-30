@@ -30,7 +30,12 @@ namespace FinancialAdvisorTelegramBot.Data.Configurations
                 .HasColumnName("category_id")
                 .IsRequired();
 
-            builder.Property(x => x.TotalAmount)
+            builder.Property(x => x.TotalIncome)
+                .HasColumnType("decimal(16,6)")
+                .HasDefaultValue(0)
+                .IsRequired();
+
+            builder.Property(x => x.TotalExpense)
                 .HasColumnType("decimal(16,6)")
                 .HasDefaultValue(0)
                 .IsRequired();

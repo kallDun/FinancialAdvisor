@@ -22,6 +22,8 @@ namespace FinancialAdvisorTelegramBot.Models.Operations
 
         public bool AutoPay { get; set; }
 
+        public int OverduePaymentNumber { get; set; }
+
         public virtual IList<Transaction>? Transactions { get; set; }
 
         public DateTime? LastPaymentDate { get; set; }

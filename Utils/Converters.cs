@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using System.Globalization;
+﻿using System.Globalization;
 
 namespace FinancialAdvisorTelegramBot.Utils
 {
@@ -22,11 +21,21 @@ namespace FinancialAdvisorTelegramBot.Utils
         }
 
         public static string DateTimeFormat => "dd.MM.yyyy HH:mm:ss";
+        
+        public static string DateFormat => "dd.MM.yyyy";
 
         public static DateTime ToDateTime(string str)
         {
             IFormatProvider provider = new CultureInfo("en-US");
             if (!DateTime.TryParseExact(str, DateTimeFormat, provider, DateTimeStyles.AllowWhiteSpaces, out DateTime result))
+                throw new ArgumentException("String is not a datetime");
+            return result;
+        }
+
+        public static DateTime ToDate(string str)
+        {
+            IFormatProvider provider = new CultureInfo("en-US");
+            if (!DateTime.TryParseExact(str, DateFormat, provider, DateTimeStyles.AllowWhiteSpaces, out DateTime result))
                 throw new ArgumentException("String is not a date");
             return result;
         }

@@ -29,8 +29,13 @@ namespace FinancialAdvisorTelegramBot.Data.Configurations
                 .HasColumnName("index")
                 .IsRequired();
 
-            builder.Property(x => x.TotalAmount)
-                .HasColumnName("total_amount")
+            builder.Property(x => x.TotalIncome)
+                .HasColumnName("total_income")
+                .HasColumnType("decimal(14,4)")
+                .IsRequired();
+
+            builder.Property(x => x.TotalExpense)
+                .HasColumnName("total_expense")
                 .HasColumnType("decimal(14,4)")
                 .IsRequired();
 

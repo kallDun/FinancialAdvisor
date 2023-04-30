@@ -17,14 +17,12 @@ namespace FinancialAdvisorTelegramBot.Models.Operations
         public int CategoryId { get; set; }
 
         public virtual Category? Category { get; set; }
-
-        public decimal Limit { get; set; }
         
-        public int GroupCount { get; set; }
+        public decimal ExpenseLimit { get; set; }
+        
+        public byte GroupCount { get; set; }
 
         public int GroupIndexFrom { get; set; }
-
-        public bool Enabled { get; set; }
 
         public DateTime CreatedAt { get; set; }
 

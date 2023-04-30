@@ -10,7 +10,9 @@
 
         public int Index { get; set; }
 
-        public decimal TotalAmount { get; set; }
+        public decimal TotalIncome { get; set; }
+
+        public decimal TotalExpense { get; set; }
 
         public DateTime DateFrom { get; set; }
 

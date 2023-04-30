@@ -13,5 +13,7 @@
         public static string Transaction => "Transaction!";
 
         public static string Category => "Category!";
+
+        public static string LimitByCategory => "LimitByCategory!";
     }
 }
