@@ -16,13 +16,11 @@ namespace FinancialAdvisorTelegramBot.Models.Core
 
         public decimal CurrentBalance { get; set; }
 
-        public int? TargetAccountId { get; set; }
-
-        public virtual TargetAccount? TargetAccount { get; set; }
-
         public DateTime CreatedAt { get; set; }
 
         public DateTime? UpdatedAt { get; set; }
+
+        public virtual IList<TargetSubAccount>? TargetAccounts { get; set; }
 
         public virtual IList<Transaction>? Transactions { get; set; }
 

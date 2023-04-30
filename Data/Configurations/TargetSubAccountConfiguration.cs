@@ -1,19 +1,19 @@
-﻿using FinancialAdvisorTelegramBot.Models.Core;
+﻿using FinancialAdvisorTelegramBot.Models.Operations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace FinancialAdvisorTelegramBot.Data.Configurations
 {
-    public class AccountConfiguration : IEntityTypeConfiguration<Account>
+    public class TargetSubAccountConfiguration : IEntityTypeConfiguration<TargetSubAccount>
     {
-        public void Configure(EntityTypeBuilder<Account> builder)
+        public void Configure(EntityTypeBuilder<TargetSubAccount> builder)
         {
-            builder.ToTable("accounts");
+            builder.ToTable("target_subaccounts");
             builder.HasKey(x => x.Id);
 
-            builder.HasOne(x => x.User)
-                .WithMany(x => x.Accounts)
-                .HasForeignKey(x => x.UserId)
+            builder.HasOne(x => x.Account)
+                .WithMany(x => x.TargetAccounts)
+                .HasForeignKey(x => x.AccountId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
 
@@ -21,8 +21,8 @@ namespace FinancialAdvisorTelegramBot.Data.Configurations
                 .HasColumnName("id")
                 .ValueGeneratedOnAdd();
 
-            builder.Property(x => x.UserId)
-                .HasColumnName("user_id")
+            builder.Property(x => x.AccountId)
+                .HasColumnName("account_id")
                 .IsRequired();
 
             builder.Property(x => x.Name)
@@ -36,7 +36,12 @@ namespace FinancialAdvisorTelegramBot.Data.Configurations
 
             builder.Property(x => x.CurrentBalance)
                 .HasColumnName("balance")
-                .HasColumnType("decimal(18,8)")
+                .HasColumnType("decimal(12,6)")
+                .IsRequired();
+
+            builder.Property(x => x.GoalAmount)
+                .HasColumnName("goal_amount")
+                .HasColumnType("decimal(12,2)")
                 .IsRequired();
 
             builder.Property(x => x.CreatedAt)

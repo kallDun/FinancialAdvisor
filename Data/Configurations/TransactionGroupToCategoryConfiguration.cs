@@ -31,12 +31,14 @@ namespace FinancialAdvisorTelegramBot.Data.Configurations
                 .IsRequired();
 
             builder.Property(x => x.TotalIncome)
-                .HasColumnType("decimal(16,6)")
+                .HasColumnType("decimal(14,6)")
+                .HasColumnName("total_income")
                 .HasDefaultValue(0)
                 .IsRequired();
 
             builder.Property(x => x.TotalExpense)
-                .HasColumnType("decimal(16,6)")
+                .HasColumnType("decimal(14,6)")
+                .HasColumnName("total_expense")
                 .HasDefaultValue(0)
                 .IsRequired();
         }

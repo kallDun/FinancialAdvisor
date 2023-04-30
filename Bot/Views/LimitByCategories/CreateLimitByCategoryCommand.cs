@@ -117,6 +117,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.LimitByCategories
             await _bot.Write(user, new TextMessageArgs
             {
                 Text = $"Enter group index date from:" +
+                $"(date automatic converts into first day of week)" +
                 $"\n<code>date format '{Converters.DateFormat}'</code>",
                 Placeholder = "Select command",
                 MarkupType = ReplyMarkupType.InlineKeyboard,
@@ -141,7 +142,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.LimitByCategories
 
             await _bot.Write(user, new TextMessageArgs
             {
-                Text = $"Write limit per period:"
+                Text = $"Enter limit amount:"
             });
         }
 

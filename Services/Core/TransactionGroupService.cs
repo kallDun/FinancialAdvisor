@@ -83,7 +83,7 @@ namespace FinancialAdvisorTelegramBot.Services.Core
         {
             var (zeroIndex, dateFrom, dateTo) = CalculateGroupIndexForDateByUser(user, user.CreatedAt);
             dateFrom = dateFrom.AddDays(index * user.DaysInGroup);
-            dateTo = dateTo.AddDays(span * user.DaysInGroup);
+            dateTo = dateFrom.AddDays(span * user.DaysInGroup);
             return (dateFrom, dateTo);
         }
     }

@@ -16,6 +16,7 @@ namespace FinancialAdvisorTelegramBot.Data
         public DbSet<TransactionGroupToCategory> TransactionGroupToCategories { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<Subscription> Subscriptions { get; set; }
+        public DbSet<TargetSubAccount> TargetSubAccounts { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) 
         {
