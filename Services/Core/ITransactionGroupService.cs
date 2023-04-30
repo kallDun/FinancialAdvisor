@@ -11,5 +11,7 @@ namespace FinancialAdvisorTelegramBot.Services.Core
         Task<TransactionGroup> GetOtherwiseCreate(int accountId, int index, DateTime dateFrom, DateTime dateTo);
 
         (int Index, DateTime DateFrom, DateTime DateTo) CalculateGroupIndexForDateByUser(User user, DateTime date);
+        
+        (DateTime DateFrom, DateTime DateTo) CalculateDateForIndexByUser(User user, int index, int span = 1);
     }
 }

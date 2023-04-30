@@ -3,6 +3,7 @@ using FinancialAdvisorTelegramBot.Bot.Commands;
 using FinancialAdvisorTelegramBot.Models.Core;
 using FinancialAdvisorTelegramBot.Models.Telegram;
 using FinancialAdvisorTelegramBot.Services.Core;
+using FinancialAdvisorTelegramBot.Services.Operations;
 using FinancialAdvisorTelegramBot.Utils;
 using FinancialAdvisorTelegramBot.Utils.CommandSerializing;
 
@@ -12,12 +13,13 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Transactions
     {
         private enum CreatingTransactionStatus
         {
-            AskType, AskAmount, AskCommunicator, AskCategory, AskTransactionTime, AskDetails, Finished
+            AskType, AskAmount, AskCommunicator, AskTransactionTime, AskCategory, AskLimitConfirmation, AskDetails, Finished
         }
 
         private const string IncomeCommand = "/income";
         private const string ExpenseCommand = "/expense";
         private const string TimeNowCommand = "/now";
+        private const string ConfirmCommand = "/confirm";
 
         public static string TEXT_STYLE => "Create new transaction";
         public static string DEFAULT_STYLE => "/create";
@@ -38,14 +40,17 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Transactions
         private readonly IUserService _userService;
         private readonly ITransactionService _transactionService;
         private readonly ICategoryService _categoryService;
+        private readonly ILimitByCategoryService _limitByCategoryService;
 
-        public CreateTransactionCommand(IBot bot, IAccountService accountService, IUserService userService, ITransactionService transactionService, ICategoryService categoryService)
+        public CreateTransactionCommand(IBot bot, IAccountService accountService, IUserService userService, 
+            ITransactionService transactionService, ICategoryService categoryService, ILimitByCategoryService limitByCategoryService)
         {
             _bot = bot;
             _accountService = accountService;
             _userService = userService;
             _transactionService = transactionService;
             _categoryService = categoryService;
+            _limitByCategoryService = limitByCategoryService;
         }
 
         public bool CanExecute(UpdateArgs update, TelegramUser user)
@@ -70,8 +75,9 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Transactions
                 CreatingTransactionStatus.AskType => AskType(user, text, splitContextMenu),
                 CreatingTransactionStatus.AskAmount => AskAmount(user, text, splitContextMenu),
                 CreatingTransactionStatus.AskCommunicator => AskCommunicator(user, text, splitContextMenu),
-                CreatingTransactionStatus.AskCategory => AskCategory(user, text, splitContextMenu),
                 CreatingTransactionStatus.AskTransactionTime => AskTransactionTime(user, text, splitContextMenu),
+                CreatingTransactionStatus.AskCategory => AskCategory(user, text, splitContextMenu),
+                CreatingTransactionStatus.AskLimitConfirmation => AskLimitConfirmation(user, text, splitContextMenu),
                 CreatingTransactionStatus.AskDetails => AskDetails(user, text, splitContextMenu),
                 CreatingTransactionStatus.Finished => ProcessResult(user, text, splitContextMenu),
                 _ => throw new InvalidDataException("Invalid status")
@@ -111,9 +117,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Transactions
         
         private async Task AskDetails(TelegramUser user, string text, string[] splitContextMenu)
         {
-            TransactionTime = text == TimeNowCommand 
-                ? DateTime.Now 
-                : Converters.ToDateTime(text);
+            if (text != ConfirmCommand) throw new ArgumentException("User cancel transaction");
 
             await _bot.Write(user, new TextMessageArgs
             {
@@ -124,29 +128,41 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Transactions
             });
         }
 
-        private async Task AskTransactionTime(TelegramUser user, string text, string[] splitContextMenu)
+        private async Task AskLimitConfirmation(TelegramUser user, string text, string[] splitContextMenu)
         {
+            User profile = await _userService.GetById(user.UserId
+               ?? throw new InvalidDataException("User id cannot be null"))
+               ?? throw new InvalidDataException("Profile not found");
+            
             string categoryName = text;
-            CategoryId = (await _categoryService.GetOrOtherwiseCreateCategory(user.UserId
-                ?? throw new InvalidDataException("User id cannot be null"), categoryName)).Id;
+            CategoryId = (await _categoryService.GetOrOtherwiseCreateCategory(user.UserId.Value, categoryName)).Id;
 
-            await _bot.Write(user, new TextMessageArgs
+            if (!IsIncomeType && await _limitByCategoryService.IsTransactionExceedLimit(profile, categoryName, Amount, TransactionTime))
             {
-                Text = $"Write transaction time:" +
-                $"\n<code>(time format '{Converters.DateTimeFormat}')</code>",
-                Placeholder = "Write time",
-                MarkupType = ReplyMarkupType.InlineKeyboard,
-                InlineKeyboardButtons = new() { new() { new("Set transaction time to now", TimeNowCommand) } }
-            });
+                await _bot.Write(user, new TextMessageArgs
+                {
+                    Text = $"Confirm transaction that exceeds category limit:",
+                    MarkupType = ReplyMarkupType.InlineKeyboard,
+                    InlineKeyboardButtons = new List<List<InlineButton>>()
+                    {
+                        new() { new("Cancel", GeneralCommands.Cancel), new("Confirm", ConfirmCommand) }
+                    }
+                });
+            }
+            else
+            {
+                Status++;
+                await AskDetails(user, ConfirmCommand, splitContextMenu);
+            }
         }
 
         private async Task AskCategory(TelegramUser user, string text, string[] splitContextMenu)
         {
-            string communicator = text.Trim();
-            Validators.ValidateName(communicator);
-            Communicator = communicator;
+            TransactionTime = text == TimeNowCommand
+                ? DateTime.Now
+                : Converters.ToDateTime(text);
 
-            var categories = await _categoryService.GetAll(user.UserId 
+            var categories = await _categoryService.GetAll(user.UserId
                 ?? throw new InvalidDataException("User id cannot be null"));
             if (categories.Count == 0)
             {
@@ -164,6 +180,22 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Transactions
                     new(x.Name ?? "-- Missing name --", 
                         x.Name ?? GeneralCommands.Cancel)
                 }).ToList()
+            });
+        }
+
+        private async Task AskTransactionTime(TelegramUser user, string text, string[] splitContextMenu)
+        {
+            string communicator = text.Trim();
+            Validators.ValidateName(communicator);
+            Communicator = communicator;
+
+            await _bot.Write(user, new TextMessageArgs
+            {
+                Text = $"Write transaction time:" +
+                $"\n<code>(time format '{Converters.DateTimeFormat}')</code>",
+                Placeholder = "Write time",
+                MarkupType = ReplyMarkupType.InlineKeyboard,
+                InlineKeyboardButtons = new() { new() { new("Set transaction time to now", TimeNowCommand) } }
             });
         }
 
@@ -199,7 +231,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Transactions
                 MarkupType = ReplyMarkupType.InlineKeyboard,
                 InlineKeyboardButtons = new List<List<InlineButton>>()
                 {
-                    new() { new("Income", IncomeCommand), new("Expense", ExpenseCommand) }
+                    new() { new("Expense", ExpenseCommand), new("Income", IncomeCommand) }
                 }
             });
         }

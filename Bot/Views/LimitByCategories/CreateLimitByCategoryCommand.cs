@@ -17,8 +17,8 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.LimitByCategories
             AskAccount, AskLimit, AskGroupIndexDateFrom, AskGroupCount, Finished
         }
 
-        public static string TEXT_STYLE => "Limits";
-        public static string DEFAULT_STYLE => "/limits_menu";
+        public static string TEXT_STYLE => "Create new limit";
+        public static string DEFAULT_STYLE => "/create";
         public bool IsFinished { get; private set; } = false;
         public bool ShowContextMenuAfterExecution => true;
 
@@ -102,8 +102,8 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.LimitByCategories
             await _bot.Write(telegramUser, new TextMessageArgs
             {
                 Text = $"Write count of groups in period:" +
-                $"/n(one group is {user.DaysInGroup} days, " +
-                $"month in average has {Math.Round(30.0 / user.DaysInGroup)} groups)",
+                $"\n<code>(one group is {user.DaysInGroup} days, " +
+                $"month in average has {Math.Round(30.0 / user.DaysInGroup)} groups)</code>",
             });
         }
 

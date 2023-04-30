@@ -32,7 +32,7 @@ namespace FinancialAdvisorTelegramBot.Services.Operations
             if (limit < 0 || limit > expenseLimitMax) throw new ArgumentException($"Expense limit icannot be more than {expenseLimitMax} and less than 0");
             if (DateTime.Now < groupDateFrom) throw new ArgumentException("Start limit date cannot be in the future");
 
-            int? accountId = accountName is null ? null : (await _accountService.GetByName(user.Id, accountName) 
+            int? accountId = string.IsNullOrEmpty(accountName) ? null : (await _accountService.GetByName(user.Id, accountName) 
                 ?? throw new InvalidDataException($"Account with name {accountName} not found")).Id;
             int categoryId = (await _categoryService.GetByName(user.Id, categoryName))?.Id 
                 ?? throw new InvalidDataException($"Category with name {categoryName} not found");
@@ -55,6 +55,45 @@ namespace FinancialAdvisorTelegramBot.Services.Operations
             var added = await _repository.Add(limitByCategory);
             return await _repository.GetById(added.Id) 
                 ?? throw new InvalidDataException("Limit by category was not created");
+        }
+
+        public async Task<IList<LimitByCategory>> GetLimitByCategoriesInfo(User user, string categoryName)
+        {
+            return await _repository.GetByCategoryWithInfo(user.Id, categoryName);
+        }
+
+        public async Task<decimal> GetTotalExpenseAmountByLimit(User user, LimitByCategory limitByCategory, DateTime date)
+        {
+            var (index, dateFrom, dateTo) = _transactionGroupService.CalculateGroupIndexForDateByUser(user, date);
+            return await _repository.GetTotalExpenseAmount(limitByCategory, index);
+        }
+
+        public int GetDaysLeft(User user, LimitByCategory limitByCategory, DateTime date)
+        {
+            var (index, dateFrom, dateTo) = _transactionGroupService.CalculateGroupIndexForDateByUser(user, date);
+            int indexStart = (index - limitByCategory.GroupIndexFrom) / limitByCategory.GroupCount;
+            int groupsLeft = limitByCategory.GroupCount - ((index - limitByCategory.GroupIndexFrom) % limitByCategory.GroupCount);
+            (dateFrom, dateTo) = _transactionGroupService.CalculateDateForIndexByUser(user, indexStart, groupsLeft);
+            return (dateTo - date).Days - ((((int)date.DayOfWeek) - ((int)DayOfWeek.Monday) + 7) % 7) + 1;
+        }
+
+        public async Task<bool> HasAny(int userId, string categoryName)
+        {
+            return await _repository.HasAny(userId, categoryName);
+        }
+
+        public async Task<bool> IsTransactionExceedLimit(User user, string categoryName, decimal amount, DateTime date)
+        {
+            var (index, dateFrom, dateTo) = _transactionGroupService.CalculateGroupIndexForDateByUser(user, date);
+
+            IList<LimitByCategory> limits = await _repository.GetByCategoryWithInfo(user.Id, categoryName);
+
+            foreach (var limit in limits)
+            {
+                var totalExpenseAmount = await _repository.GetTotalExpenseAmount(limit, index);
+                return totalExpenseAmount + amount > limit.ExpenseLimit;
+            }
+            return false;
         }
     }
 }
