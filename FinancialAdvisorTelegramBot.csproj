@@ -21,7 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Bot\Views\Limits\" />
     <Folder Include="Bot\Views\Transactions\" />
   </ItemGroup>
 
