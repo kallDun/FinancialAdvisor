@@ -12,7 +12,7 @@ namespace FinancialAdvisorTelegramBot.Utils
               .CurrentDomain
               .GetAssemblies()
               .SelectMany(assembly => assembly.GetTypes())
-              .Where(x => x.GetCustomAttributes(typeof(CustomRepositoryAttribute), false).Length > 0);
+              .Where(x => x.GetCustomAttributes(typeof(CustomRepositoryAttribute), true).Length > 0);
 
             foreach (var repository in repositories)
             {
@@ -29,26 +29,31 @@ namespace FinancialAdvisorTelegramBot.Utils
               .CurrentDomain
               .GetAssemblies()
               .SelectMany(assembly => assembly.GetTypes())
-              .Where(x => x.GetCustomAttributes(typeof(CustomServiceAttribute), false).Length > 0);
+              .Where(x => x.GetCustomAttributes(typeof(CustomServiceAttribute), true).Length > 0);
 
-            foreach (var customService in customServices)
+            foreach (Type? customService in customServices)
             {
-                Type? customServiceInterfaceType = customService.GetInterfaces().First();
-                if (customServiceInterfaceType is null) throw new Exception("Custom service interface not found");
+                if (customService is null) throw new Exception("Custom service not found");
+                Type? customServiceInterfaceType = customService.GetInterfaces().First();                
 
                 CustomServiceAttribute? attribute = Attribute.GetCustomAttribute(customService, typeof(CustomServiceAttribute)) as CustomServiceAttribute;
                 if (attribute is null) throw new Exception("Custom service attribute not found");
 
+                if (attribute is CustomBackgroundServiceAttribute) customServiceInterfaceType = null;
+
                 switch (attribute.LifeTimeType)
                 {
                     case LifeTimeServiceType.Scoped:
-                        services.AddScoped(customServiceInterfaceType, customService);
+                        if (customServiceInterfaceType is null) services.AddScoped(customService);
+                        else services.AddScoped(customServiceInterfaceType, customService);
                         break;
                     case LifeTimeServiceType.Singleton:
-                        services.AddSingleton(customServiceInterfaceType, customService);
+                        if (customServiceInterfaceType is null) services.AddSingleton(customService);
+                        else services.AddSingleton(customServiceInterfaceType, customService);
                         break;
                     case LifeTimeServiceType.Transient:
-                        services.AddTransient(customServiceInterfaceType, customService);
+                        if (customServiceInterfaceType is null) services.AddTransient(customService);
+                        else services.AddTransient(customServiceInterfaceType, customService);
                         break;
                     default:
                         goto case LifeTimeServiceType.Scoped;

@@ -1,12 +1,13 @@
 using FinancialAdvisorTelegramBot.Bot;
 using FinancialAdvisorTelegramBot.Data;
+using FinancialAdvisorTelegramBot.Services.Background;
 using FinancialAdvisorTelegramBot.Utils;
 using Laraue.EfCoreTriggers.PostgreSql.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// database init
+// database
 builder.Services.AddDbContext<AppDbContext>(
     options => options
         .UseNpgsql(builder.Configuration.GetConnectionString("AppDatabaseConnection"))
@@ -14,14 +15,15 @@ builder.Services.AddDbContext<AppDbContext>(
 builder.Services.AddScoped<DbContext>(provider => provider.GetRequiredService<AppDbContext>());
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
-// custom
-builder.Services.AutomaticAddCustomRepositoriesFromAssembly();
-builder.Services.AutomaticAddCustomServicesFromAssembly();
-
 // telegram
 builder.Services.Configure<BotSettings>(builder.Configuration.GetSection("BotSettings"));
 builder.Services.AutomaticAddUpdateListenersFromAssembly();
 builder.Services.AutomaticAddCommandsFromAssembly();
+
+// custom
+builder.Services.AutomaticAddCustomRepositoriesFromAssembly();
+builder.Services.AutomaticAddCustomServicesFromAssembly();
+builder.Services.AddHostedService<BackgroundServicesPool>();
 
 // main services
 builder.Services.AddControllers().AddNewtonsoftJson();

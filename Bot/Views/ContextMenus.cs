@@ -15,5 +15,7 @@
         public static string Category => "Category!";
 
         public static string LimitByCategory => "LimitByCategory!";
+
+        public static string Target => "Target!";
     }
 }
