@@ -1,4 +1,5 @@
 ﻿using FinancialAdvisorTelegramBot.Models.Core;
+using FinancialAdvisorTelegramBot.Models.Operations;
 using FinancialAdvisorTelegramBot.Repositories.Core;
 using FinancialAdvisorTelegramBot.Services.Auxiliary;
 using FinancialAdvisorTelegramBot.Utils.Attributes;
@@ -19,25 +20,17 @@ namespace FinancialAdvisorTelegramBot.Services.Core
             _boundaryUnitsService = boundaryUnitsService;
         }
 
-        public async Task<Transaction> Create(User user, decimal amount, string communicator, int accountId, 
-            int categoryId, DateTime transactionTime, string? details, bool useDbTransaction = true)
+        public async Task<Transaction> Create(User user, decimal amount, string communicator, int accountId, int categoryId, DateTime transactionTime, string? details)
         {
             Transaction transaction;
-            if (useDbTransaction)
-            {
-                using var dbTransaction = await _repository.DatabaseContext.Database.BeginTransactionAsync();
-                transaction = await CreateMethodWithoutDbTransaction(user, amount, communicator, accountId, categoryId, transactionTime, details);
-                await dbTransaction.CommitAsync();
-            }
-            else
-            {
-                transaction = await CreateMethodWithoutDbTransaction(user, amount, communicator, accountId, categoryId, transactionTime, details);
-            }
+            using var dbTransaction = await _repository.DatabaseContext.Database.BeginTransactionAsync();
+            transaction = await CreateWithoutDatabaseTransaction(user, amount, communicator, accountId, categoryId, transactionTime, details);
+            await dbTransaction.CommitAsync();
             return transaction;
         }
 
-        private async Task<Transaction> CreateMethodWithoutDbTransaction(User user, decimal amount, string communicator, 
-            int accountId, int categoryId, DateTime transactionTime, string? details)
+        public async Task<Transaction> CreateWithoutDatabaseTransaction(User user, decimal amount, string communicator, int accountId, int categoryId, 
+            DateTime transactionTime, string? details, IList<Subscription>? subscriptions = null)
         {
             (int index, DateTime groupDateFrom, DateTime groupDateTo) = _transactionGroupService.CalculateGroupIndexForDateByUser(user, transactionTime);
             TransactionGroup group = await _transactionGroupService.GetOtherwiseCreate(accountId, index, groupDateFrom, groupDateTo);
@@ -45,9 +38,9 @@ namespace FinancialAdvisorTelegramBot.Services.Core
 
             var transactionMax = _boundaryUnitsService.GetMaxTransactionAmount(accountId);
             var transactionMin = _boundaryUnitsService.GetMinTransactionAmount(accountId);
-            if (amount > transactionMax || amount < transactionMin) 
+            if (amount > transactionMax || amount < transactionMin)
                 throw new ArgumentException($"Amount in transaction cannot be more than {transactionMax} and less than {transactionMin}");
-            
+
             Transaction transaction = new()
             {
                 Amount = amount,
@@ -56,7 +49,8 @@ namespace FinancialAdvisorTelegramBot.Services.Core
                 AccountId = accountId,
                 CategoryId = categoryId,
                 TransactionTime = transactionTime,
-                Details = details
+                Details = details,
+                Subscriptions = subscriptions
             };
             Transaction created = await _repository.Add(transaction);
             Transaction result = await _repository.GetById(created.Id) ?? throw new InvalidDataException("Transaction was not created");

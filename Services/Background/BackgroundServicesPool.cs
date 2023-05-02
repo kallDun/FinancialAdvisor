@@ -19,6 +19,7 @@ namespace FinancialAdvisorTelegramBot.Services.Background
                 .Where(t => t.GetCustomAttribute<CustomBackgroundServiceAttribute>() != null
                 && t.GetInterfaces().Contains(typeof(IHostedService)));
 
+            _backgroundServices.Clear();
             foreach (Type type in services)
             {
                 var attribute = type.GetCustomAttribute<CustomBackgroundServiceAttribute>();
@@ -37,11 +38,15 @@ namespace FinancialAdvisorTelegramBot.Services.Background
         {
             using (var scope = _serviceProvider.CreateScope())
             {
-                IHostedService? myScopedService = scope.ServiceProvider.GetRequiredService(service) as IHostedService;
-                if (myScopedService is not null)
+                try
                 {
-                    await myScopedService.StartAsync(cancellationToken);
+                    IHostedService? myScopedService = scope.ServiceProvider.GetRequiredService(service) as IHostedService;
+                    if (myScopedService is not null)
+                    {
+                        await myScopedService.StartAsync(cancellationToken);
+                    }
                 }
+                catch (Exception) { /*log*/ }
             }
 
             if (cancellationToken.IsCancellationRequested)

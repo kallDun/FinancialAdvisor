@@ -43,7 +43,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Subscriptions
                 string.Join("\n-------------------------------", subscriptions.Select(subscription =>
                     $"\nName: <code>{subscription.Name}</code>" +
                     $"\nNext payment date: " +
-                    $"<code>{_subscriptionService.GetNextPaymentDate(subscription.PaymentDay, subscription.LastPaymentDate ?? DateTime.Now):dd/MM/yyyy}</code>" +
+                    $"<code>{_subscriptionService.GetNextPaymentDate(subscription):dd/MM/yyyy}</code>" +
                     $"\nAmount: <code>{subscription.Amount}</code>" +
                     $"{(subscription.Account is null ? "" 
                         : $"\nAccount owner: <code>{subscription.Account.Name}</code>")}"

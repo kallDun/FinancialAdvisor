@@ -27,7 +27,7 @@ namespace FinancialAdvisorTelegramBot.Data.Configurations
                 .WithMany(x => x.LimitByCategories)
                 .HasForeignKey(x => x.CategoryId)
                 .IsRequired()
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Property(x => x.Id)
                 .HasColumnName("id")

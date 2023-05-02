@@ -19,7 +19,15 @@ namespace FinancialAdvisorTelegramBot.Repositories.Operations
 
         public DbSet<Subscription> DbSet => _context.Subscriptions;
 
-        
+        public async Task<IList<Subscription>> GetAllWithData()
+        {
+            return await _context.Subscriptions
+                .Include(x => x.Account)
+                .Include(x => x.User).ThenInclude(x => x.TelegramUser)
+                .Include(x => x.Category)
+                .ToListAsync();
+        }
+
         public async Task<Subscription?> GetByName(int userId, string name)
         {
             return await _context.Subscriptions

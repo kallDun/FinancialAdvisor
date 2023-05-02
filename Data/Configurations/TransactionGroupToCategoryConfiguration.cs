@@ -20,8 +20,8 @@ namespace FinancialAdvisorTelegramBot.Data.Configurations
             builder.HasOne(x => x.Category)
                 .WithMany(x => x.TransactionGroupToCategories)
                 .HasForeignKey(x => x.CategoryId)
-                .OnDelete(DeleteBehavior.Cascade);
-
+                .OnDelete(DeleteBehavior.Restrict);
+            
             builder.Property(x => x.TransactionGroupId)
                 .HasColumnName("transaction_group_id")
                 .IsRequired();

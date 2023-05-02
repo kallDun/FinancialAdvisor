@@ -134,8 +134,9 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Transactions
                ?? throw new InvalidDataException("User id cannot be null"))
                ?? throw new InvalidDataException("Profile not found");
             
-            string categoryName = text;
-            CategoryId = (await _categoryService.GetOrOtherwiseCreateCategory(user.UserId.Value, categoryName)).Id;
+            string categoryName = text.Trim();
+            CategoryId = (await _categoryService.GetByName(user.UserId.Value, categoryName) 
+                ?? throw new InvalidDataException($"Cannot find category with name {categoryName}")).Id;
 
             if (!IsIncomeType && await _limitByCategoryService.IsTransactionExceedLimit(profile, categoryName, Amount, TransactionTime))
             {

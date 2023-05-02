@@ -1,4 +1,5 @@
-﻿using FinancialAdvisorTelegramBot.Models.Operations;
+﻿using FinancialAdvisorTelegramBot.Models.Core;
+using FinancialAdvisorTelegramBot.Models.Operations;
 
 namespace FinancialAdvisorTelegramBot.Services.Operations
 {
@@ -10,8 +11,12 @@ namespace FinancialAdvisorTelegramBot.Services.Operations
 
         Task<IList<Subscription>> LoadAllWithAccounts(int userId, string? accountName = null);
 
-        Task<Subscription> Create(int userId, int? accountId, string name, decimal amount, byte paymentDay, bool autoPay);
+        Task<Subscription> Create(int userId, int? accountId, int categoryId, string name, decimal amount, byte paymentDay, bool autoPay);
 
-        DateTime GetNextPaymentDate(byte paymentDay, DateTime lastPaymentDay);
+        DateTime GetNextPaymentDate(Subscription subscription);
+
+        Task<IList<Subscription>> GetAllWithData();
+
+        Task<Transaction> CreateTransaction(Subscription subscription, DateTime transactionTime);
     }
 }

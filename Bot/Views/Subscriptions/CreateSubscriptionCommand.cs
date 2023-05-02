@@ -1,5 +1,6 @@
 ﻿using FinancialAdvisorTelegramBot.Bot.Args;
 using FinancialAdvisorTelegramBot.Bot.Commands;
+using FinancialAdvisorTelegramBot.Models.Core;
 using FinancialAdvisorTelegramBot.Models.Telegram;
 using FinancialAdvisorTelegramBot.Services.Core;
 using FinancialAdvisorTelegramBot.Services.Operations;
@@ -12,7 +13,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Subscriptions
     {
         private enum CreatingSubscriptionStatus
         {
-            AskAccountName, AskName, AskAmount, AskPayday, AskAutoPay, Finished
+            AskAccountName, AskCategory, AskName, AskAmount, AskPayday, AskAutoPay, Finished
         }
 
         public static string TEXT_STYLE => "Create new subscription";
@@ -23,20 +24,23 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Subscriptions
         private readonly IBot _bot;
         private readonly IAccountService _accountService;
         private readonly ISubscriptionService _subscriptionService;
+        private readonly ICategoryService _categoryService;
 
         private CreatingSubscriptionStatus _status => (CreatingSubscriptionStatus)Status;
         [CommandPropertySerializable] public int Status { get; set; }
         [CommandPropertySerializable] public string? AccountName { get; set; }
+        [CommandPropertySerializable] public string? CategoryName { get; set; }
         [CommandPropertySerializable] public string? Name { get; set; }
         [CommandPropertySerializable] public decimal Amount { get; set; }
         [CommandPropertySerializable] public byte Payoutday { get; set; }
         [CommandPropertySerializable] public bool AutoPay { get; set; }
 
-        public CreateSubscriptionCommand(IBot bot, IAccountService accountService, ISubscriptionService subscriptionService)
+        public CreateSubscriptionCommand(IBot bot, IAccountService accountService, ISubscriptionService subscriptionService, ICategoryService categoryService)
         {
             _bot = bot;
             _accountService = accountService;
             _subscriptionService = subscriptionService;
+            _categoryService = categoryService;
         }
 
         public bool CanExecute(UpdateArgs update, TelegramUser user)
@@ -57,6 +61,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Subscriptions
             Task function = _status switch
             {
                 CreatingSubscriptionStatus.AskAccountName => AskAccountName(user, text, contextMenuSplit),
+                CreatingSubscriptionStatus.AskCategory => AskCategory(user, text),
                 CreatingSubscriptionStatus.AskName => AskSubscriptionName(user, text),
                 CreatingSubscriptionStatus.AskAmount => AskAmount(user, text),
                 CreatingSubscriptionStatus.AskPayday => AskPayday(user, text),
@@ -89,14 +94,17 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Subscriptions
                 : (await _accountService.GetByName((int)user.UserId, AccountName)
                 ?? throw new InvalidDataException($"Cannot find account with name {AccountName}"))
                 .Id;
+            int categoryId = (await _categoryService.GetByName(user.UserId.Value, CategoryName 
+                ?? throw new InvalidDataException("Category name cannot be null")) 
+                ?? throw new InvalidDataException($"Cannot find category with name {CategoryName}")).Id;
             if (Name is null) throw new InvalidDataException("Name cannot be null");
 
-            var subscription = await _subscriptionService.Create((int)user.UserId, accountId, Name, Amount, Payoutday, AutoPay);
+            var subscription = await _subscriptionService.Create(user.UserId.Value, accountId, categoryId, Name, Amount, Payoutday, AutoPay);
             await _bot.Write(user, new TextMessageArgs
             {
                 Text = $"{Name} subscription has been created.\n" +
                 $"<code>Next payment day is " +
-                $"{_subscriptionService.GetNextPaymentDate(subscription.PaymentDay, subscription.LastPaymentDate ?? DateTime.Now):dd/MM/yyyy}"
+                $"{_subscriptionService.GetNextPaymentDate(subscription):dd/MM/yyyy}"
                 + $" with {subscription.Amount}</code>"
             });
         }
@@ -105,7 +113,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Subscriptions
         {
             Payoutday = Converters.ToByte(text.Trim());
 
-            if (contextMenuSplit.Length == 1)
+            if (AccountName is null)
             {
                 await ProcessResult(user, text, contextMenuSplit);
                 return;
@@ -146,18 +154,47 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Subscriptions
 
         private async Task AskSubscriptionName(TelegramUser user, string text)
         {
-            if (string.IsNullOrEmpty(AccountName) && text != GeneralCommands.SetEmpty)
-            {
-                string accountName = text.Trim();
-                var account = await _accountService.GetByName(user.UserId
-                    ?? throw new InvalidDataException("User id is null"), accountName);
-                if (account is null) throw new ArgumentNullException("Account not found");
-                AccountName = accountName;
-            }
+            if (user.UserId is null) throw new InvalidDataException("User id cannot be null");
+            string categoryName = text.Trim();
+            if (await _categoryService.GetByName(user.UserId.Value, categoryName) is null)
+                throw new InvalidDataException($"Cannot find category with name {categoryName}");
+            CategoryName = categoryName;
 
             await _bot.Write(user, new TextMessageArgs
             {
                 Text = $"Write subscription name:"
+            });
+        }
+
+        private async Task AskCategory(TelegramUser user, string text)
+        {
+            if (user.UserId is null) throw new InvalidDataException("User id cannot be null");
+
+            if (string.IsNullOrEmpty(AccountName) && text != GeneralCommands.SetEmpty)
+            {
+                string accountName = text.Trim();
+                var account = await _accountService.GetByName(user.UserId.Value, accountName);
+                if (account is null) throw new ArgumentNullException("Account not found");
+                AccountName = accountName;
+            }
+
+            IList<Category> categories = await _categoryService.GetAll(user.UserId.Value);
+            if (categories.Any(x => x.Name == CategoryNames.Subscription) == false)
+            {
+                var subscriptionCategory = await _categoryService.GetOrOtherwiseCreateCategory(user.UserId.Value, CategoryNames.Subscription);
+                categories.Add(subscriptionCategory);
+            }
+
+            await _bot.Write(user, new TextMessageArgs
+            {
+                Text = $"Select category for subscription:",
+                Placeholder = "Select category",
+                MarkupType = ReplyMarkupType.InlineKeyboard,
+                InlineKeyboardButtons = categories.Select(x => new List<InlineButton>()
+                {
+                    new(x.Name ?? "-- Missing name --",
+                        x.Name ?? GeneralCommands.Cancel)
+                }).ToList()
             });
         }
 
@@ -171,7 +208,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Subscriptions
                     Text = $"Subscription will be created in account <code>{AccountName}</code>"
                 });
                 Status++;
-                await AskSubscriptionName(user, text);
+                await AskCategory(user, text);
                 return;
             }
 

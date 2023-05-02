@@ -21,7 +21,13 @@ namespace FinancialAdvisorTelegramBot.Data.Configurations
                 .WithMany(x => x.Subscriptions)
                 .HasForeignKey(x => x.AccountId)
                 .OnDelete(DeleteBehavior.Cascade);
-            
+
+            builder.HasOne(x => x.Category)
+                .WithMany(x => x.Subscriptions)
+                .HasForeignKey(x => x.CategoryId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
+
             builder.HasMany(x => x.Transactions)
                 .WithMany(x => x.Subscriptions)
                 .UsingEntity(entity => entity.ToTable("subscriptions_to_transactions"));
@@ -36,6 +42,10 @@ namespace FinancialAdvisorTelegramBot.Data.Configurations
 
             builder.Property(x => x.AccountId)
                 .HasColumnName("account_id");
+
+            builder.Property(x => x.CategoryId)
+                .HasColumnName("category_id")
+                .IsRequired();
 
             builder.Property(x => x.Name)
                 .HasColumnName("name")

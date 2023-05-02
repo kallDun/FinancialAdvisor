@@ -82,7 +82,7 @@ namespace FinancialAdvisorTelegramBot.Services.Operations
             return await _repository.HasAny(userId, categoryName);
         }
 
-        public async Task<bool> IsTransactionExceedLimit(User user, string categoryName, decimal amount, DateTime date)
+        public async Task<bool> IsTransactionExceedLimit(User user, string categoryName, decimal expensePositiveAmount, DateTime date)
         {
             var (index, dateFrom, dateTo) = _transactionGroupService.CalculateGroupIndexForDateByUser(user, date);
 
@@ -91,7 +91,7 @@ namespace FinancialAdvisorTelegramBot.Services.Operations
             foreach (var limit in limits)
             {
                 var totalExpenseAmount = await _repository.GetTotalExpenseAmount(limit, index);
-                return totalExpenseAmount + amount > limit.ExpenseLimit;
+                return totalExpenseAmount + expensePositiveAmount > limit.ExpenseLimit;
             }
             return false;
         }

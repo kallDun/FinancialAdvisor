@@ -11,7 +11,7 @@ namespace FinancialAdvisorTelegramBot.Services.Operations
 
         Task<decimal> GetTotalExpenseAmountByLimit(User user, LimitByCategory limitByCategory, DateTime date);
 
-        Task<bool> IsTransactionExceedLimit(User user, string categoryName, decimal amount, DateTime date);
+        Task<bool> IsTransactionExceedLimit(User user, string categoryName, decimal expensePositiveAmount, DateTime date);
 
         Task<bool> HasAny(int userId, string categoryName);
 

@@ -63,7 +63,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Categories
 
             await _bot.Write(user, new TextMessageArgs
             {
-                Text = "<b>↓ Available accounts ↓</b>",
+                Text = "<b>↓ Available categories ↓</b>",
                 Placeholder = "Select command",
                 MarkupType = ReplyMarkupType.InlineKeyboard,
                 InlineKeyboardButtons = categories

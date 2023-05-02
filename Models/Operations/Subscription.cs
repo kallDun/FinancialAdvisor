@@ -14,6 +14,10 @@ namespace FinancialAdvisorTelegramBot.Models.Operations
         
         public virtual Account? Account { get; set; }
 
+        public int CategoryId { get; set; }
+
+        public virtual Category? Category { get; set; }
+
         public string? Name { get; set; }
 
         public decimal Amount { get; set; }
@@ -28,8 +32,8 @@ namespace FinancialAdvisorTelegramBot.Models.Operations
 
         public DateTime? LastPaymentDate { get; set; }
 
-        public DateTime? CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; }
 
-        public DateTime UpdatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
     }
 }
