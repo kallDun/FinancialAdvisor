@@ -5,9 +5,9 @@ using FinancialAdvisorTelegramBot.Models.Telegram;
 using FinancialAdvisorTelegramBot.Services.Operations;
 using FinancialAdvisorTelegramBot.Services.Telegram;
 
-namespace FinancialAdvisorTelegramBot.Bot.Views.Target
+namespace FinancialAdvisorTelegramBot.Bot.Views.Targets
 {
-    public class TargetsMenu : ICommand
+    public class TargetsMenuCommand : ICommand
     {
         public static string TEXT_STYLE => "Targets";
         public static string DEFAULT_STYLE => "/targets_menu";
@@ -16,7 +16,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Target
         private readonly ITelegramUserService _telegramUserService;
         private readonly ITargetService _targetService;
 
-        public TargetsMenu(IBot bot, ITelegramUserService telegramUserService, ITargetService targetService)
+        public TargetsMenuCommand(IBot bot, ITelegramUserService telegramUserService, ITargetService targetService)
         {
             _bot = bot;
             _telegramUserService = telegramUserService;
@@ -41,18 +41,19 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Target
             string[] split = user.ContextMenu?.Split('/') ?? throw new InvalidDataException("Missing context menu");
             string accountName = split[1];
 
-            List<string> buttons = await _targetService.HasAny(accountName)
+            List<string> buttons = await _targetService.HasAny(user.UserId.Value, accountName)
                 ? new()
                 {
-                    CreateTargetCommand.TEXT_STYLE
+                    SelectTargetCommand.TEXT_STYLE,
+                    ViewManyTargetsCommand.TEXT_STYLE,
+                    CreateTargetCommand.TEXT_STYLE,
+                    AccountByNameMenuCommand.TEXT_STYLE
                 }
                 : new()
                 {
-                    CreateTargetCommand.TEXT_STYLE
+                    CreateTargetCommand.TEXT_STYLE,
+                    AccountByNameMenuCommand.TEXT_STYLE
                 };
-
-            // add back to previous menu button
-            buttons.Add(AccountByNameMenuCommand.TEXT_STYLE);
 
             await _telegramUserService.SetContextMenu(user, $"{ContextMenus.Account}/{accountName}/{ContextMenus.Target}");
 

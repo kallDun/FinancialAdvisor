@@ -5,6 +5,7 @@ using FinancialAdvisorTelegramBot.Models.Operations;
 using FinancialAdvisorTelegramBot.Models.Telegram;
 using FinancialAdvisorTelegramBot.Services.Core;
 using FinancialAdvisorTelegramBot.Services.Operations;
+using FinancialAdvisorTelegramBot.Utils.Bot;
 
 namespace FinancialAdvisorTelegramBot.Bot.Views.LimitByCategories
 {
@@ -45,7 +46,6 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.LimitByCategories
             if (limits.Count == 0) throw new InvalidDataException("Limits not found");
             DateTime now = DateTime.Now;
             
-            const int totalCharactersCount = 20;
             var limitsPercentage = limits
                 .Select(async limit => (
                     Limit: limit, 
@@ -53,7 +53,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.LimitByCategories
                 .ToDictionary(x => x.Result.Limit, x => (
                     Percent: x.Result.Expense / x.Result.Limit.ExpenseLimit,
                     Characters: (int)Math.Round(((x.Result.Expense > x.Result.Limit.ExpenseLimit ? x.Result.Limit.ExpenseLimit : x.Result.Expense) 
-                        / x.Result.Limit.ExpenseLimit) * totalCharactersCount),
+                        / x.Result.Limit.ExpenseLimit) * BotWriteUtils.MaxPercentageLength),
                     ExpenseLeft: x.Result.Limit.ExpenseLimit - x.Result.Expense));
 
             await _bot.Write(user, new TextMessageArgs
@@ -63,8 +63,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.LimitByCategories
                     $"\nExpense left: <code>{limitsPercentage[limit].ExpenseLeft:0.##}/{limit.ExpenseLimit:0.##}</code>" +
                     $"\nDays left: <code>{_limitByCategoryService.GetDaysLeft(profile, limit, now)}/{limit.GroupCount * profile.DaysInGroup}</code>" +
                     $"{(limit.Account is not null ? $"\nAccount name: <code>{limit.Account.Name}</code>" : "")}" +
-                    $"\n|{string.Join("", Enumerable.Range(0, limitsPercentage[limit].Characters).Select(x => "█"))}" +
-                    $"{string.Join("", Enumerable.Range(0, totalCharactersCount - limitsPercentage[limit].Characters).Select(x => "   "))}|" +
+                    $"\n|{BotWriteUtils.GetPercentageString(limitsPercentage[limit].Characters)}|" +
                     $" <code>{limitsPercentage[limit].Percent * 100:0.##}%</code>"))
             });
         }

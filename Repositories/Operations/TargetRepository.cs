@@ -19,11 +19,12 @@ namespace FinancialAdvisorTelegramBot.Repositories.Operations
 
         public DbSet<TargetSubAccount> DbSet => _context.TargetSubAccounts;
 
-        public async Task<bool> HasAny(string accountName)
+        public async Task<bool> HasAny(int userId, string accountName)
         {
             return await _context.TargetSubAccounts
                 .Include(x => x.Account)
-                .AnyAsync(x => x.Account.Name == accountName);
+                .AnyAsync(x => x.Account.UserId == userId 
+                            && x.Account.Name == accountName);
         }
     }
 }

@@ -7,6 +7,10 @@ namespace FinancialAdvisorTelegramBot.Services.Operations
     {
         Task<TargetSubAccount> Create(Account account, string name, string? description, decimal goalAmount);
 
-        Task<bool> HasAny(string accountName);
+        Task<IList<TargetSubAccount>> GetAll(int userId, string accountName);
+
+        Task<TargetSubAccount> GetByName(int userId, string accountName, string name);
+
+        Task<bool> HasAny(int userId, string accountName);
     }
 }

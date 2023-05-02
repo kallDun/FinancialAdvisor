@@ -8,7 +8,7 @@ using FinancialAdvisorTelegramBot.Services.Operations;
 using FinancialAdvisorTelegramBot.Utils;
 using FinancialAdvisorTelegramBot.Utils.CommandSerializing;
 
-namespace FinancialAdvisorTelegramBot.Bot.Views.Target
+namespace FinancialAdvisorTelegramBot.Bot.Views.Targets
 {
     public class CreateTargetCommand : ICommand
     {
@@ -44,10 +44,9 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Target
             var split = (string.IsNullOrEmpty(user.ContextMenu) ? string.Empty : user.ContextMenu).Split('/');
             return split.Length == 3 && split[0] == ContextMenus.Account && split[2] == ContextMenus.Target
                 && (update.GetTextData() == DEFAULT_STYLE
-                || update.GetTextData() == TEXT_STYLE)
-                && user.UserId is not null;
+                || update.GetTextData() == TEXT_STYLE);
         }
-
+        
         public async Task Execute(UpdateArgs update, TelegramUser user)
         {
             if (user.UserId is null) throw new InvalidDataException("User id cannot be null");

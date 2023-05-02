@@ -20,9 +20,19 @@ namespace FinancialAdvisorTelegramBot.Services.Operations
             throw new NotImplementedException();
         }
 
-        public async Task<bool> HasAny(string accountName)
+        public Task<IList<TargetSubAccount>> GetAll(int userId, string accountName)
         {
-            return await _repository.HasAny(accountName);
+            throw new NotImplementedException();
+        }
+
+        public Task<TargetSubAccount> GetByName(int userId, string accountName, string name)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<bool> HasAny(int userId, string accountName)
+        {
+            return await _repository.HasAny(userId, accountName);
         }
     }
 }
