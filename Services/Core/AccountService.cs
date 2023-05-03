@@ -30,7 +30,6 @@ namespace FinancialAdvisorTelegramBot.Services.Core
                 UserId = user.Id,
                 Name = name,
                 Description = description,
-                CurrentBalance = 0,
                 CreatedAt = DateTime.Now
             };
             Account added = await _repository.Add(entity);
@@ -46,6 +45,26 @@ namespace FinancialAdvisorTelegramBot.Services.Core
             
             await transaction.CommitAsync();
             return account;
+        }
+
+        public async Task<(Transaction From, Transaction To)> Transfer(User user, Account accountFrom, Account accountTo, 
+            decimal amount, int categoryId, DateTime transactionTime, string? details)
+        {
+            if (accountFrom.UserId != user.Id || accountTo.UserId != user.Id) throw new ArgumentException("Accounts do not belong to one user");
+            if (accountFrom.Id == accountTo.Id) throw new ArgumentException("Accounts must be different");
+            if (amount <= 0) throw new ArgumentException("Amount must be positive");
+            if (accountFrom.Name is null || accountTo.Name is null) throw new ArgumentException("Account name cannot be null");
+
+            using var dbTransaction = await _repository.DatabaseContext.Database.BeginTransactionAsync();  
+            
+            Transaction transactionFrom = await _transactionService.CreateWithoutDatabaseTransaction(user, amount * -1,
+                    accountTo.Name, accountFrom.Id, categoryId, transactionTime, $"Transfer to {accountTo.Name}. {details}");
+            Transaction transactionTo = await _transactionService.CreateWithoutDatabaseTransaction(user, amount,
+                    accountFrom.Name, accountTo.Id, categoryId, transactionTime, $"Transfer from {accountFrom.Name}. {details}");
+            
+            await dbTransaction.CommitAsync();
+
+            return (transactionFrom, transactionTo);
         }
 
         public async Task DeleteByName(int userId, string accountName)

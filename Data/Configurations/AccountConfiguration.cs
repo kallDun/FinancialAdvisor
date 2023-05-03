@@ -37,6 +37,13 @@ namespace FinancialAdvisorTelegramBot.Data.Configurations
             builder.Property(x => x.CurrentBalance)
                 .HasColumnName("balance")
                 .HasColumnType("decimal(18,8)")
+                .HasDefaultValue(0)
+                .IsRequired();
+
+            builder.Property(x => x.CreditLimit)
+                .HasColumnName("credit_limit")
+                .HasColumnType("decimal(8,2)")
+                .HasDefaultValue(0)
                 .IsRequired();
 
             builder.Property(x => x.CreatedAt)

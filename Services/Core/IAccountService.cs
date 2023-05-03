@@ -17,5 +17,8 @@ namespace FinancialAdvisorTelegramBot.Services.Core
         Task<Account> Update(Account account);
 
         Task DeleteByName(int userId, string accountName);
+
+        Task<(Transaction From, Transaction To)> Transfer(User user, Account accountFrom, Account accountTo,
+            decimal amount, int categoryId, DateTime transactionTime, string? details);
     }
 }

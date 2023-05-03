@@ -16,6 +16,8 @@ namespace FinancialAdvisorTelegramBot.Models.Core
 
         public decimal CurrentBalance { get; set; }
 
+        public decimal CreditLimit { get; set; }
+
         public DateTime CreatedAt { get; set; }
 
         public DateTime? UpdatedAt { get; set; }

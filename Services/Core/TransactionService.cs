@@ -12,12 +12,15 @@ namespace FinancialAdvisorTelegramBot.Services.Core
         private readonly ITransactionRepository _repository;
         private readonly ITransactionGroupService _transactionGroupService;
         private readonly IBoundaryUnitsService _boundaryUnitsService;
+        private readonly IAccountRepository _accountRepository;
 
-        public TransactionService(ITransactionRepository repository, ITransactionGroupService transactionGroupService, IBoundaryUnitsService boundaryUnitsService)
+        public TransactionService(ITransactionRepository repository, ITransactionGroupService transactionGroupService, 
+            IBoundaryUnitsService boundaryUnitsService, IAccountRepository accountRepository)
         {
             _repository = repository;
             _transactionGroupService = transactionGroupService;
             _boundaryUnitsService = boundaryUnitsService;
+            _accountRepository = accountRepository;
         }
 
         public async Task<Transaction> Create(User user, decimal amount, string communicator, int accountId, int categoryId, DateTime transactionTime, string? details)
@@ -40,6 +43,16 @@ namespace FinancialAdvisorTelegramBot.Services.Core
             var transactionMin = _boundaryUnitsService.GetMinTransactionAmount(accountId);
             if (amount > transactionMax || amount < transactionMin)
                 throw new ArgumentException($"Amount in transaction cannot be more than {transactionMax} and less than {transactionMin}");
+
+            Account account = await _accountRepository.GetById(accountId)
+                    ?? throw new ArgumentException("Account with this id does not exist");
+            if (account.UserId != user.Id) throw new ArgumentException("Account does not belong to this user");
+
+            if (amount < 0)
+            {
+                if (account.CurrentBalance + amount < account.CreditLimit * -1)
+                    throw new ArgumentException("Transaction exceeds the credit limit");
+            }
 
             Transaction transaction = new()
             {
