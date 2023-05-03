@@ -30,7 +30,7 @@ namespace FinancialAdvisorTelegramBot.Data.Configurations
 
             builder.HasMany(x => x.Transactions)
                 .WithMany(x => x.Subscriptions)
-                .UsingEntity(entity => entity.ToTable("subscriptions_to_transactions"));
+                .UsingEntity(entity => entity.ToTable("subscription_to_transactions"));
 
             builder.Property(x => x.Id)
                 .HasColumnName("id")

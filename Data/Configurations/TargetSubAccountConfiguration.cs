@@ -17,6 +17,10 @@ namespace FinancialAdvisorTelegramBot.Data.Configurations
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
 
+            builder.HasMany(x => x.Transactions)
+                .WithMany(x => x.TargetSubAccounts)
+                .UsingEntity(entity => entity.ToTable("target_to_transactions"));
+
             builder.Property(x => x.Id)
                 .HasColumnName("id")
                 .ValueGeneratedOnAdd();

@@ -36,7 +36,8 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Targets
             string targetName = splitContextMenu[3];
 
             TargetSubAccount target = await _targetService.GetByName(user.UserId
-                ?? throw new InvalidDataException("User id cannot be null"), accountName, targetName);
+                ?? throw new InvalidDataException("User id cannot be null"), accountName, targetName)
+                ?? throw new InvalidDataException("Target not found");
 
             int characters = (int)Math.Round((target.CurrentBalance / target.GoalAmount) * BotWriteUtils.MaxPercentageLength);
             decimal percent = (target.CurrentBalance / target.GoalAmount) * 100;

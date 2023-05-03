@@ -18,13 +18,38 @@ namespace FinancialAdvisorTelegramBot.Repositories.Operations
         public DbContext DatabaseContext => _context;
 
         public DbSet<TargetSubAccount> DbSet => _context.TargetSubAccounts;
+        
+
+        public async Task<IList<TargetSubAccount>> GetAll(int userId, string accountName)
+        {
+            return await DbSet
+                .Include(x => x.Account)
+                .Where(x => x.Account.UserId == userId && x.Account.Name == accountName)
+                .ToListAsync();
+        }
+
+        public async Task<TargetSubAccount?> GetByName(int userId, string accountName, string targetName)
+        {
+            return await DbSet
+                .Include(x => x.Account)
+                .FirstOrDefaultAsync(x => x.Account.UserId == userId && x.Account.Name == accountName && x.Name == targetName);
+        }
+
+        public async Task<TargetSubAccount?> GetByName(int accountId, string targetName)
+        {
+            return await DbSet.FirstOrDefaultAsync(x => x.AccountId == accountId && x.Name == targetName);
+        }
 
         public async Task<bool> HasAny(int userId, string accountName)
         {
-            return await _context.TargetSubAccounts
+            return await DbSet
                 .Include(x => x.Account)
-                .AnyAsync(x => x.Account.UserId == userId 
-                            && x.Account.Name == accountName);
+                .AnyAsync(x => x.Account.UserId == userId && x.Account.Name == accountName);
+        }
+
+        public async Task<bool> IsUnique(int accountId, string name)
+        {
+            return await DbSet.AnyAsync(x => x.AccountId == accountId && x.Name == name);
         }
     }
 }

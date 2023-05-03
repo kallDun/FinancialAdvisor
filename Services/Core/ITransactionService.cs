@@ -6,7 +6,8 @@ namespace FinancialAdvisorTelegramBot.Services.Core
     public interface ITransactionService
     {
         Task<Transaction> CreateWithoutDatabaseTransaction(User user, decimal amount, string communicator,
-            int accountId, int categoryId, DateTime transactionTime, string? details, IList<Subscription>? subscriptions = null);
+            int accountId, int categoryId, DateTime transactionTime, string? details, 
+            IList<Subscription>? subscriptions = null, IList<TargetSubAccount>? targetSubAccounts = null);
 
         Task<Transaction> Create(User user, decimal amount, string communicator,
             int accountId, int categoryId, DateTime transactionTime, string? details);

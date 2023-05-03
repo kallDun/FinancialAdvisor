@@ -55,7 +55,8 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Targets
         {
             string name = update.GetTextData().Trim();
             TargetSubAccount target = await _targetService.GetByName(user.UserId
-                ?? throw new InvalidDataException("User id is null"), contextMenuSplit[1], name);
+                ?? throw new InvalidDataException("User id is null"), contextMenuSplit[1], name)
+                ?? throw new ArgumentException($"Target with name {name} not found");
             if (target is null) throw new ArgumentNullException("Category not found");
 
             await _telegramUserService.SetContextMenu(user, $"{ContextMenus.Account}/{contextMenuSplit[1]}/{ContextMenus.Target}/{name}");

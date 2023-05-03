@@ -30,7 +30,7 @@ namespace FinancialAdvisorTelegramBot.Services.Core
         }
 
         public async Task<Transaction> CreateWithoutDatabaseTransaction(User user, decimal amount, string communicator, int accountId, int categoryId, 
-            DateTime transactionTime, string? details, IList<Subscription>? subscriptions = null)
+            DateTime transactionTime, string? details, IList<Subscription>? subscriptions = null, IList<TargetSubAccount>? targetSubAccounts = null)
         {
             (int index, DateTime groupDateFrom, DateTime groupDateTo) = _transactionGroupService.CalculateGroupIndexForDateByUser(user, transactionTime);
             TransactionGroup group = await _transactionGroupService.GetOtherwiseCreate(accountId, index, groupDateFrom, groupDateTo);
@@ -50,7 +50,8 @@ namespace FinancialAdvisorTelegramBot.Services.Core
                 CategoryId = categoryId,
                 TransactionTime = transactionTime,
                 Details = details,
-                Subscriptions = subscriptions
+                Subscriptions = subscriptions,
+                TargetSubAccounts = targetSubAccounts
             };
             Transaction created = await _repository.Add(transaction);
             Transaction result = await _repository.GetById(created.Id) ?? throw new InvalidDataException("Transaction was not created");

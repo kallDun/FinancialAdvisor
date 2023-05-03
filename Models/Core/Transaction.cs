@@ -27,5 +27,7 @@ namespace FinancialAdvisorTelegramBot.Models.Core
         public string? Details { get; set; }
 
         public virtual IList<Subscription>? Subscriptions { get; set; }
+
+        public virtual IList<TargetSubAccount>? TargetSubAccounts { get; set; }
     }
 }
