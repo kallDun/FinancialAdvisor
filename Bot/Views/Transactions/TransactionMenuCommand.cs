@@ -47,6 +47,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Transactions
                 ? new()
                 {
                     CreateTransactionCommand.TEXT_STYLE,
+                    CreateTransferToAccountCommand.TEXT_STYLE,
                     AccountByNameMenuCommand.TEXT_STYLE
                 }
                 : new()

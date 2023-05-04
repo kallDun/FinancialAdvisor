@@ -8,9 +8,9 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Accounts
 {
     public class ViewManyAccountsCommand : ICommand
     {
-        public static string TEXT_STYLE => "View accounts short info";
+        public static string TEXT_STYLE => "View accounts info";
         public static string DEFAULT_STYLE => "/view";
-
+        
         private readonly IBot _bot;
         private readonly IAccountService _accountService;
 

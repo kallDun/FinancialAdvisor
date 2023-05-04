@@ -7,7 +7,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Categories
 {
     public class ViewManyCategoriesCommand : ICommand
     {
-        public static string TEXT_STYLE => "View categories short info";
+        public static string TEXT_STYLE => "View categories info";
         public static string DEFAULT_STYLE => "/view";
 
         private readonly IBot _bot;

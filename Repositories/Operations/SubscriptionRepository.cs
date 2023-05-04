@@ -28,9 +28,14 @@ namespace FinancialAdvisorTelegramBot.Repositories.Operations
                 .ToListAsync();
         }
 
-        public async Task<Subscription?> GetByName(int userId, string name)
+        public async Task<Subscription?> GetByName(int userId, string name, bool loadAllData)
         {
-            return await _context.Subscriptions
+            return loadAllData 
+                ? await _context.Subscriptions.FirstOrDefaultAsync(s => s.UserId == userId && s.Name == name)
+                : await _context.Subscriptions
+                .Include(x => x.Account)
+                .Include(x => x.User)
+                .Include(x => x.Category)
                 .FirstOrDefaultAsync(s => s.UserId == userId && s.Name == name);
         }
 
@@ -48,19 +53,23 @@ namespace FinancialAdvisorTelegramBot.Repositories.Operations
             }
         }
 
-        public async Task<IList<Subscription>> LoadAllWithAccounts(int userId, string? accountName = null)
+        public async Task<IList<Subscription>> LoadAllWithDataByUser(int userId, string? accountName = null)
         {
             if (accountName is null)
             {
                 return await _context.Subscriptions
                     .Where(s => s.UserId == userId)
+                    .Include(x => x.User)
                     .Include(s => s.Account)
+                    .Include(x => x.Category)
                     .ToListAsync();
             }
             else
             {
                 return await _context.Subscriptions
                     .Include(s => s.Account)
+                    .Include(s => s.Account)
+                    .Include(x => x.Category)
                     .Where(s => s.UserId == userId && s.Account != null && s.Account.Name == accountName)
                     .ToListAsync();
             }

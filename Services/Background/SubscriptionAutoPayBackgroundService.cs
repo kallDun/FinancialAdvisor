@@ -32,7 +32,7 @@ namespace FinancialAdvisorTelegramBot.Services.Background
                 string message = "<b>[AutoPay Service]:</b> ";
                 try
                 {
-                    if (_subscriptionService.GetNextPaymentDate(subscription) == DateTime.Now.Date)
+                    if (subscription.NextPaymentDate == DateTime.Now.Date)
                     {
                         flag = true;
                         if (subscription.AutoPay)
@@ -47,7 +47,8 @@ namespace FinancialAdvisorTelegramBot.Services.Background
                                 throw new ArgumentException("Transaction exceeds limit");
                             }
 
-                            Transaction transaction = await _subscriptionService.CreateTransaction(subscription, transactionTime);
+                            Transaction transaction = await _subscriptionService.CreateTransaction(subscription, transactionTime, SubscriptionTransactionType.Default)
+                                ?? throw new InvalidDataException("Transaction was not created");
                             message += transaction.Amount > 0
                                 ? $"Income from subscription <code>{subscription.Name}</code> was received. Amount: <code>{transaction.Amount}</code>"
                                 : $"Subscription <code>{subscription.Name}</code> was paid. Amount: <code>{Math.Abs(transaction.Amount)}</code>";

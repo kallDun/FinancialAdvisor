@@ -1,4 +1,5 @@
-﻿using FinancialAdvisorTelegramBot.Services.Auxiliary;
+﻿using FinancialAdvisorTelegramBot.Models.Core;
+using FinancialAdvisorTelegramBot.Services.Auxiliary;
 using FinancialAdvisorTelegramBot.Utils.Attributes;
 
 namespace FinancialAdvisorTelegramBot.Services.Units
@@ -29,6 +30,11 @@ namespace FinancialAdvisorTelegramBot.Services.Units
         public decimal GetMinSubscriptionAmount(int userId, int? accountId)
         {
             return -100000;
+        }
+
+        public int GetMaxTransactionGroupsAgo(User user)
+        {
+            return 4;
         }
     }
 }

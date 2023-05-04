@@ -103,8 +103,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Subscriptions
             await _bot.Write(user, new TextMessageArgs
             {
                 Text = $"{Name} subscription has been created.\n" +
-                $"<code>Next payment day is " +
-                $"{_subscriptionService.GetNextPaymentDate(subscription):dd/MM/yyyy}"
+                $"<code>Next payment day is {subscription.NextPaymentDate:dd.MM.yyyy}</code>"
                 + $" with {subscription.Amount}</code>"
             });
         }

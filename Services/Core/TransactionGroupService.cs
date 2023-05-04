@@ -1,5 +1,6 @@
 ﻿using FinancialAdvisorTelegramBot.Models.Core;
 using FinancialAdvisorTelegramBot.Repositories.Core;
+using FinancialAdvisorTelegramBot.Services.Auxiliary;
 using FinancialAdvisorTelegramBot.Utils.Attributes;
 
 namespace FinancialAdvisorTelegramBot.Services.Core
@@ -9,14 +10,15 @@ namespace FinancialAdvisorTelegramBot.Services.Core
     {
         private readonly ITransactionGroupRepository _repository;
         private readonly ITransactionGroupToCategoryRepository _groupByCategoryRepository;
+        private readonly IBoundaryUnitsService _boundaryUnitsService;
 
-        public TransactionGroupService(ITransactionGroupRepository repository, ITransactionGroupToCategoryRepository groupByCategoryRepository)
+        public TransactionGroupService(ITransactionGroupRepository repository, ITransactionGroupToCategoryRepository groupByCategoryRepository, IBoundaryUnitsService boundaryUnitsService)
         {
             _repository = repository;
             _groupByCategoryRepository = groupByCategoryRepository;
+            _boundaryUnitsService = boundaryUnitsService;
         }
 
-        
         public async Task<TransactionGroup> Create(int accountId, int index, DateTime dateFrom, DateTime dateTo)
         {
             if (dateTo < dateFrom) throw new ArgumentException("DateTo must be greater than DateFrom");
@@ -30,18 +32,18 @@ namespace FinancialAdvisorTelegramBot.Services.Core
                 DateTo = dateTo,
                 CreatedAt = DateTime.Now
             };
-            if (!(group.CreatedAt > dateFrom && group.CreatedAt < dateTo))
-                throw new ArgumentException("Transaction group must be created at the same time as date range");
 
             var created = await _repository.Add(group);
             return await _repository.GetById(created.Id) ?? 
                 throw new InvalidDataException("Transaction group was not created");
         }
 
-        public async Task<TransactionGroup> GetOtherwiseCreate(int accountId, int index, DateTime dateFrom, DateTime dateTo)
+        public async Task<TransactionGroup> GetOtherwiseCreate(User user, int accountId, int index, DateTime dateFrom, DateTime dateTo)
         {
-            if (!(DateTime.Now > dateFrom && DateTime.Now < dateTo))
-                throw new ArgumentException("Cannot add transaction into previous or future group");
+            int indexNow = CalculateGroupIndexForDateByUser(user, DateTime.Now).Index;
+            if (index > indexNow) throw new ArgumentException("Cannot add transaction into future group");
+            int maxGroupsAgo = _boundaryUnitsService.GetMaxTransactionGroupsAgo(user);
+            if (index < indexNow - maxGroupsAgo) throw new ArgumentException($"Cannot add transaction into more than {maxGroupsAgo} groups ago");
 
             return await _repository.GetByIndex(accountId, index)
                 ?? await Create(accountId, index, dateFrom, dateTo);

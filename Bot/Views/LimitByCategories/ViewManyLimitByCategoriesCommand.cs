@@ -11,7 +11,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.LimitByCategories
 {
     public class ViewManyLimitByCategoriesCommand : ICommand
     {
-        public static string TEXT_STYLE => "View limits short info";
+        public static string TEXT_STYLE => "View limits info";
         public static string DEFAULT_STYLE => "/view";
 
         private readonly IBot _bot;

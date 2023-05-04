@@ -36,7 +36,7 @@ namespace FinancialAdvisorTelegramBot.Services.Core
             DateTime transactionTime, string? details, IList<Subscription>? subscriptions = null, IList<TargetSubAccount>? targetSubAccounts = null)
         {
             (int index, DateTime groupDateFrom, DateTime groupDateTo) = _transactionGroupService.CalculateGroupIndexForDateByUser(user, transactionTime);
-            TransactionGroup group = await _transactionGroupService.GetOtherwiseCreate(accountId, index, groupDateFrom, groupDateTo);
+            TransactionGroup group = await _transactionGroupService.GetOtherwiseCreate(user, accountId, index, groupDateFrom, groupDateTo);
             await _transactionGroupService.CreateTransactionGroupByCategoryIfNotExist(group.Id, categoryId);
 
             var transactionMax = _boundaryUnitsService.GetMaxTransactionAmount(accountId);

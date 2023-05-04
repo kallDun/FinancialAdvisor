@@ -68,7 +68,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Subscriptions
             bool contextMenuWithAccount = contextMenuSplit.Length == 3 && contextMenuSplit[0] == ContextMenus.Account;
             string? accountName = contextMenuWithAccount ? contextMenuSplit[1] : null;
 
-            var subscriptions = await _subscriptionService.LoadAllWithAccounts(user.UserId.Value, accountName);
+            var subscriptions = await _subscriptionService.LoadAllWithDataByUser(user.UserId.Value, accountName);
 
             await _bot.Write(user, new TextMessageArgs
             {

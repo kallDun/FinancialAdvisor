@@ -30,7 +30,7 @@ namespace FinancialAdvisorTelegramBot.Models.Operations
 
         public virtual IList<Transaction>? Transactions { get; set; }
 
-        public DateTime? LastPaymentDate { get; set; }
+        public DateTime NextPaymentDate { get; set; }
 
         public DateTime CreatedAt { get; set; }
 

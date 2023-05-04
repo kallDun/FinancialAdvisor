@@ -8,7 +8,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Subscriptions
 {
     public class ViewManySubscriptionsCommand : ICommand
     {
-        public static string TEXT_STYLE => "View subscriptions short info";
+        public static string TEXT_STYLE => "View subscriptions info";
         public static string DEFAULT_STYLE => "/view";
 
         private readonly IBot _bot;
@@ -34,7 +34,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Subscriptions
             if (user.UserId is null) throw new InvalidDataException("User id cannot be null");
             var split = user.ContextMenu?.Split('/') ?? throw new InvalidDataException("Missing context menu");
 
-            IList<Subscription> subscriptions = await _subscriptionService.LoadAllWithAccounts(user.UserId.Value,
+            IList<Subscription> subscriptions = await _subscriptionService.LoadAllWithDataByUser(user.UserId.Value,
                 split.Length == 3 ? split[1] : null);
 
             await _bot.Write(user, new TextMessageArgs
@@ -42,11 +42,13 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Subscriptions
                 Text = $"<u><b>Subscriptions:</b></u>\n" +
                 string.Join("\n-------------------------------", subscriptions.Select(subscription =>
                     $"\nName: <code>{subscription.Name}</code>" +
-                    $"\nNext payment date: " +
-                    $"<code>{_subscriptionService.GetNextPaymentDate(subscription):dd/MM/yyyy}</code>" +
                     $"\nAmount: <code>{subscription.Amount}</code>" +
-                    $"{(subscription.Account is null ? "" 
-                        : $"\nAccount owner: <code>{subscription.Account.Name}</code>")}"
+                    $"\nNext payment date: <code>{subscription.NextPaymentDate:dd.MM.yyyy}</code>" +
+                    $"\nPayment day: <code>{subscription.PaymentDay}</code>" +
+                    $"\nCategory: <code>{subscription.Category?.Name}</code>" +
+                    $"\nAuto pay function: <code>{(subscription.AutoPay ? "enabled" : "disabled")}</code>" +
+                    $"\nOverdue payments count: <code>{subscription.OverduePaymentNumber}</code>" +
+                    $"{(subscription.Account is null ? "" : $"\nAccount owner: <code>{subscription.Account.Name}</code>")}"
                 ))
             });
         }
