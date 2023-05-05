@@ -1,5 +1,6 @@
 using FinancialAdvisorTelegramBot.Bot;
 using FinancialAdvisorTelegramBot.Data;
+using FinancialAdvisorTelegramBot.Services.Advisor;
 using FinancialAdvisorTelegramBot.Services.Background;
 using FinancialAdvisorTelegramBot.Utils;
 using Laraue.EfCoreTriggers.PostgreSql.Extensions;
@@ -15,8 +16,11 @@ builder.Services.AddDbContext<AppDbContext>(
 builder.Services.AddScoped<DbContext>(provider => provider.GetRequiredService<AppDbContext>());
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
-// telegram
+// settings
 builder.Services.Configure<BotSettings>(builder.Configuration.GetSection("BotSettings"));
+builder.Services.Configure<OpenAiSettings>(builder.Configuration.GetSection("OpenAiSettings"));
+
+// telegram
 builder.Services.AutomaticAddUpdateListenersFromAssembly();
 builder.Services.AutomaticAddCommandsFromAssembly();
 

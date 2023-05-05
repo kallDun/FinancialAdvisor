@@ -4,6 +4,8 @@
     {
         public static string MainMenu => "MainMenu!";
 
+        public static string Advisor => "Advisor!";
+
         public static string Profile => "Profile!";
         
         public static string Account => "Account!";
