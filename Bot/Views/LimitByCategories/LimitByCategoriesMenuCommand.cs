@@ -8,7 +8,7 @@ using FinancialAdvisorTelegramBot.Services.Telegram;
 
 namespace FinancialAdvisorTelegramBot.Bot.Views.LimitByCategories
 {
-    public class LimitByCategoryMenuCommand : ICommand
+    public class LimitByCategoriesMenuCommand : ICommand
     {
         public static string TEXT_STYLE => "Limits";
         public static string DEFAULT_STYLE => "/limits_menu";
@@ -18,7 +18,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.LimitByCategories
         private readonly ICategoryService _categoryService;
         private readonly ILimitByCategoryService _limitByCategoryService;
 
-        public LimitByCategoryMenuCommand(IBot bot, ITelegramUserService telegramUserService, 
+        public LimitByCategoriesMenuCommand(IBot bot, ITelegramUserService telegramUserService, 
             ICategoryService categoryService, ILimitByCategoryService limitByCategoryService)
         {
             _bot = bot;

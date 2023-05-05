@@ -47,7 +47,8 @@ namespace FinancialAdvisorTelegramBot.Services.Background
                                 throw new ArgumentException("Transaction exceeds limit");
                             }
 
-                            Transaction transaction = await _subscriptionService.CreateTransaction(subscription, transactionTime, SubscriptionTransactionType.Default)
+                            Transaction transaction = await _subscriptionService.CreateTransaction(subscription, subscription.Account
+                                ?? throw new InvalidDataException("Account cannot be null"), transactionTime, SubscriptionTransactionType.Default)
                                 ?? throw new InvalidDataException("Transaction was not created");
                             message += transaction.Amount > 0
                                 ? $"Income from subscription <code>{subscription.Name}</code> was received. Amount: <code>{transaction.Amount}</code>"

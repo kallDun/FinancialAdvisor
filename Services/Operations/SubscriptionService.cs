@@ -25,7 +25,7 @@ namespace FinancialAdvisorTelegramBot.Services.Operations
         {
             if (paymentDay < 1 || paymentDay > 31) 
                 throw new ArgumentException("Payment day must be between 1 and 31", nameof(paymentDay));
-            if (await _repository.GetByName(userId, name) is not null) 
+            if (await _repository.GetByName(userId, name, loadAllData: false) is not null) 
                 throw new ArgumentException("Subscription with this name already exists", nameof(name));
             
             var minBoundaryAmount = _boundaryUnitsService.GetMinSubscriptionAmount(userId, accountId);

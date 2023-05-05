@@ -24,13 +24,30 @@ namespace FinancialAdvisorTelegramBot.Repositories.Operations
             return !(await DbSet.AnyAsync(x => x.CategoryId == categoryId && x.ExpenseLimit == limit));
         }
 
-        public async Task<IList<LimitByCategory>> GetByCategoryWithInfo(int userId, string categoryName)
+        public async Task<IList<LimitByCategory>> GetByCategoryWithInfo(int userId, string categoryName, bool withData)
         {
-            return await DbSet
+            return withData
+                ? await DbSet
                 .Include(x => x.Account)
                 .Include(x => x.Category)
                 .Where(x => x.UserId == userId && x.Category.Name == categoryName)
+                .ToListAsync()
+                : await DbSet
+                .Include(x => x.Category)
+                .Where(x => x.UserId == userId && x.Category.Name == categoryName)
                 .ToListAsync();
+        }
+
+        public async Task<LimitByCategory?> GetByCategoryAndExpense(int userId, string categoryName, decimal expense, bool withData)
+        {
+            return withData
+                ? await DbSet
+                .Include(x => x.Account)
+                .Include(x => x.Category)
+                .FirstAsync(x => x.ExpenseLimit == expense && x.UserId == userId && x.Category.Name == categoryName)
+                : await DbSet
+                .Include(x => x.Account)
+                .FirstAsync(x => x.ExpenseLimit == expense && x.UserId == userId && x.Category.Name == categoryName);
         }
 
         public async Task<decimal> GetTotalExpenseAmount(LimitByCategory limitByCategory, int currentGroupIndex)

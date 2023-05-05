@@ -45,7 +45,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Categories
                 ? new()
                 {
                     ViewCategoryCommand.TEXT_STYLE,
-                    LimitByCategoryMenuCommand.TEXT_STYLE,
+                    LimitByCategoriesMenuCommand.TEXT_STYLE,
                     CategoriesMenuCommand.TEXT_STYLE
                 }
                 : new()

@@ -7,7 +7,9 @@ namespace FinancialAdvisorTelegramBot.Services.Operations
     {
         Task<LimitByCategory> Create(User user, string accountName, string categoryName, decimal limit, byte groupCount, DateTime groupDateFrom);
 
-        Task<IList<LimitByCategory>> GetLimitByCategoriesInfo(User user, string categoryName);
+        Task<IList<LimitByCategory>> GetManyLimitByCategories(User user, string categoryName, bool withData);
+        
+        Task<LimitByCategory?> GetLimitByCategory(User user, string categoryName, decimal expense, bool withData);
 
         Task<decimal> GetTotalExpenseAmountByLimit(User user, LimitByCategory limitByCategory, DateTime date);
 

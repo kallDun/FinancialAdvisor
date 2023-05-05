@@ -42,7 +42,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.LimitByCategories
                 ?? throw new InvalidDataException("Missing profile id"))
                 ?? throw new InvalidDataException("Missing profile");
 
-            IList<LimitByCategory> limits = await _limitByCategoryService.GetLimitByCategoriesInfo(profile, name);
+            IList<LimitByCategory> limits = await _limitByCategoryService.GetManyLimitByCategories(profile, name, withData: true);
             if (limits.Count == 0) throw new InvalidDataException("Limits not found");
             DateTime now = DateTime.Now;
             

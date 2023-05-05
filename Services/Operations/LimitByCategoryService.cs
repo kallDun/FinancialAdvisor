@@ -57,15 +57,20 @@ namespace FinancialAdvisorTelegramBot.Services.Operations
                 ?? throw new InvalidDataException("Limit by category was not created");
         }
 
-        public async Task<IList<LimitByCategory>> GetLimitByCategoriesInfo(User user, string categoryName)
+        public async Task<IList<LimitByCategory>> GetManyLimitByCategories(User user, string categoryName, bool withData)
         {
-            return await _repository.GetByCategoryWithInfo(user.Id, categoryName);
+            return await _repository.GetByCategoryWithInfo(user.Id, categoryName, withData);
         }
 
         public async Task<decimal> GetTotalExpenseAmountByLimit(User user, LimitByCategory limitByCategory, DateTime date)
         {
             var (index, dateFrom, dateTo) = _transactionGroupService.CalculateGroupIndexForDateByUser(user, date);
             return await _repository.GetTotalExpenseAmount(limitByCategory, index);
+        }
+
+        public async Task<LimitByCategory?> GetLimitByCategory(User user, string categoryName, decimal expense, bool withData)
+        {
+            return await _repository.GetByCategoryAndExpense(user.Id, categoryName, expense, withData);
         }
 
         public int GetDaysLeft(User user, LimitByCategory limitByCategory, DateTime date)
@@ -86,7 +91,7 @@ namespace FinancialAdvisorTelegramBot.Services.Operations
         {
             var (index, dateFrom, dateTo) = _transactionGroupService.CalculateGroupIndexForDateByUser(user, date);
 
-            IList<LimitByCategory> limits = await _repository.GetByCategoryWithInfo(user.Id, categoryName);
+            IList<LimitByCategory> limits = await _repository.GetByCategoryWithInfo(user.Id, categoryName, true);
 
             foreach (var limit in limits)
             {
