@@ -26,9 +26,10 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Subscriptions
         public bool ShowContextMenuAfterExecution => true;
 
         private CreatingTransactionStatus _status => (CreatingTransactionStatus)Status;
+        private SubscriptionTransactionType _type => (SubscriptionTransactionType)Type;
         [CommandPropertySerializable] public string? AccountName { get; set; }
         [CommandPropertySerializable] public int Status { get; set; }
-        [CommandPropertySerializable] public SubscriptionTransactionType Type { get; set; }
+        [CommandPropertySerializable] public int Type { get; set; }
         [CommandPropertySerializable] public DateTime TransactionTime { get; set; }
 
         private readonly IBot _bot;
@@ -91,11 +92,11 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Subscriptions
                 ?? throw new InvalidDataException("Account name cannot be null")))
                 ?? throw new InvalidDataException("Account not found");
             
-            Transaction? transaction = await _subscriptionService.CreateTransaction(subscription, account, TransactionTime, Type);
+            Transaction? transaction = await _subscriptionService.CreateTransaction(subscription, account, TransactionTime, _type);
 
             await _bot.Write(telegramUser, new TextMessageArgs
             {
-                Text = Type switch
+                Text = _type switch
                 {
                     SubscriptionTransactionType.Default => $"Transaction to account {account.Name} was created successfully." +
                     $"\n<code>Next payment day is {subscription.NextPaymentDate:dd.MM.yyyy}</code> with <code>{subscription.Amount}</code>",
@@ -147,11 +148,12 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Subscriptions
         {
             if (int.TryParse(text, out int type))
             {
-                Type = (SubscriptionTransactionType)type;
+                if (type >= 0 && type <= 2) Type = type;
+                else throw new ArgumentException("Invalid transaction type");
             }
             else throw new ArgumentException("Invalid transaction type");
 
-            if (Type is SubscriptionTransactionType.Delayed)
+            if (_type is SubscriptionTransactionType.Delayed)
             {
                 Status += 2;
                 await ProcessResult(user, ConfirmCommand, splitContextMenu);
@@ -182,9 +184,9 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Subscriptions
                 MarkupType = ReplyMarkupType.InlineKeyboard,
                 InlineKeyboardButtons = new List<List<InlineButton>>()
                 {
-                    new() { new("Expense", $"{(int)SubscriptionTransactionType.Default}") },
-                    new() { new("Expense", $"{(int)SubscriptionTransactionType.Late}") },
-                    new() { new("Expense", $"{(int)SubscriptionTransactionType.Delayed}") }
+                    new() { new($"{SubscriptionTransactionType.Default}", ((int)SubscriptionTransactionType.Default).ToString()) },
+                    new() { new($"{SubscriptionTransactionType.Late}",((int)SubscriptionTransactionType.Late).ToString()) },
+                    new() { new($"{SubscriptionTransactionType.Delayed}", ((int)SubscriptionTransactionType.Delayed).ToString()) }
                 }
             });
         }

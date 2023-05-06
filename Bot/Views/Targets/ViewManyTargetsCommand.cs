@@ -44,7 +44,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Targets
                 Text = $"<u><b>Targets:</b></u>\n" +
                 string.Join("\n-------------------------------", targets.Select(target =>
                     $"\nName: <code>{target.Name}</code>" +
-                    $"\nAmount collected: <code>{target.CurrentBalance}/{target.GoalAmount}</code>" +
+                    $"\nAmount collected: <code>{target.CurrentBalance:0.##}/{target.GoalAmount:0.##}</code>" +
                     $"\n|{BotWriteUtils.GetPercentageString(targetsPercentage[target].Characters)}|" +
                     $" <code>{targetsPercentage[target].Percent:0.##}%</code>"))
             });

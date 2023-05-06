@@ -44,6 +44,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Subscriptions
             List<string> buttons = await _subscriptionService.GetByName(user.UserId.Value, name) is not null
                 ? new()
                 {
+                    ViewSubscriptionCommand.TEXT_STYLE,
                     CreateTransactionForSubscriptionCommand.TEXT_STYLE,
                     SubscriptionsMenuCommand.TEXT_STYLE
                 }

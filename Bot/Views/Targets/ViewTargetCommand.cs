@@ -46,7 +46,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Targets
             {
                 Text = $"<u><b>Target:</b></u>" +
                 $"\nName: <code>{target.Name}</code>" +
-                $"\nAmount collected: <code>{target.CurrentBalance}/{target.GoalAmount}</code>" +
+                $"\nAmount collected: <code>{target.CurrentBalance:0.##}/{target.GoalAmount:0.##}</code>" +
                 $"\n|{BotWriteUtils.GetPercentageString(characters)}|" +
                 $" <code>{percent:0.##}%</code>" +
                 $"\nDescription: <code>{(string.IsNullOrEmpty(target.Description) ? "none" : target.Description)}</code>"

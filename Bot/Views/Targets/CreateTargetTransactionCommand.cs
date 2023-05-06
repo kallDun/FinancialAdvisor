@@ -87,11 +87,12 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Targets
         {
             if (text != ConfirmCommand) throw new ArgumentException("User cancel transaction");
 
-            int accountId = (await _accountService.GetByName(telegramUser.UserId
-                ?? throw new InvalidDataException("User id cannot be null"), splitContextMenu[1])
-                ?? throw new InvalidDataException("Account not found")).Id;
-
+            string accountName = splitContextMenu[1];
             string targetName = splitContextMenu[3];
+
+            int accountId = (await _accountService.GetByName(telegramUser.UserId
+                ?? throw new InvalidDataException("User id cannot be null"), accountName)
+                ?? throw new InvalidDataException("Account not found")).Id;
 
             User user = await _userService.GetById(telegramUser.UserId.Value)
                 ?? throw new InvalidDataException("User not found");
@@ -101,8 +102,9 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Targets
             await _bot.Write(telegramUser, new TextMessageArgs
             {
                 Text = $"Transaction has been created successfully." +
-                $"\n({(IsIncomeType ? "Received" : "Sent")} <code>{Math.Abs(transaction.Amount)}</code> " +
-                $"{(IsIncomeType ? "from" : "to")} target account <code>{targetName}</code>)"
+                $"\n(Sent <code>{Math.Abs(transaction.Amount)}</code> " +
+                $"{(IsIncomeType ? "to" : "from")} target account <code>{targetName}</code> " +
+                $"{(IsIncomeType ? "from" : "to")} account <code>{accountName}</code>)"
             });
         }
 

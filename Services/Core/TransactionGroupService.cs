@@ -22,7 +22,6 @@ namespace FinancialAdvisorTelegramBot.Services.Core
         public async Task<TransactionGroup> Create(int accountId, int index, DateTime dateFrom, DateTime dateTo)
         {
             if (dateTo < dateFrom) throw new ArgumentException("DateTo must be greater than DateFrom");
-            if (index < 0) throw new ArgumentException("Index must be greater than 0");
                         
             TransactionGroup group = new()
             {

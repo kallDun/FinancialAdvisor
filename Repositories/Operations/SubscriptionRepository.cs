@@ -35,13 +35,13 @@ namespace FinancialAdvisorTelegramBot.Repositories.Operations
 
         public async Task<Subscription?> GetByName(int userId, string name, bool loadAllData)
         {
-            return loadAllData 
-                ? await _context.Subscriptions.FirstOrDefaultAsync(s => s.UserId == userId && s.Name == name)
-                : await _context.Subscriptions
+            return loadAllData
+                ? await _context.Subscriptions
                 .Include(x => x.Account)
                 .Include(x => x.User)
                 .Include(x => x.Category)
-                .FirstOrDefaultAsync(s => s.UserId == userId && s.Name == name);
+                .FirstOrDefaultAsync(s => s.UserId == userId && s.Name == name)
+                : await _context.Subscriptions.FirstOrDefaultAsync(s => s.UserId == userId && s.Name == name);
         }
 
         public async Task<bool> HasAny(int userId, string? accountName = null)

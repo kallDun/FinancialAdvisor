@@ -34,7 +34,8 @@ namespace FinancialAdvisorTelegramBot.Services.Operations
                 AccountId = account.Id,
                 Name = name,
                 Description = description,
-                GoalAmount = goalAmount
+                GoalAmount = goalAmount,
+                CreatedAt = DateTime.Now
             };
             var created = await _repository.Add(target);
             return await _repository.GetById(created.Id) 
@@ -52,6 +53,7 @@ namespace FinancialAdvisorTelegramBot.Services.Operations
                 transactionTime, details: $"Payed/received money for target {targetName}", targetSubAccounts: new List<TargetSubAccount> { target });
 
             target.CurrentBalance += positiveAmountForTarget;
+            if (target.CurrentBalance < 0) throw new ArgumentException("Target cannot have negative amount");
             target.UpdatedAt = DateTime.Now;
             await _repository.Update(target);
 

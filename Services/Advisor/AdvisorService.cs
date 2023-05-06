@@ -26,7 +26,8 @@ namespace FinancialAdvisorTelegramBot.Services.Advisor
             await WriteAdviceInBackground(user, async () =>
             {
                 string prompt = $"Hi. My name is {profile.FirstName} {profile.LastName}. My occupation is {profile.Occupation}. " +
-                $"Write me a few simple financial advices so that I can follow them and always had money. 2-3 advices at least.";
+                $"Write me a few simple financial advices so that I can follow them and always had money. 2-3 advices at least. " +
+                $"Create personal advices for my occupation";
                 ChatGptReturnBody? response = await _chatGptService.CreateRequest(prompt);
                 string? advice = response?.Choices.FirstOrDefault()?.Message.Content;
                 if (advice is null) throw new BadHttpRequestException("Bad connection to the openAI server. Try again...");
