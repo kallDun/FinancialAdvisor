@@ -20,12 +20,13 @@ namespace FinancialAdvisorTelegramBot.Services.Core
             return await _repository.GetById(userId);
         }
 
-        public async Task<User> Create(TelegramUser telegramUser, string first_name, string? last_name, string? email)
+        public async Task<User> Create(TelegramUser telegramUser, string first_name, string? last_name, string occupation, string? email)
         {
             var user = new User
             {
                 FirstName = first_name,
                 LastName = last_name,
+                Occupation = occupation,
                 Email = email,
                 TelegramUser = telegramUser,
                 CreatedAt = DateTime.Now,

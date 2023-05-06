@@ -7,7 +7,7 @@ namespace FinancialAdvisorTelegramBot.Services.Core
     {
         Task<User?> GetById(int userId);
 
-        Task<User> Create(TelegramUser telegramUser, string first_name, string? last_name, string? email);
+        Task<User> Create(TelegramUser telegramUser, string first_name, string? last_name, string occupation, string? email);
 
         Task<User> Update(User user);
 

@@ -12,7 +12,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Profiles
     {
         private enum CreatingProfileStatus
         {
-            AskName, AskLastname, AskEmail, Finished
+            AskName, AskLastname, AskOccupation, AskEmail, Finished
         }
 
         public static string TEXT_STYLE => "Update profile";
@@ -21,9 +21,11 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Profiles
 
         [CommandPropertySerializable] public int Status { get; set; }
         [CommandPropertySerializable] public bool SkipName { get; set; }
-        [CommandPropertySerializable] public string Name { get; set; } = "";
+        [CommandPropertySerializable] public string? Name { get; set; }
         [CommandPropertySerializable] public bool SkipSurname { get; set; }
         [CommandPropertySerializable] public string? Surname { get; set; }
+        [CommandPropertySerializable] public bool SkipOccupation { get; set; }
+        [CommandPropertySerializable] public string? Occupation { get; set; }
         [CommandPropertySerializable] public bool SkipEmail { get; set; }
         [CommandPropertySerializable] public string? Email { get; set; }
 
@@ -50,6 +52,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Profiles
             {
                 CreatingProfileStatus.AskName => AskName(user),
                 CreatingProfileStatus.AskLastname => AskLastName(user, text),
+                CreatingProfileStatus.AskOccupation => AskOccupation(user, text),
                 CreatingProfileStatus.AskEmail => AskEmail(user, text),
                 CreatingProfileStatus.Finished => ProcessResult(user, text),
                 _ => throw new NotImplementedException()
@@ -75,7 +78,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Profiles
             }
             SkipEmail = text == GeneralCommands.Skip;
 
-            if (SkipName && SkipSurname && SkipEmail)
+            if (SkipName && SkipSurname && SkipOccupation && SkipEmail)
             {
                 await _bot.Write(user, new TextMessageArgs
                 {
@@ -89,6 +92,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Profiles
 
                 if (!SkipName) profile.FirstName = Name;
                 if (!SkipSurname) profile.LastName = Surname;
+                if (!SkipOccupation) profile.Occupation = Occupation;
                 if (!SkipEmail) profile.Email = Email;
                 await _userService.Update(profile);
 
@@ -101,14 +105,13 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Profiles
 
         private async Task AskEmail(TelegramUser user, string text)
         {
-            if (text != GeneralCommands.SetEmpty
-                && text != GeneralCommands.Skip)
+            if (text != GeneralCommands.Skip)
             {
-                string surname = text.Trim();
-                Validators.ValidateName(surname);
-                Surname = surname;
+                string occupation = text.Trim();
+                Validators.ValidateName(occupation);
+                Occupation = occupation;
             }
-            SkipSurname = text == GeneralCommands.Skip;
+            SkipOccupation = text == GeneralCommands.Skip;
 
             await _bot.Write(user, new TextMessageArgs
             {
@@ -123,6 +126,31 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Profiles
                     new()
                     {
                         new InlineButton("Do not update email", GeneralCommands.Skip)
+                    }
+                }
+            });
+        }
+
+        private async Task AskOccupation(TelegramUser user, string text)
+        {
+            if (text != GeneralCommands.SetEmpty
+                && text != GeneralCommands.Skip)
+            {
+                string surname = text.Trim();
+                Validators.ValidateName(surname);
+                Surname = surname;
+            }
+            SkipSurname = text == GeneralCommands.Skip;
+
+            await _bot.Write(user, new TextMessageArgs
+            {
+                Text = $"Write your new occupation:",
+                MarkupType = ReplyMarkupType.InlineKeyboard,
+                InlineKeyboardButtons = new()
+                {
+                    new()
+                    {
+                        new InlineButton("Do not update occupation", GeneralCommands.Skip)
                     }
                 }
             });

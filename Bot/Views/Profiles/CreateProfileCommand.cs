@@ -12,7 +12,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Profiles
     {
         private enum CreatingProfileStatus
         {
-            AskName, AskLastname, AskEmail, Finished
+            AskName, AskLastname, AskOccupation, AskEmail, Finished
         }
 
         public static string TEXT_STYLE => "Create new profile";
@@ -27,6 +27,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Profiles
         [CommandPropertySerializable] public int Status { get; set; }
         [CommandPropertySerializable] public string? Name { get; set; }
         [CommandPropertySerializable] public string? Surname { get; set; }
+        [CommandPropertySerializable] public string? Occupation { get; set; }
         [CommandPropertySerializable] public string? Email { get; set; }
 
         public CreateProfileCommand(IBot bot, IUserService userService)
@@ -47,6 +48,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Profiles
             {
                 CreatingProfileStatus.AskName => AskName(user),
                 CreatingProfileStatus.AskLastname => AskLastname(user, text),
+                CreatingProfileStatus.AskOccupation => AskOccupation(user, text),
                 CreatingProfileStatus.AskEmail => AskEmail(user, text),
                 CreatingProfileStatus.Finished => ProcessResult(user, text),
                 _ => throw new InvalidDataException("Invalid status")
@@ -68,9 +70,10 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Profiles
                 Validators.ValidateEmail(email);
                 Email = email;
             }
-            if (Name is null) throw new ArgumentException("Name cannot be empty!");
+            if (Name is null) throw new InvalidDataException("Name cannot be empty!");
+            if (Occupation is null) throw new InvalidDataException("Occupation cannot be empty!");
 
-            User profile = await _userService.Create(user, Name, Surname, Email);
+            User profile = await _userService.Create(user, Name, Surname, Occupation, Email);
 
             await _bot.Write(user, new TextMessageArgs
             {
@@ -80,12 +83,10 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Profiles
 
         private async Task AskEmail(TelegramUser user, string text)
         {
-            if (text != GeneralCommands.SetEmpty)
-            {
-                string surname = text.Trim();
-                Validators.ValidateName(surname);
-                Surname = surname;
-            }
+            string occupation = text.Trim();
+            Validators.ValidateName(occupation);
+            Occupation = occupation;
+            
             await _bot.Write(user, new TextMessageArgs
             {
                 Text = $"Write your email:",
@@ -100,11 +101,27 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Profiles
             });
         }
 
+        private async Task AskOccupation(TelegramUser user, string text)
+        {
+            if (text != GeneralCommands.SetEmpty)
+            {
+                string surname = text.Trim();
+                Validators.ValidateName(surname);
+                Surname = surname;
+            }
+
+            await _bot.Write(user, new TextMessageArgs
+            {
+                Text = $"Write your occupation:"
+            });
+        }
+
         private async Task AskLastname(TelegramUser user, string text)
         {
             string name = text.Trim();
             Validators.ValidateName(name);
             Name = name;
+            
             await _bot.Write(user, new TextMessageArgs
             {
                 Text = $"Write your surname:",

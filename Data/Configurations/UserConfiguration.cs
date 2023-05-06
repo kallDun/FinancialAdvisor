@@ -24,6 +24,11 @@ namespace FinancialAdvisorTelegramBot.Data.Configurations
                 .HasColumnName("last_name")
                 .HasMaxLength(50);
 
+            builder.Property(x => x.Occupation)
+                .HasColumnName("occupation")
+                .HasMaxLength(50)
+                .IsRequired();
+
             builder.Property(x => x.Email)
                 .HasColumnName("email")
                 .HasMaxLength(50);

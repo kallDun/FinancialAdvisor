@@ -10,7 +10,7 @@ namespace FinancialAdvisorTelegramBot.Services.Advisor
     [CustomService]
     public class AdvisorService : IAdvisorService
     {
-        private static readonly List<TelegramUser> _servicesActive = new();
+        private static readonly HashSet<int> _servicesActive = new();
 
         private readonly IChatGptService _chatGptService;
         private readonly IBot _bot;
@@ -25,8 +25,8 @@ namespace FinancialAdvisorTelegramBot.Services.Advisor
         {
             await WriteAdviceInBackground(user, async () =>
             {
-                string prompt = $"Hi. My name is {profile.FirstName} {profile.LastName}. Write me a few simple financial advices so that " +
-                $"I can follow them and always had money. 3-4 advices at least.";
+                string prompt = $"Hi. My name is {profile.FirstName} {profile.LastName}. My occupation is {profile.Occupation}. " +
+                $"Write me a few simple financial advices so that I can follow them and always had money. 2-3 advices at least.";
                 ChatGptReturnBody? response = await _chatGptService.CreateRequest(prompt);
                 string? advice = response?.Choices.FirstOrDefault()?.Message.Content;
                 if (advice is null) throw new BadHttpRequestException("Bad connection to the openAI server. Try again...");
@@ -40,15 +40,15 @@ namespace FinancialAdvisorTelegramBot.Services.Advisor
             string message = "<b>[Advisor Service]:</b>\n";
             try
             {
-                if (_servicesActive.Contains(user)) throw new Exception("Cannot run many parallel advices");
-                _servicesActive.Add(user);
+                if (_servicesActive.Contains(user.Id)) throw new Exception("Cannot run many parallel advices");
+                _servicesActive.Add(user.Id);
                 message += await getAdviceAsync();
             }
             catch (Exception e)
             {
                 message += $"Error occurred while processing advice.\n<b>Error:</b> {e.Message}.";
             }
-            _servicesActive.Remove(user);
+            _servicesActive.Remove(user.Id);
             await _bot.Write(user, new TextMessageArgs() { Text = message });
         }
     }

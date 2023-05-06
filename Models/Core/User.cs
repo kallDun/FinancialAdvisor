@@ -11,6 +11,8 @@ namespace FinancialAdvisorTelegramBot.Models.Core
 
         public string? LastName { get; set; }
 
+        public string? Occupation { get; set; }
+
         public string? Email { get; set; }
 
         public int DaysInGroup { get; set; }
