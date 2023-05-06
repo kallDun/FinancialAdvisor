@@ -1,7 +1,6 @@
 ﻿using FinancialAdvisorTelegramBot.Bot;
 using FinancialAdvisorTelegramBot.Bot.Args;
-using FinancialAdvisorTelegramBot.Bot.Views.Subscriptions;
-using FinancialAdvisorTelegramBot.Models.Operations;
+using FinancialAdvisorTelegramBot.Models.Core;
 using FinancialAdvisorTelegramBot.Models.Telegram;
 using FinancialAdvisorTelegramBot.Services.Advisor.RequestBody;
 using FinancialAdvisorTelegramBot.Utils.Attributes;
@@ -22,11 +21,12 @@ namespace FinancialAdvisorTelegramBot.Services.Advisor
             _bot = bot;
         }
 
-        public async void WriteSimpleAdviceInBackground(TelegramUser user)
+        public async void WriteSimpleAdviceInBackground(TelegramUser user, User profile)
         {
             await WriteAdviceInBackground(user, async () =>
             {
-                const string prompt = "Hi. Write me a few simple financial advices so that I can follow them and always had money. 3-4 advices at least.";
+                string prompt = $"Hi. My name is {profile.FirstName} {profile.LastName}. Write me a few simple financial advices so that " +
+                $"I can follow them and always had money. 3-4 advices at least.";
                 ChatGptReturnBody? response = await _chatGptService.CreateRequest(prompt);
                 string? advice = response?.Choices.FirstOrDefault()?.Message.Content;
                 if (advice is null) throw new BadHttpRequestException("Bad connection to the openAI server. Try again...");

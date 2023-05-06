@@ -1,9 +1,10 @@
-﻿using FinancialAdvisorTelegramBot.Models.Telegram;
+﻿using FinancialAdvisorTelegramBot.Models.Core;
+using FinancialAdvisorTelegramBot.Models.Telegram;
 
 namespace FinancialAdvisorTelegramBot.Services.Advisor
 {
     public interface IAdvisorService
     {
-        void WriteSimpleAdviceInBackground(TelegramUser user);
+        void WriteSimpleAdviceInBackground(TelegramUser user, User profile);
     }
 }
