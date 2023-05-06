@@ -1,6 +1,7 @@
 ﻿using FinancialAdvisorTelegramBot.Models.Core;
 using FinancialAdvisorTelegramBot.Models.Operations;
 using FinancialAdvisorTelegramBot.Repositories.Operations;
+using FinancialAdvisorTelegramBot.Services.Auxiliary;
 using FinancialAdvisorTelegramBot.Services.Core;
 using FinancialAdvisorTelegramBot.Utils.Attributes;
 
@@ -11,17 +12,22 @@ namespace FinancialAdvisorTelegramBot.Services.Operations
     {
         private readonly ITargetRepository _repository;
         private readonly ITransactionService _transactionService;
+        private readonly IBoundaryUnitsService _boundaryUnitsService;
 
-        public TargetService(ITargetRepository repository, ITransactionService transactionService)
+        public TargetService(ITargetRepository repository, ITransactionService transactionService, IBoundaryUnitsService boundaryUnitsService)
         {
             _repository = repository;
             _transactionService = transactionService;
+            _boundaryUnitsService = boundaryUnitsService;
         }
 
         public async Task<TargetSubAccount> Create(Account account, string name, string? description, decimal goalAmount)
         {
             if (await _repository.IsUnique(account.Id, name) == false) 
                 throw new ArgumentException($"Target with name {name} already exists");
+
+            if (_boundaryUnitsService.GetMaxTargetsInOneAccount(account.UserId) <= await _repository.Count(account.Id))
+                throw new ArgumentException("You have reached the limit of targets in one account");
 
             var target = new TargetSubAccount
             {

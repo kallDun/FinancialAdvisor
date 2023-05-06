@@ -42,7 +42,7 @@ namespace FinancialAdvisorTelegramBot.Services.Core
         {
             int indexNow = CalculateGroupIndexForDateByUser(user, DateTime.Now).Index;
             if (index > indexNow) throw new ArgumentException("Cannot add transaction into future group");
-            int maxGroupsAgo = _boundaryUnitsService.GetMaxTransactionGroupsAgo(user);
+            int maxGroupsAgo = _boundaryUnitsService.GetMaxTransactionGroupsAgo(user.Id);
             if (index < indexNow - maxGroupsAgo) throw new ArgumentException($"Cannot add transaction into more than {maxGroupsAgo} groups ago");
 
             return await _repository.GetByIndex(accountId, index)

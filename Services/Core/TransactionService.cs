@@ -39,8 +39,8 @@ namespace FinancialAdvisorTelegramBot.Services.Core
             TransactionGroup group = await _transactionGroupService.GetOtherwiseCreate(user, accountId, index, groupDateFrom, groupDateTo);
             await _transactionGroupService.CreateTransactionGroupByCategoryIfNotExist(group.Id, categoryId);
 
-            var transactionMax = _boundaryUnitsService.GetMaxTransactionAmount(accountId);
-            var transactionMin = _boundaryUnitsService.GetMinTransactionAmount(accountId);
+            var transactionMax = _boundaryUnitsService.GetMaxTransactionAmount(user.Id);
+            var transactionMin = _boundaryUnitsService.GetMinTransactionAmount(user.Id);
             if (amount > transactionMax || amount < transactionMin)
                 throw new ArgumentException($"Amount in transaction cannot be more than {transactionMax} and less than {transactionMin}");
 

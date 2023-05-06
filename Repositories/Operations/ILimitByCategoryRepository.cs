@@ -13,5 +13,7 @@ namespace FinancialAdvisorTelegramBot.Repositories.Operations
         Task<decimal> GetTotalExpenseAmount(LimitByCategory limitByCategory, int currentGroupIndex);
 
         Task<bool> IsLimitExpenseUnique(int categoryId, decimal limit);
+        
+        Task<int> Count(int userId, string categoryName);
     }
 }

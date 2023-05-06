@@ -1,5 +1,6 @@
 ﻿using FinancialAdvisorTelegramBot.Models.Core;
 using FinancialAdvisorTelegramBot.Repositories.Core;
+using FinancialAdvisorTelegramBot.Services.Auxiliary;
 using FinancialAdvisorTelegramBot.Utils.Attributes;
 
 namespace FinancialAdvisorTelegramBot.Services.Core
@@ -9,19 +10,23 @@ namespace FinancialAdvisorTelegramBot.Services.Core
     {
         private readonly ICategoryRepository _repository;
         private readonly ITransactionRepository _transactionRepository;
+        private readonly IBoundaryUnitsService _boundaryUnitsService;
 
-
-        public CategoryService(ICategoryRepository repository, ITransactionRepository transactionRepository)
+        public CategoryService(ICategoryRepository repository, ITransactionRepository transactionRepository, IBoundaryUnitsService boundaryUnitsService)
         {
             _repository = repository;
             _transactionRepository = transactionRepository;
+            _boundaryUnitsService = boundaryUnitsService;
         }
 
         public async Task<Category> CreateCategory(int userId, string name, string? description)
         {
             if (!(await _repository.IsCategoryNameUnique(userId, name))) 
                 throw new Exception("Category name is not unique");
-            
+
+            if (_boundaryUnitsService.GetMaxCategoriesInOneUser(userId) <= await _repository.Count(userId))
+                throw new ArgumentException("You have reached the limit of categories");
+
             Category category = new()
             {
                 Name = name,

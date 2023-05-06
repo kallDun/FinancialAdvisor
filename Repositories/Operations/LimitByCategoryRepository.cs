@@ -78,5 +78,13 @@ namespace FinancialAdvisorTelegramBot.Repositories.Operations
                 .Where(x => x.UserId == userId && x.Category.Name == categoryName)
                 .AnyAsync();
         }
+
+        public async Task<int> Count(int userId, string categoryName)
+        {
+            return await DbSet
+                .Include(x => x.Category)
+                .Where(x => x.UserId == userId && x.Category.Name == categoryName)
+                .CountAsync();
+        }
     }
 }

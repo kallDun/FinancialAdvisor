@@ -4,6 +4,8 @@ namespace FinancialAdvisorTelegramBot.Repositories.Operations
 {
     public interface ITargetRepository : IRepository<TargetSubAccount>
     {
+        Task<int> Count(int accountId);
+
         Task<IList<TargetSubAccount>> GetAll(int userId, string accountName);
         
         Task<TargetSubAccount?> GetByName(int userId, string accountName, string targetName);

@@ -18,7 +18,11 @@ namespace FinancialAdvisorTelegramBot.Repositories.Operations
         public DbContext DatabaseContext => _context;
 
         public DbSet<TargetSubAccount> DbSet => _context.TargetSubAccounts;
-        
+
+        public async Task<int> Count(int accountId)
+        {
+            return await DbSet.Where(x => x.AccountId == accountId).CountAsync();
+        }
 
         public async Task<IList<TargetSubAccount>> GetAll(int userId, string accountName)
         {

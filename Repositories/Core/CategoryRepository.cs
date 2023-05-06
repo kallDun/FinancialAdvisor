@@ -19,6 +19,11 @@ namespace FinancialAdvisorTelegramBot.Repositories.Core
 
         public DbSet<Category> DbSet => _context.Categories;
 
+        public async Task<int> Count(int userId)
+        {
+            return await _context.Categories.CountAsync(c => c.UserId == userId);
+        }
+
         public async Task<IList<Category>> GetCategoriesByUser(int userId)
         {
             return await DbSet.Where(x => x.UserId == userId).ToListAsync();

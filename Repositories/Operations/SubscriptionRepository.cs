@@ -19,6 +19,11 @@ namespace FinancialAdvisorTelegramBot.Repositories.Operations
 
         public DbSet<Subscription> DbSet => _context.Subscriptions;
 
+        public async Task<int> Count(int userId)
+        {
+            return await _context.Subscriptions.CountAsync(x => x.UserId == userId);
+        }
+
         public async Task<IList<Subscription>> GetAllWithData()
         {
             return await _context.Subscriptions

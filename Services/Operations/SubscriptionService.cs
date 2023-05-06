@@ -28,11 +28,14 @@ namespace FinancialAdvisorTelegramBot.Services.Operations
             if (await _repository.GetByName(userId, name, loadAllData: false) is not null) 
                 throw new ArgumentException("Subscription with this name already exists", nameof(name));
             
-            var minBoundaryAmount = _boundaryUnitsService.GetMinSubscriptionAmount(userId, accountId);
-            var maxBoundaryAmount = _boundaryUnitsService.GetMaxSubscriptionAmount(userId, accountId);
+            var minBoundaryAmount = _boundaryUnitsService.GetMinTransactionAmount(userId);
+            var maxBoundaryAmount = _boundaryUnitsService.GetMaxTransactionAmount(userId);
             if (amount < minBoundaryAmount || amount > maxBoundaryAmount)
                 throw new ArgumentException($"Subscription amount must be between {minBoundaryAmount} and {maxBoundaryAmount}");
             if (amount == 0) throw new ArgumentException("Subscription cannot be equal to zero", nameof(amount));
+
+            if (_boundaryUnitsService.GetMaxCategoriesInOneUser(userId) <= await _repository.Count(userId))
+                throw new ArgumentException("You have reached the limit of subscriptions");
 
             Subscription entity = new()
             {

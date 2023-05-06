@@ -28,7 +28,7 @@ namespace FinancialAdvisorTelegramBot.Services.Operations
 
         public async Task<LimitByCategory> Create(User user, string accountName, string categoryName, decimal limit, byte groupCount, DateTime groupDateFrom)
         {
-            var expenseLimitMax = _boundaryUnitsService.GetMaxExpenseLimit();
+            var expenseLimitMax = _boundaryUnitsService.GetMaxExpenseLimit(user.Id);
             if (limit < 0 || limit > expenseLimitMax) throw new ArgumentException($"Expense limit icannot be more than {expenseLimitMax} and less than 0");
             if (DateTime.Now < groupDateFrom) throw new ArgumentException("Start limit date cannot be in the future");
 
@@ -39,6 +39,9 @@ namespace FinancialAdvisorTelegramBot.Services.Operations
 
             if (await _repository.IsLimitExpenseUnique(categoryId, limit) == false) 
                 throw new ArgumentException($"Limit with category {categoryName} and amount {limit} already exists");
+
+            if (_boundaryUnitsService.GetMaxLimitsInOneCategory(user.Id) <= await _repository.Count(user.Id, categoryName))
+                throw new ArgumentException($"You have reached the limit of 'limits' in one category");
 
             var (index, dateFrom, dateTo) = _transactionGroupService.CalculateGroupIndexForDateByUser(user, groupDateFrom);
             var limitByCategory = new LimitByCategory()

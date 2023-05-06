@@ -19,9 +19,14 @@ namespace FinancialAdvisorTelegramBot.Repositories.Core
 
         public DbSet<Account> DbSet => _context.Accounts;
 
-        public Task<Account?> GetAccountByName(int userId, string name)
+        public async Task<int> Count(int userId)
         {
-            return _context.Accounts.FirstOrDefaultAsync(a => a.UserId == userId && a.Name == name);
+            return await _context.Accounts.CountAsync(a => a.UserId == userId);
+        }
+
+        public async Task<Account?> GetAccountByName(int userId, string name)
+        {
+            return await _context.Accounts.FirstOrDefaultAsync(a => a.UserId == userId && a.Name == name);
         }
 
         public async Task<IList<Account>> GetAccountsByUserId(int userId)

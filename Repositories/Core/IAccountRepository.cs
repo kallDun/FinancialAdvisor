@@ -11,5 +11,7 @@ namespace FinancialAdvisorTelegramBot.Repositories.Core
         Task<bool> IsAccountNameUnique(int userId, string name);
 
         Task<bool> HasAny(int userId);
+
+        Task<int> Count(int userId);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using FinancialAdvisorTelegramBot.Models.Core;
 using FinancialAdvisorTelegramBot.Repositories.Core;
+using FinancialAdvisorTelegramBot.Services.Auxiliary;
 using FinancialAdvisorTelegramBot.Utils.Attributes;
 
 namespace FinancialAdvisorTelegramBot.Services.Core
@@ -10,21 +11,24 @@ namespace FinancialAdvisorTelegramBot.Services.Core
         private readonly IAccountRepository _repository;
         private readonly ITransactionService _transactionService;
         private readonly ICategoryService _categoryService;
+        private readonly IBoundaryUnitsService _boundaryUnitsService;
 
-        public AccountService(IAccountRepository accountRepository, ITransactionService transactionService, ICategoryService categoryService)
+        public AccountService(IAccountRepository repository, ITransactionService transactionService, ICategoryService categoryService, IBoundaryUnitsService boundaryUnitsService)
         {
-            _repository = accountRepository;
+            _repository = repository;
             _transactionService = transactionService;
             _categoryService = categoryService;
+            _boundaryUnitsService = boundaryUnitsService;
         }
-        
 
         public async Task<Account> Create(User user, string name, string? description, decimal startBalance)
         {
             using var transaction = await _repository.DatabaseContext.Database.BeginTransactionAsync();
 
             if (await GetByName(user.Id, name) is not null) throw new ArgumentException("Account with this name already exists");
-            
+            if (_boundaryUnitsService.GetMaxAccountsInOneUser(user.Id) <= await _repository.Count(user.Id))
+                throw new ArgumentException("You have reached the limit of accounts");
+
             Account entity = new()
             {
                 UserId = user.Id,

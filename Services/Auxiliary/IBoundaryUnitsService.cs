@@ -1,19 +1,21 @@
-﻿using FinancialAdvisorTelegramBot.Models.Core;
-
-namespace FinancialAdvisorTelegramBot.Services.Auxiliary
+﻿namespace FinancialAdvisorTelegramBot.Services.Auxiliary
 {
     public interface IBoundaryUnitsService
     {
-        decimal GetMaxExpenseLimit();
+        decimal GetMaxExpenseLimit(int userId);
 
-        decimal GetMaxTransactionAmount(int accountId);
+        decimal GetMaxTransactionAmount(int userId);
         
-        decimal GetMinTransactionAmount(int accountId);
+        decimal GetMinTransactionAmount(int userId);
 
-        decimal GetMinSubscriptionAmount(int userId, int? accountId);
-        
-        decimal GetMaxSubscriptionAmount(int userId, int? accountId);
+        int GetMaxTransactionGroupsAgo(int userId);
 
-        int GetMaxTransactionGroupsAgo(User user);
+        int GetMaxAccountsInOneUser(int userId);
+
+        int GetMaxCategoriesInOneUser(int userId);
+
+        int GetMaxLimitsInOneCategory(int userId);
+
+        int GetMaxTargetsInOneAccount(int userId);
     }
 }
