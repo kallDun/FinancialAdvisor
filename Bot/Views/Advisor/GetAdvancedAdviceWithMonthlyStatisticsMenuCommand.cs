@@ -7,16 +7,16 @@ using FinancialAdvisorTelegramBot.Services.Core;
 
 namespace FinancialAdvisorTelegramBot.Bot.Views.Advisor
 {
-    public class GetSimpleAdviceMenuCommand : ICommand
+    public class GetAdvancedAdviceWithMonthlyStatisticsMenuCommand : ICommand
     {
-        public static string TEXT_STYLE => "Get simple advice";
-        public static string DEFAULT_STYLE => "/simple";
+        public static string TEXT_STYLE => "Get advanced advice using monthly statistics";
+        public static string DEFAULT_STYLE => "/advanced_weekly";
 
         private readonly IBot _bot;
         private readonly IUserService _userService;
         private readonly IAdvisorService _advisorService;
 
-        public GetSimpleAdviceMenuCommand(IBot bot, IUserService userService, IAdvisorService advisorService)
+        public GetAdvancedAdviceWithMonthlyStatisticsMenuCommand(IBot bot, IUserService userService, IAdvisorService advisorService)
         {
             _bot = bot;
             _userService = userService;
@@ -35,7 +35,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Advisor
                 ?? throw new InvalidDataException("User id is null"))
                 ?? throw new InvalidDataException("User not found");
 
-            _advisorService.WriteSimpleAdvice(user, profile);
+            _advisorService.WriteAdvancedAdviceUsingMonthlyStatistics(user, profile);
 
             await _bot.Write(user, new TextMessageArgs
             {

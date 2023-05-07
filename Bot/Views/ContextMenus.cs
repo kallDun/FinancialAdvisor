@@ -19,5 +19,7 @@
         public static string LimitByCategory => "LimitByCategory!";
 
         public static string Target => "Target!";
+
+        public static string Statistics => "Statistics!";
     }
 }

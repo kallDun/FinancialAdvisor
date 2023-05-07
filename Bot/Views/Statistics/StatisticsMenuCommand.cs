@@ -4,18 +4,18 @@ using FinancialAdvisorTelegramBot.Models.Telegram;
 using FinancialAdvisorTelegramBot.Services.Core;
 using FinancialAdvisorTelegramBot.Services.Telegram;
 
-namespace FinancialAdvisorTelegramBot.Bot.Views.Advisor
+namespace FinancialAdvisorTelegramBot.Bot.Views.Statistics
 {
-    public class AdvisorMenuCommand : ICommand
+    public class StatisticsMenuCommand : ICommand
     {
-        public static string TEXT_STYLE => "Advisor";
-        public static string DEFAULT_STYLE => "/advisor";
-        
+        public static string TEXT_STYLE => "Statistics";
+        public static string DEFAULT_STYLE => "/statistics_menu";
+
         private readonly IBot _bot;
         private readonly ITelegramUserService _telegramUserService;
         private readonly IAccountService _accountService;
 
-        public AdvisorMenuCommand(IBot bot, ITelegramUserService telegramUserService, IAccountService accountService)
+        public StatisticsMenuCommand(IBot bot, ITelegramUserService telegramUserService, IAccountService accountService)
         {
             _bot = bot;
             _telegramUserService = telegramUserService;
@@ -24,7 +24,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Advisor
 
         public bool IsContextMenu(string[] contextMenu)
             => contextMenu.Length == 1
-            && contextMenu[0] == ContextMenus.Advisor;
+            && contextMenu[0] == ContextMenus.Statistics;
 
         public bool CanExecute(UpdateArgs update, TelegramUser user)
             => (update.GetTextData() == DEFAULT_STYLE
@@ -37,22 +37,19 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Advisor
                 ?? throw new ArgumentNullException("User id cannot be null"))
                 ? new()
                 {
-                    GetAdvancedAdviceWithMonthlyStatisticsMenuCommand.TEXT_STYLE,
-                    GetAdvancedAdviceWithWeeklyStatisticsMenuCommand.TEXT_STYLE,
-                    GetSimpleAdviceMenuCommand.TEXT_STYLE,
+                    GroupBundlesStatisticsCommand.TEXT_STYLE,
                     MainMenuCommand.TEXT_STYLE
                 }
                 : new()
                 {
-                    GetSimpleAdviceMenuCommand.TEXT_STYLE,
                     MainMenuCommand.TEXT_STYLE
                 };
 
-            await _telegramUserService.SetContextMenu(user, ContextMenus.Advisor);
+            await _telegramUserService.SetContextMenu(user, ContextMenus.Statistics);
 
             await _bot.Write(user, new TextMessageArgs
             {
-                Text = "<b>↓ Advisor menu ↓</b>",
+                Text = "<b>↓ Statistics menu ↓</b>",
                 Placeholder = "Select command",
                 MarkupType = ReplyMarkupType.ReplyKeyboard,
                 ReplyKeyboardButtons = buttons,

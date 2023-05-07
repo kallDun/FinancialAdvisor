@@ -4,6 +4,7 @@ using FinancialAdvisorTelegramBot.Bot.Views.Accounts;
 using FinancialAdvisorTelegramBot.Bot.Views.Advisor;
 using FinancialAdvisorTelegramBot.Bot.Views.Categories;
 using FinancialAdvisorTelegramBot.Bot.Views.Profiles;
+using FinancialAdvisorTelegramBot.Bot.Views.Statistics;
 using FinancialAdvisorTelegramBot.Bot.Views.Subscriptions;
 using FinancialAdvisorTelegramBot.Models.Telegram;
 using FinancialAdvisorTelegramBot.Services.Core;
@@ -54,6 +55,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views
             {
                 buttons.AddRange(new List<string>()
                 {
+                    StatisticsMenuCommand.TEXT_STYLE,
                     SubscriptionsMenuCommand.TEXT_STYLE
                 });
             }

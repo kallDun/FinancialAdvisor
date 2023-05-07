@@ -24,5 +24,14 @@ namespace FinancialAdvisorTelegramBot.Repositories.Core
             return await _context.TransactionGroups
                 .FirstOrDefaultAsync(group => group.AccountId == accountId && group.Index == index);
         }
+
+        public async Task<IList<TransactionGroup>> GetGroupsBetweenIndexesByUser(int userId, int indexFrom, int indexTo)
+        {
+            return await _context.TransactionGroups
+                .Include(x => x.Account)
+                .Include(x => x.TransactionGroupToCategories).ThenInclude(x => x.Category)
+                .Where(group => group.Account.UserId == userId && group.Index >= indexFrom && group.Index <= indexTo)
+                .ToListAsync();
+        }
     }
 }
