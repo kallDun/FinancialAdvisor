@@ -8,5 +8,6 @@
         public static string SetEmpty => "/set_empty";
         public static string Yes => "/yes";
         public static string No => "/no";
+        public static string Confirm => "/confirm";
     }
 }

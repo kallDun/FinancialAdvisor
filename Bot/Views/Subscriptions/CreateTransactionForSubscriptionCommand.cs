@@ -18,7 +18,6 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Subscriptions
         }
         
         private const string TimeNowCommand = "/now";
-        private const string ConfirmCommand = "/confirm";
 
         public static string TEXT_STYLE => "Create new transaction";
         public static string DEFAULT_STYLE => "/transaction";
@@ -80,7 +79,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Subscriptions
 
         private async Task ProcessResult(TelegramUser telegramUser, string text, string[] splitContextMenu)
         {
-            if (text != ConfirmCommand) throw new ArgumentException("User cancel transaction");
+            if (text != GeneralCommands.Confirm) throw new ArgumentException("User cancel transaction");
 
             string subscriptionName = splitContextMenu.Length == 4 ? splitContextMenu[3] : splitContextMenu[1];
             Subscription subscription = await _subscriptionService.GetByName(telegramUser.UserId
@@ -133,14 +132,14 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Subscriptions
                     MarkupType = ReplyMarkupType.InlineKeyboard,
                     InlineKeyboardButtons = new List<List<InlineButton>>()
                     {
-                        new() { new("Cancel", GeneralCommands.Cancel), new("Confirm", ConfirmCommand) }
+                        new() { new("Cancel", GeneralCommands.Cancel), new("Confirm", GeneralCommands.Confirm) }
                     }
                 });
             }
             else
             {
                 Status++;
-                await ProcessResult(user, ConfirmCommand, splitContextMenu);
+                await ProcessResult(user, GeneralCommands.Confirm, splitContextMenu);
             }
         }
 
@@ -156,7 +155,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Subscriptions
             if (_type is SubscriptionTransactionType.Delayed)
             {
                 Status += 2;
-                await ProcessResult(user, ConfirmCommand, splitContextMenu);
+                await ProcessResult(user, GeneralCommands.Confirm, splitContextMenu);
                 return;
             }
 

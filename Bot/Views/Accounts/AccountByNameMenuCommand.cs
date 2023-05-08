@@ -51,6 +51,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Accounts
                     TransactionMenuCommand.TEXT_STYLE,
                     SubscriptionsMenuCommand.TEXT_STYLE,
                     TargetsMenuCommand.TEXT_STYLE,
+                    DeleteAccountCommand.TEXT_STYLE,
                     AccountsMenuCommand.TEXT_STYLE
                 }
                 : new()

@@ -31,24 +31,23 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Profiles
 
         public async Task Execute(UpdateArgs update, TelegramUser user)
         {
-            const string CONFIRM_COMMAND = "/profile_delete_confirm";
             string text = update.GetTextData();
 
             if (Status == 0)
             {
-                await AskForDelete(user, CONFIRM_COMMAND);
+                await AskForDelete(user);
                 Status++;
             }
             else
             {
-                await ProcessDeletion(user, CONFIRM_COMMAND, text);
+                await ProcessDeletion(user, text);
                 IsFinished = true;
             }
         }
 
-        private async Task ProcessDeletion(TelegramUser user, string CONFIRM_COMMAND, string text)
+        private async Task ProcessDeletion(TelegramUser user, string text)
         {
-            if (text == CONFIRM_COMMAND)
+            if (text == GeneralCommands.Confirm)
             {
                 if (user.UserId is null) throw new InvalidOperationException("User id is null");
                 await _userService.DeleteById((int)user.UserId);
@@ -60,7 +59,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Profiles
             }
         }
 
-        private async Task AskForDelete(TelegramUser user, string CONFIRM_COMMAND)
+        private async Task AskForDelete(TelegramUser user)
         {
             await _bot.Write(user, new TextMessageArgs
             {
@@ -70,7 +69,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Profiles
                     {
                         new()
                         {
-                            new InlineButton("Yes", CONFIRM_COMMAND)
+                            new InlineButton("Yes", GeneralCommands.Confirm)
                         },
                         new()
                         {

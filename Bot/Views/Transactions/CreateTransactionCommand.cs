@@ -19,7 +19,6 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Transactions
         private const string IncomeCommand = "/income";
         private const string ExpenseCommand = "/expense";
         private const string TimeNowCommand = "/now";
-        private const string ConfirmCommand = "/confirm";
 
         public static string TEXT_STYLE => "Create new transaction";
         public static string DEFAULT_STYLE => "/transaction";
@@ -117,7 +116,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Transactions
         
         private async Task AskDetails(TelegramUser user, string text, string[] splitContextMenu)
         {
-            if (text != ConfirmCommand) throw new ArgumentException("User cancel transaction");
+            if (text != GeneralCommands.Confirm) throw new ArgumentException("User cancel transaction");
 
             await _bot.Write(user, new TextMessageArgs
             {
@@ -146,14 +145,14 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Transactions
                     MarkupType = ReplyMarkupType.InlineKeyboard,
                     InlineKeyboardButtons = new List<List<InlineButton>>()
                     {
-                        new() { new("Cancel", GeneralCommands.Cancel), new("Confirm", ConfirmCommand) }
+                        new() { new("Cancel", GeneralCommands.Cancel), new("Confirm", GeneralCommands.Confirm) }
                     }
                 });
             }
             else
             {
                 Status++;
-                await AskDetails(user, ConfirmCommand, splitContextMenu);
+                await AskDetails(user, GeneralCommands.Confirm, splitContextMenu);
             }
         }
 
