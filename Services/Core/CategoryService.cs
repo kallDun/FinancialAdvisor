@@ -39,13 +39,6 @@ namespace FinancialAdvisorTelegramBot.Services.Core
                 ?? throw new Exception("Category was not created");
         }
 
-        public async Task DeleteCategory(Category category)
-        {
-            if (await _transactionRepository.HasAnyTransactionByCategory(category.Id))
-                throw new Exception("Cannot delete category with transactions");
-            await _repository.Delete(category);
-        }
-
         public async Task<Category> UpdateCategory(Category category)
         {
             category.UpdatedAt = DateTime.Now;
@@ -71,6 +64,13 @@ namespace FinancialAdvisorTelegramBot.Services.Core
         public async Task<Category?> GetByName(int userId, string name)
         {
             return await _repository.GetCategoryByName(userId, name);
+        }
+
+        public async Task DeleteByName(int userId, string name)
+        {
+            Category category = await GetByName(userId, name) 
+                ?? throw new ArgumentException("Category not found");
+            await _repository.Delete(category);
         }
     }
 }

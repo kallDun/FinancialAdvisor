@@ -29,9 +29,9 @@ namespace FinancialAdvisorTelegramBot.Services.Operations
         public async Task<LimitByCategory> Create(User user, string accountName, string categoryName, decimal limit, byte groupCount, DateTime groupDateFrom)
         {
             var expenseLimitMax = _boundaryUnitsService.GetMaxExpenseLimit(user.Id);
-            if (limit < 0 || limit > expenseLimitMax) throw new ArgumentException($"Expense limit icannot be more than {expenseLimitMax} and less than 0");
+            if (limit < 0 || limit > expenseLimitMax) throw new ArgumentException($"Expense limit cannot be more than {expenseLimitMax} and less than 0");
             if (DateTime.Now < groupDateFrom) throw new ArgumentException("Start limit date cannot be in the future");
-
+            
             int? accountId = string.IsNullOrEmpty(accountName) ? null : (await _accountService.GetByName(user.Id, accountName) 
                 ?? throw new InvalidDataException($"Account with name {accountName} not found")).Id;
             int categoryId = (await _categoryService.GetByName(user.Id, categoryName))?.Id 

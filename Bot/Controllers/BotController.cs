@@ -30,10 +30,9 @@ namespace FinancialAdvisorTelegramBot.Bot.Controllers
             catch (Exception e)
             {
                 Console.WriteLine($"Something went wrong in user {updateArgs.From.Username}: " + e);
-                await _bot.WriteByChatId(updateArgs.ChatId, new TextMessageArgs
-                {
-                    Text = $"Something went wrong: {e.Message}"
-                });
+                string message = $"<b>Something went wrong:</b> {e.Message}";
+                if (e.InnerException is not null) message += $"\nInner exception: {e.InnerException.Message}";
+                await _bot.WriteByChatId(updateArgs.ChatId, new TextMessageArgs { Text = message });
             }
         }
 

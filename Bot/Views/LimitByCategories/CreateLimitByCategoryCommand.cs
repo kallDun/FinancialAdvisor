@@ -110,6 +110,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.LimitByCategories
         private async Task AskGroupIndexDateFrom(TelegramUser user, string text)
         {
             ExpenseLimit = Converters.ToDecimal(text);
+            if (ExpenseLimit <= 0) throw new ArgumentException("Expense limit must be positive");
 
             DateTime today = DateTime.Today;
             DateTime firstDayOfMonth = new DateTime(today.Year, today.Month, 1);
