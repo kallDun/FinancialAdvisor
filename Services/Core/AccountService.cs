@@ -21,10 +21,12 @@ namespace FinancialAdvisorTelegramBot.Services.Core
             _boundaryUnitsService = boundaryUnitsService;
         }
 
-        public async Task<Account> Create(User user, string name, string? description, decimal startBalance)
+        public async Task<Account> Create(User user, string name, string? description, decimal startBalance, decimal creditLimit)
         {
             using var transaction = await _repository.DatabaseContext.Database.BeginTransactionAsync();
-
+            
+            if (creditLimit < 0 || creditLimit > _boundaryUnitsService.GetMaxTransactionAmount(user.Id)) 
+                throw new ArgumentException("Credit limit cannot be negative or greater than max transaction amount");
             if (await GetByName(user.Id, name) is not null) throw new ArgumentException("Account with this name already exists");
             if (_boundaryUnitsService.GetMaxAccountsInOneUser(user.Id) <= await _repository.Count(user.Id))
                 throw new ArgumentException("You have reached the limit of accounts");
@@ -34,6 +36,7 @@ namespace FinancialAdvisorTelegramBot.Services.Core
                 UserId = user.Id,
                 Name = name,
                 Description = description,
+                CreditLimit = creditLimit,
                 CreatedAt = DateTime.Now
             };
             Account added = await _repository.Add(entity);

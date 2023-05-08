@@ -12,7 +12,7 @@ namespace FinancialAdvisorTelegramBot.Services.Core
 
         Task<Account?> GetByName(int userId, string accountName);
 
-        Task<Account> Create(User user, string name, string? description, decimal startBalance);
+        Task<Account> Create(User user, string name, string? description, decimal startBalance, decimal creditLimit);
 
         Task<Account> Update(Account account);
 

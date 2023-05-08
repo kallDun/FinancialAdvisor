@@ -8,9 +8,9 @@ namespace FinancialAdvisorTelegramBot.Repositories.Telegram
     [CustomRepository]
     public class TelegramUserRepository : ITelegramUserRepository
     {
-        private readonly AppDbContext _context;
+        private readonly TelegramDbContext _context;
 
-        public TelegramUserRepository(AppDbContext context)
+        public TelegramUserRepository(TelegramDbContext context)
         {
             _context = context;
         }

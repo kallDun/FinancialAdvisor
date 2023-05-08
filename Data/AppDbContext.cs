@@ -7,7 +7,6 @@ namespace FinancialAdvisorTelegramBot.Data
 {
     public class AppDbContext : DbContext
     {
-        public DbSet<TelegramUser> TelegramUsers { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Account> Accounts { get; set; }
         public DbSet<Category> Categories { get; set; }
@@ -20,7 +19,6 @@ namespace FinancialAdvisorTelegramBot.Data
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) 
         {
-            //Database.EnsureDeleted();
             Database.EnsureCreated();
         }
         

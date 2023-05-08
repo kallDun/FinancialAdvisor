@@ -12,7 +12,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Accounts
     {
         private enum CreatingAccountStatus
         {
-            AskName, AskDescription, AskCurrentBalance, Finished
+            AskName, AskDescription, AskCurrentBalance, AskCreditLimit, Finished
         }
 
         public static string TEXT_STYLE => "Create new account";
@@ -29,6 +29,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Accounts
         [CommandPropertySerializable] public string? Name { get; set; }
         [CommandPropertySerializable] public string? Description { get; set; }
         [CommandPropertySerializable] public decimal StartBalance { get; set; }
+        [CommandPropertySerializable] public decimal CreditLimit { get; set; }
 
         public CreateAccountCommand(IBot bot, IAccountService accountService, IUserService userService)
         {
@@ -49,6 +50,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Accounts
                 CreatingAccountStatus.AskName => AskName(user),
                 CreatingAccountStatus.AskDescription => AskDescription(user, text),
                 CreatingAccountStatus.AskCurrentBalance => AskCurrentBalance(user, text),
+                CreatingAccountStatus.AskCreditLimit => AskCreditLimit(user, text),
                 CreatingAccountStatus.Finished => ProcessResult(user, text),
                 _ => throw new InvalidDataException("Invalid status")
             };
@@ -63,19 +65,39 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Accounts
 
         private async Task ProcessResult(TelegramUser user, string text)
         {
-            StartBalance = text != GeneralCommands.SetEmpty
+            CreditLimit = text != GeneralCommands.SetEmpty
                 ? Converters.ToDecimal(text.Trim()) : 0;
+            if (CreditLimit < 0) throw new ArgumentException("Credit limit cannot be negative");
 
             if (Name is null) throw new ArgumentNullException("Name cannot be empty");
 
             User profile = await _userService.GetById(user.UserId
                 ?? throw new ArgumentNullException("Profile id cannot be null"))
                 ?? throw new InvalidDataException("Profile cannot be null");
-            Account account = await _accountService.Create(profile, Name, Description, StartBalance);
+            Account account = await _accountService.Create(profile, Name, Description, StartBalance, CreditLimit);
 
             await _bot.Write(user, new TextMessageArgs
             {
                 Text = $"{account.Name} account has been created"
+            });
+        }
+
+        private async Task AskCreditLimit(TelegramUser user, string text)
+        {
+            StartBalance = text != GeneralCommands.SetEmpty
+                ? Converters.ToDecimal(text.Trim()) : 0;
+
+            await _bot.Write(user, new TextMessageArgs
+            {
+                Text = $"Write account credit limit (positive):",
+                MarkupType = ReplyMarkupType.InlineKeyboard,
+                InlineKeyboardButtons = new()
+                {
+                    new()
+                    {
+                        new InlineButton("Set credit limit to 0", GeneralCommands.SetEmpty)
+                    }
+                }
             });
         }
 

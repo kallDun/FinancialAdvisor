@@ -8,12 +8,17 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// database
+// database contexts
 builder.Services.AddDbContext<AppDbContext>(
     options => options
         .UseNpgsql(builder.Configuration.GetConnectionString("AppDatabaseConnection"))
         .UsePostgreSqlTriggers());
 builder.Services.AddScoped<DbContext>(provider => provider.GetRequiredService<AppDbContext>());
+builder.Services.AddDbContext<TelegramDbContext>(
+    options => options
+        .UseNpgsql(builder.Configuration.GetConnectionString("AppDatabaseConnection"))
+        .UsePostgreSqlTriggers());
+builder.Services.AddScoped<DbContext>(provider => provider.GetRequiredService<TelegramDbContext>());
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 // settings
