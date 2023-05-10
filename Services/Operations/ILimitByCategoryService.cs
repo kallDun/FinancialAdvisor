@@ -17,6 +17,8 @@ namespace FinancialAdvisorTelegramBot.Services.Operations
 
         Task<bool> HasAny(int userId, string categoryName);
 
+        Task Delete(int userId, string categoryName, decimal maxExpense);
+
         int GetDaysLeft(User user, LimitByCategory limitByCategory, DateTime date);
     }
 }

@@ -17,5 +17,6 @@ namespace FinancialAdvisorTelegramBot.Services.Operations
 
         Task<Transaction?> CreateTransaction(Subscription subscription, Account account, DateTime transactionTime, SubscriptionTransactionType transactionType);
 
+        Task DeleteByName(int userId, string subscriptionName);
     }
 }

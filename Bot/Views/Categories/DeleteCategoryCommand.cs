@@ -62,7 +62,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Categories
 
                 await _bot.Write(user, new TextMessageArgs
                 {
-                    Text = $"Category {categoryName} has been deleted"
+                    Text = $"Category <code>{categoryName}</code> has been deleted"
                 });
 
                 await _telegramUserService.SetContextMenu(user, ContextMenus.Category);
@@ -73,7 +73,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Categories
         {
             await _bot.Write(user, new TextMessageArgs
             {
-                Text = $"Are you sure you want to delete category {splitContextMenu[1]} with ALL data?",
+                Text = $"Are you sure you want to delete category <code>{splitContextMenu[1]}</code> with ALL data?",
                 MarkupType = ReplyMarkupType.InlineKeyboard,
                 InlineKeyboardButtons = new()
                 {

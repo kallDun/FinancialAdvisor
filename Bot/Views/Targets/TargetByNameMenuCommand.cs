@@ -45,6 +45,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Targets
                 {
                     ViewTargetCommand.TEXT_STYLE,
                     CreateTargetTransactionCommand.TEXT_STYLE,
+                    DeleteTargetCommand.TEXT_STYLE,
                     TargetsMenuCommand.TEXT_STYLE
                 }
                 : new()

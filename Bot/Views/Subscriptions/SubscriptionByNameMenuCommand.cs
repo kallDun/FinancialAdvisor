@@ -46,6 +46,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Subscriptions
                 {
                     ViewSubscriptionCommand.TEXT_STYLE,
                     CreateTransactionForSubscriptionCommand.TEXT_STYLE,
+                    DeleteSubscriptionCommand.TEXT_STYLE,
                     SubscriptionsMenuCommand.TEXT_STYLE
                 }
                 : new()

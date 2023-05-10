@@ -61,6 +61,13 @@ namespace FinancialAdvisorTelegramBot.Services.Operations
             return transaction;
         }
 
+        public async Task DeleteByName(int userId, string accountName, string targetName)
+        {
+            var target = await _repository.GetByName(userId, accountName, targetName)
+                ?? throw new ArgumentException($"Target with name {targetName} not found int account {accountName}");            
+            await _repository.Delete(target);
+        }
+
         public async Task<IList<TargetSubAccount>> GetAll(int userId, string accountName)
         {
             return await _repository.GetAll(userId, accountName);

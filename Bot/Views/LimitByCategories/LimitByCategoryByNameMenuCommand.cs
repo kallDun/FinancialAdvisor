@@ -54,6 +54,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.LimitByCategories
                 ? new()
                 {
                     ViewLimitByCategoryCommand.TEXT_STYLE,
+                    DeleteLimitByCategoryCommand.TEXT_STYLE,
                     LimitByCategoriesMenuCommand.TEXT_STYLE
                 }
                 : new()

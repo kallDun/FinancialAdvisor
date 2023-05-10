@@ -126,5 +126,12 @@ namespace FinancialAdvisorTelegramBot.Services.Operations
             await dbTransaction.CommitAsync();
             return transaction;
         }
+
+        public async Task DeleteByName(int userId, string subscriptionName)
+        {
+            var subscription = await _repository.GetByName(userId, subscriptionName, loadAllData: false);
+            if (subscription is null) throw new ArgumentException("Subscription with this name does not exist", nameof(subscriptionName));
+            await _repository.Delete(subscription);
+        }
     }
 }

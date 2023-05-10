@@ -103,5 +103,12 @@ namespace FinancialAdvisorTelegramBot.Services.Operations
             }
             return false;
         }
+
+        public async Task Delete(int userId, string categoryName, decimal maxExpense)
+        {
+            var limit = await _repository.GetByCategoryAndExpense(userId, categoryName, maxExpense, false);
+            if (limit is null) throw new ArgumentException($"Limit with category {categoryName} and amount {maxExpense} not found");
+            await _repository.Delete(limit);
+        }
     }
 }

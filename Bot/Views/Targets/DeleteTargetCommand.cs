@@ -1,15 +1,15 @@
 ﻿using FinancialAdvisorTelegramBot.Bot.Args;
 using FinancialAdvisorTelegramBot.Bot.Commands;
 using FinancialAdvisorTelegramBot.Models.Telegram;
-using FinancialAdvisorTelegramBot.Services.Core;
+using FinancialAdvisorTelegramBot.Services.Operations;
 using FinancialAdvisorTelegramBot.Services.Telegram;
 using FinancialAdvisorTelegramBot.Utils.CommandSerializing;
 
-namespace FinancialAdvisorTelegramBot.Bot.Views.Accounts
+namespace FinancialAdvisorTelegramBot.Bot.Views.Targets
 {
-    public class DeleteAccountCommand : ICommand
+    public class DeleteTargetCommand : ICommand
     {
-        public static string TEXT_STYLE => "Delete account";
+        public static string TEXT_STYLE => "Delete target";
         public static string DEFAULT_STYLE => "/delete";
         public virtual bool IsFinished { get; private set; } = false;
         public bool ShowContextMenuAfterExecution => true;
@@ -18,28 +18,27 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Accounts
 
         private readonly IBot _bot;
         private readonly ITelegramUserService _telegramUserService;
-        private readonly IAccountService _accountService;
+        private readonly ITargetService _targetService;
 
-        public DeleteAccountCommand(IBot bot, ITelegramUserService telegramUserService, IAccountService accountService)
+        public DeleteTargetCommand(IBot bot, ITelegramUserService telegramUserService, ITargetService targetService)
         {
             _bot = bot;
             _telegramUserService = telegramUserService;
-            _accountService = accountService;
+            _targetService = targetService;
         }
 
         public bool CanExecute(UpdateArgs update, TelegramUser user)
         {
-            var splitContextMenu = user.ContextMenu?.Split('/') ?? throw new InvalidDataException("Missing context menu");
-            return (splitContextMenu.Length == 2 && splitContextMenu[0] == ContextMenus.Account)
-                && (update.GetTextData() == DEFAULT_STYLE || update.GetTextData() == TEXT_STYLE)
-                && user.UserId != null;
+            var split = (string.IsNullOrEmpty(user.ContextMenu) ? string.Empty : user.ContextMenu).Split('/');
+            return split.Length == 4 && split[0] == ContextMenus.Account && split[2] == ContextMenus.Target
+                && (update.GetTextData() == DEFAULT_STYLE
+                || update.GetTextData() == TEXT_STYLE);
         }
 
         public async Task Execute(UpdateArgs update, TelegramUser user)
         {
             string[] splitContextMenu = user.ContextMenu?.Split('/') ?? throw new InvalidDataException("Missing context menu");
             string text = update.GetTextData();
-
             if (Status == 0)
             {
                 await AskForDelete(user, text, splitContextMenu);
@@ -57,15 +56,16 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Accounts
             if (text == GeneralCommands.Confirm)
             {
                 string accountName = splitContextMenu[1];
+                string targetName = splitContextMenu[3];
                 if (user.UserId is null) throw new InvalidOperationException("User id is null");
-                await _accountService.DeleteByName(user.UserId.Value, accountName);
+                await _targetService.DeleteByName(user.UserId.Value, accountName, targetName);
 
                 await _bot.Write(user, new TextMessageArgs
                 {
-                    Text = $"Account <code>{accountName}</code> has been deleted"
+                    Text = $"Target <code>{targetName}</code> in account <code>{accountName}</code> has been deleted"
                 });
 
-                await _telegramUserService.SetContextMenu(user, ContextMenus.Account);
+                await _telegramUserService.SetContextMenu(user, $"{ContextMenus.Account}/{accountName}/{ContextMenus.Target}");
             }
         }
 
@@ -73,7 +73,8 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Accounts
         {
             await _bot.Write(user, new TextMessageArgs
             {
-                Text = $"Are you sure you want to delete account <code>{splitContextMenu[1]}</code> with ALL data?",
+                Text = $"Are you sure you want to delete target <code>{splitContextMenu[3]}</code> " +
+                $"in account <code>{splitContextMenu[1]}</code> with ALL data?",
                 MarkupType = ReplyMarkupType.InlineKeyboard,
                 InlineKeyboardButtons = new()
                 {
