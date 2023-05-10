@@ -14,7 +14,7 @@ namespace FinancialAdvisorTelegramBot.Services.Core
 
         Task<Account> Create(User user, string name, string? description, decimal startBalance, decimal creditLimit);
 
-        Task<Account> Update(Account account);
+        Task<Account> Update(User profile, Account account);
 
         Task DeleteByName(int userId, string accountName);
 

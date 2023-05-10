@@ -101,9 +101,12 @@ namespace FinancialAdvisorTelegramBot.Services.Core
             return await _repository.HasAny(userId);
         }
 
-        public async Task<Account> Update(Account account)
+        public async Task<Account> Update(User profile, Account account)
         {
-            account.UpdatedAt = DateTime.Now;
+            if (account.CreditLimit < 0 || account.CreditLimit > _boundaryUnitsService.GetMaxTransactionAmount(profile.Id))
+                throw new ArgumentException("Credit limit cannot be negative or greater than max transaction amount");
+            if (account.CurrentBalance < 0 && account.CreditLimit < Math.Abs(account.CurrentBalance)) 
+                throw new ArgumentException("Credit limit cannot be more than current balance");
             return await _repository.Update(account);
         }
     }

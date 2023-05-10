@@ -42,8 +42,9 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Accounts
             {
                 Text = $"<u><b>Account:</b></u>" +
                 $"\nName: <code>{account.Name}</code>" +
-                $"\nDescription: <code>{(string.IsNullOrEmpty(account.Description) ? "none" : account.Description)}</code>" +
-                $"\nBalance: <code>{account.CurrentBalance}</code>"
+                $"\nBalance: <code>{account.CurrentBalance}</code>" +
+                $"\nCredit limit: <code>{account.CreditLimit}</code>" +
+                $"\nDescription: <code>{(string.IsNullOrEmpty(account.Description) ? "none" : account.Description)}</code>"
             });
         }
     }

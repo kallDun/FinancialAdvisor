@@ -78,29 +78,22 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Profiles
             }
             SkipEmail = text == GeneralCommands.Skip;
 
-            if (SkipName && SkipSurname && SkipOccupation && SkipEmail)
-            {
-                await _bot.Write(user, new TextMessageArgs
-                {
-                    Text = "You didn't update any field!"
-                });
-            }
-            else
-            {
-                if (user.UserId is null) throw new InvalidOperationException("User id is null!");
-                User profile = await _userService.GetById((int)user.UserId) ?? throw new InvalidOperationException("Cannot find profile!");
+            if (SkipName && SkipSurname && SkipOccupation && SkipEmail) 
+                throw new ArgumentException("You didn't update any field");
 
-                if (!SkipName) profile.FirstName = Name;
-                if (!SkipSurname) profile.LastName = Surname;
-                if (!SkipOccupation) profile.Occupation = Occupation;
-                if (!SkipEmail) profile.Email = Email;
-                await _userService.Update(profile);
+            if (user.UserId is null) throw new InvalidOperationException("User id is null!");
+            User profile = await _userService.GetById((int)user.UserId) ?? throw new InvalidOperationException("Cannot find profile!");
 
-                await _bot.Write(user, new TextMessageArgs
-                {
-                    Text = $"{profile.FirstName}'s profile has been updated"
-                });
-            }
+            if (!SkipName) profile.FirstName = Name;
+            if (!SkipSurname) profile.LastName = Surname;
+            if (!SkipOccupation) profile.Occupation = Occupation;
+            if (!SkipEmail) profile.Email = Email;
+            await _userService.Update(profile);
+
+            await _bot.Write(user, new TextMessageArgs
+            {
+                Text = $"{profile.FirstName}'s profile has been updated"
+            });
         }
 
         private async Task AskEmail(TelegramUser user, string text)
