@@ -101,12 +101,15 @@ namespace FinancialAdvisorTelegramBot.Services.Core
             return await _repository.HasAny(userId);
         }
 
-        public async Task<Account> Update(User profile, Account account)
+        public async Task<Account> Update(User profile, Account account, bool nameUpdated)
         {
             if (account.CreditLimit < 0 || account.CreditLimit > _boundaryUnitsService.GetMaxTransactionAmount(profile.Id))
                 throw new ArgumentException("Credit limit cannot be negative or greater than max transaction amount");
             if (account.CurrentBalance < 0 && account.CreditLimit < Math.Abs(account.CurrentBalance)) 
                 throw new ArgumentException("Credit limit cannot be more than current balance");
+            if (nameUpdated && await GetByName(profile.Id, account.Name
+                ?? throw new InvalidDataException("Account name must be unique")) is not null)
+                throw new ArgumentException("Account with this name already exists");
             return await _repository.Update(account);
         }
     }

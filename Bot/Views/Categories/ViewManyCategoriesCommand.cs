@@ -31,9 +31,9 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Categories
 
             await _bot.Write(user, new TextMessageArgs
             {
-                Text = $"<u><b>Categories:</b></u>\n" +
+                Text = $"<u><b>Categories:</b></u>\n\n" +
                 string.Join("\n", categories.Select((category, index) =>
-                    $"\n{index + 1}. <code>{category.Name}</code>"
+                    $"{index + 1}. <code>{category.Name}</code>"
                 ))
             });
         }

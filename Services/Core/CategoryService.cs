@@ -22,7 +22,7 @@ namespace FinancialAdvisorTelegramBot.Services.Core
         public async Task<Category> CreateCategory(int userId, string name, string? description)
         {
             if (!(await _repository.IsCategoryNameUnique(userId, name))) 
-                throw new Exception("Category name is not unique");
+                throw new Exception("Category name must be unique");
 
             if (_boundaryUnitsService.GetMaxCategoriesInOneUser(userId) <= await _repository.Count(userId))
                 throw new ArgumentException("You have reached the limit of categories");
@@ -37,12 +37,6 @@ namespace FinancialAdvisorTelegramBot.Services.Core
             Category added = await _repository.Add(category);
             return await _repository.GetById(added.Id) 
                 ?? throw new Exception("Category was not created");
-        }
-
-        public async Task<Category> UpdateCategory(Category category)
-        {
-            category.UpdatedAt = DateTime.Now;
-            return await _repository.Update(category);
         }
 
         public async Task<IList<Category>> GetAll(int userId)
@@ -71,6 +65,18 @@ namespace FinancialAdvisorTelegramBot.Services.Core
             Category category = await GetByName(userId, name) 
                 ?? throw new ArgumentException("Category not found");
             await _repository.Delete(category);
+        }
+
+        public async Task<Category> Update(int userId, Category category, bool nameUpdated)
+        {
+            category.UpdatedAt = DateTime.Now;
+            if (nameUpdated)
+            {
+                if (!(await _repository.IsCategoryNameUnique(userId, category.Name
+                    ?? throw new InvalidDataException("Category name cannot be null"))))
+                    throw new Exception("Category name must be unique");
+            }
+            return await _repository.Update(category);
         }
     }
 }

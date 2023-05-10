@@ -92,10 +92,11 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Accounts
             if (SkipName && SkipDescription && SkipCreditLimit) 
                 throw new ArgumentException("You didn't update any field");
 
+            if (!SkipName && accountName == Name) throw new ArgumentException("Name cannot be the same");
             if (!SkipName) account.Name = Name ?? throw new InvalidDataException("Name cannot be null");
             if (!SkipDescription) account.Description = Description;
             if (!SkipCreditLimit) account.CreditLimit = CreditLimit;
-            account = await _accountService.Update(profile, account);
+            account = await _accountService.Update(profile, account, nameUpdated: !SkipName);
 
             if (!SkipName)
             {
@@ -104,7 +105,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Accounts
 
             await _bot.Write(user, new TextMessageArgs
             {
-                Text = $"{account.Name} account has been update"
+                Text = $"Account <code>{account.Name}</code> has been updated"
             });
         }
 
@@ -113,9 +114,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Accounts
             if (text != GeneralCommands.SetEmpty
                 && text != GeneralCommands.Skip)
             {
-                string description = text.Trim();
-                Validators.ValidateName(description);
-                Description = description;
+                Description = text.Trim();
             }
             SkipDescription = text == GeneralCommands.Skip;
 

@@ -105,8 +105,7 @@ namespace FinancialAdvisorTelegramBot.Bot.Views.Accounts
         {
             if (text != GeneralCommands.SetEmpty)
             {
-                string description = text.Trim();
-                Description = description;
+                Description = text.Trim();
             }
             await _bot.Write(user, new TextMessageArgs
             {

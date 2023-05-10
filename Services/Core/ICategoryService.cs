@@ -11,11 +11,11 @@ namespace FinancialAdvisorTelegramBot.Services.Core
         Task<Category?> GetByName(int userId, string name);
 
         Task<Category> CreateCategory(int userId, string name, string? description);
-        
-        Task<Category> UpdateCategory(Category category);
 
         Task DeleteByName(int userId, string name);
 
         Task<Category> GetOrOtherwiseCreateCategory(int userId, string categoryName);
+
+        Task<Category> Update(int userId, Category category, bool nameUpdated);
     }
 }
